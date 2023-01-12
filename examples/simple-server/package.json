@@ -1,0 +1,24 @@
+{
+  "name": "simple-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fastify": "^4.11.0",
+    "fastify-plugin": "^4.5.0",
+    "mongoose": "^6.8.3",
+    "nodemon": "^2.0.20"
+  },
+  "devDependencies": {
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^18.11.18",
+    "@types/pino": "^7.0.5",
+    "typescript": "^4.9.4"
+  }
+}
