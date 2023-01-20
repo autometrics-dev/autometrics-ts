@@ -1,3 +1,5 @@
 
 examples/simple-server/node_modules
 node_modules
+packages/rollup/dist
+packages/vite/dist

@@ -1,15 +1,13 @@
 {
-  "name": "autometrics-ts",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "tsup": "^6.5.0"
-  }
+    "private": true,
+    "type": "module",
+    "name": "autometrics",
+    "workspaces": [
+        "packages/core",
+        "packages/playground"
+    ],
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {}
 }
