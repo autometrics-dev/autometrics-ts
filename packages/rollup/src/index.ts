@@ -1,9 +1,9 @@
 import { Plugin } from "rollup";
 import ts from "typescript";
 import {
-	autometricsHeader,
-	autometricsInit,
-	autometricsReturn,
+	createAutometricsHeader,
+	createAutometricsInit,
+	createAutometricsReturn,
 } from "./instrumentation";
 
 function parse(fileName: string, code: string): ts.SourceFile {
@@ -16,13 +16,12 @@ export default function autometrics(): Plugin {
 		transform: {
 			order: "pre",
 			handler(src: string, filename: string) {
-
 				let newSrc = src;
 				if (filename.endsWith(".ts")) {
-
-					const result = ts.transform<ts.SourceFile>(parse(filename, src), [
-						transformer,
-					]);
+					const result = ts.transform<ts.SourceFile>(
+						parse(filename, src),
+						[transformer]
+					);
 
 					const newAst: ts.SourceFile = result.transformed[0];
 					const printer: ts.Printer = ts.createPrinter();
@@ -44,7 +43,7 @@ export default function autometrics(): Plugin {
 					code: newSrc,
 					map: { mappings: "" },
 				};
-			}
+			},
 		},
 	};
 }
@@ -75,8 +74,9 @@ const transformer: ts.TransformerFactory<ts.SourceFile> = () => {
 		const functionsInstrumentedSrc = <ts.SourceFile>(
 			ts.transform(sourceFile, [functionTransformer]).transformed[0]
 		);
+
 		const finalSrc = [
-			autometricsHeader().statements,
+			<ts.Statement[]>createAutometricsHeader(8081), // FIXME: prometheus port is hardcoded here
 			functionsInstrumentedSrc.statements,
 		].flat();
 
@@ -85,80 +85,95 @@ const transformer: ts.TransformerFactory<ts.SourceFile> = () => {
 };
 
 const functionTransformer = <T extends ts.Node>(ctx: ts.TransformationContext) =>
-	(root: T) => {
-		function visit(node: ts.Node): ts.Node {
-			node = ts.visitEachChild(node, visit, ctx);
+		(root: T) => {
+			function visit(node: ts.Node): ts.Node {
+				node = ts.visitEachChild(node, visit, ctx);
 
-			if (ts.isFunctionDeclaration(node)) {
-				const autometricsTag = ts
-					.getJSDocTags(node)
-					.find((tag) => {
-						if (tag.getText().trimEnd() == "@autometrics") {
-							return true;
-						}
-					})
-					?.getText()
-					.trimEnd();
-				if (autometricsTag != undefined) {
-					return addAutometrics(<ts.FunctionDeclaration>node);
+				if (ts.isFunctionLike(node)) {
+					const autometricsTag = ts
+						.getJSDocTags(node)
+						.find((tag) => {
+							if (tag.getText().trimEnd() == "@autometrics") {
+								return true;
+							}
+						})
+						?.getText()
+						.trimEnd();
+					if (autometricsTag != undefined) {
+						return addAutometrics(<ts.FunctionDeclaration>node, ctx);
+					}
 				}
-			}
 
-			return node;
-		}
-		return ts.visitNode(root, visit);
-	};
+				return node;
+			}
+			return ts.visitNode(root, visit);
+		};
 
 function addAutometrics(
-	function_node: ts.FunctionDeclaration
+	functionNode: ts.FunctionDeclaration,
+	ctx: ts.TransformationContext
 ): ts.FunctionDeclaration {
-	if (function_node.body == undefined) {
-		throw new Error("No function body");
+	const functionIdentifier = functionNode.name?.escapedText as string;
+
+	if (functionIdentifier == undefined) {
+		throw new Error("Autometrics needs a named function to instrument");
 	}
 
-	// TODO: the code below assumes that
-	// 1. Function has a return statement
-	// 2. Function has only 1 return statement
-
-	const returnStatement =
-		function_node.body.statements.find((st) => isReturnStatement(st));
-	const returnStatementIdx = function_node.body.statements.findIndex((st) =>
-		isReturnStatement(st)
-	);
-	const restOfBody = function_node.body.statements.slice(
-		0,
-		returnStatementIdx
-	);
-
-	const nodeArr = [
-		autometricsInit().statements,
-		restOfBody,
-		autometricsReturn(function_node.name?.getText() ?? "unnamed")
-			.statements,
-		returnStatement,
-	].flat();
-
-	const newBlock = ts.factory.createBlock(
-		ts.factory.createNodeArray(nodeArr, false),
-		true
-	);
-
-	return ts.factory.updateFunctionDeclaration(
-		function_node,
-		function_node.modifiers,
-		function_node.asteriskToken,
-		function_node.name,
-		function_node.typeParameters,
-		function_node.parameters,
-		function_node.type,
-		newBlock
-	);
-}
-
-function isReturnStatement(statement: ts.Statement): boolean {
-	if (statement.kind == ts.SyntaxKind.ReturnStatement) {
-		return true;
-	} else {
-		return false;
+	if (functionNode.body == undefined) {
+		throw new Error("Autometrics needs a function body to instrument");
 	}
+
+	functionNode = <ts.FunctionDeclaration>(
+		handleInitStatements(functionNode, ctx)
+	);
+	functionNode = <ts.FunctionDeclaration>(
+		handleReturnStatements(functionNode, ctx, functionIdentifier)
+	);
+
+	return functionNode
 }
+
+function handleInitStatements(
+	node: ts.Node,
+	ctx: ts.TransformationContext
+): ts.Node {
+	console.log("got to the init statement")
+	const visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
+		if (ts.isBlock(node)) {
+
+			const autometricsInit = ts.factory.createNodeArray(<ts.Statement[]>createAutometricsInit());
+
+			return ts.factory.updateBlock(node,
+				ts.factory.createNodeArray(
+					[autometricsInit, node.statements].flat(),
+					false
+				)
+			);
+		}
+		return ts.visitEachChild(node, visitor, ctx);
+	};
+
+	return ts.visitNode(node, visitor);
+}
+
+function handleReturnStatements(
+	node: ts.Node,
+	ctx: ts.TransformationContext,
+	functionIdentifier: string
+): ts.Node {
+	console.log("got here too")
+	const visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
+		if (ts.isReturnStatement(node)) {
+			const autometricsReturn =
+				createAutometricsReturn(functionIdentifier);
+			autometricsReturn.push(node);
+
+			return autometricsReturn;
+		}
+
+		return ts.visitEachChild(node, visitor, ctx);
+	};
+
+	return ts.visitNode(node, visitor);
+}
+

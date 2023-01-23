@@ -1,0 +1,16 @@
+{
+	"name": "autometrics-docs",
+	"version": "1.0.0",
+	"description": "",
+	"main": "dist/index",
+	"scripts": {
+		"dev": "tsc --watch",
+		"build": "tsc"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"typescript": "^4.9.4"
+	}
+}

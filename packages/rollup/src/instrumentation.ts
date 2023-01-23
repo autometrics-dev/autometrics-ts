@@ -1,57 +1,215 @@
-import ts from "typescript";
+import ts, { factory } from "typescript";
 
-export function autometricsHeader(): ts.SourceFile {
+/**
+* Creates nodes for necessary Open Telemetry imports and meter, exporter instantiations
+*
+* @param port {number} - which port should exporter be available on
+*/
+export function createAutometricsHeader(port: number): ts.Node[] {
+	return [
+		factory.createImportDeclaration(
+			undefined,
+			factory.createImportClause(
+				false,
+				undefined,
+				factory.createNamedImports([factory.createImportSpecifier(
+					false,
+					undefined,
+					factory.createIdentifier("PrometheusExporter")
+				)])
+			),
+			factory.createStringLiteral("@opentelemetry/exporter-prometheus"),
+			undefined
+		),
+		factory.createImportDeclaration(
+			undefined,
+			factory.createImportClause(
+				false,
+				undefined,
+				factory.createNamedImports([factory.createImportSpecifier(
+					false,
+					undefined,
+					factory.createIdentifier("MeterProvider")
+				)])
+			),
+			factory.createStringLiteral("@opentelemetry/sdk-metrics"),
+			undefined
+		),
+		factory.createVariableDeclarationList(
+			[factory.createVariableDeclaration(
+				factory.createIdentifier("exporter"),
+				undefined,
+				undefined,
+				factory.createNewExpression(
+					factory.createIdentifier("PrometheusExporter"),
+					undefined,
+					[factory.createObjectLiteralExpression(
+						[
+							factory.createPropertyAssignment(
+								factory.createIdentifier("port"),
+								factory.createNumericLiteral(port.toString())
+							),
+						],
+						false
+					)]
+				)
+			)],
+			ts.NodeFlags.Const
+		),
+		factory.createVariableDeclarationList(
+			[factory.createVariableDeclaration(
+				factory.createIdentifier("meterProvider"),
+				undefined,
+				undefined,
+				factory.createNewExpression(
+					factory.createIdentifier("MeterProvider"),
+					undefined,
+					[]
+				)
+			)],
+			ts.NodeFlags.Const
+		),
+		factory.createExpressionStatement(factory.createCallExpression(
+			factory.createPropertyAccessExpression(
+				factory.createIdentifier("meterProvider"),
+				factory.createIdentifier("addMetricReader")
+			),
+			undefined,
+			[factory.createIdentifier("exporter")]
+		)),
+		factory.createVariableDeclarationList(
+			[factory.createVariableDeclaration(
+				factory.createIdentifier("meter"),
+				undefined,
+				undefined,
+				factory.createCallExpression(
+					factory.createPropertyAccessExpression(
+						factory.createIdentifier("meterProvider"),
+						factory.createIdentifier("getMeter")
+					),
+					undefined,
+					[factory.createStringLiteral("example-prometheus")] //FIXME: this prob needs to be dynamic
+				)
+			)],
+			ts.NodeFlags.Const
+		)
 
-	const autometrics_header = `
-import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
-import { MeterProvider } from "@opentelemetry/sdk-metrics";
 
-const prometheusOptions = { port: 9090, startServer: true };
-const exporter = new PrometheusExporter(prometheusOptions);
-
-const meterProvider = new MeterProvider();
-meterProvider.addMetricReader(exporter);
-const meter = meterProvider.getMeter("example-prometheus");
-
-` //TODO: add dynamic meter name
-
-	return ts.createSourceFile(
-		"instrumentation.ts",
-		autometrics_header,
-		ts.ScriptTarget.Latest
-	)
-
+	]
 }
 
-export function autometricsInit(): ts.SourceFile {
+/**
+* Creates nodes for initiating histogram at the top of the function
+*/
+export function createAutometricsInit(): ts.Node[] {
+	return [
+		factory.createVariableStatement(
+			undefined,
+			factory.createVariableDeclarationList(
+				[factory.createVariableDeclaration(
+					factory.createIdentifier("__autometricsHistogram"),
+					undefined,
+					undefined,
+					factory.createCallExpression(
+						factory.createPropertyAccessExpression(
+							factory.createIdentifier("meter"),
+							factory.createIdentifier("createHistogram")
+						),
+						undefined,
+						[
+							factory.createStringLiteral("function.calls.duration"),
+							factory.createObjectLiteralExpression(
+								[factory.createPropertyAssignment(
+									factory.createIdentifier("description"),
+									factory.createStringLiteral("Autometrics histogram for tracking function calls")
+								)],
+								true
+							)
+						]
+					)
+				)],
+				ts.NodeFlags.Const
+			)
+		),
+		factory.createVariableStatement(
+			undefined,
+			factory.createVariableDeclarationList(
+				[factory.createVariableDeclaration(
+					factory.createIdentifier("__autometricsStart"),
+					undefined,
+					undefined,
+					factory.createCallExpression(
+						factory.createPropertyAccessExpression(
+							factory.createNewExpression(
+								factory.createIdentifier("Date"),
+								undefined,
+								[]
+							),
+							factory.createIdentifier("getTime")
+						),
+						undefined,
+						[]
+					)
+				)],
+				ts.NodeFlags.Const
+			)
+		)
 
-	const autometrics_init = `
-
-const __autometricsHistogram = meter.createHistogram("function.calls.duration", {
-	description: "Autometrics histogram for tracking function calls",
-});
-const __autometricsStart = new Date().getTime();
-
-`
-	return ts.createSourceFile(
-		"instrumentation_init.ts",
-		autometrics_init,
-		ts.ScriptTarget.Latest
-	)
-
+	]
 }
 
-export function autometricsReturn(func_name: string): ts.SourceFile {
-	const autometrics_return = `
-
-	const __autometricsDuration = new Date().getTime() - __autometricsStart;
-	__autometricsHistogram.record(__autometricsDuration, { "function": "${func_name}"});
-	`
-
-	return ts.createSourceFile(
-		"instrumentation_init.ts",
-		autometrics_return,
-		ts.ScriptTarget.Latest
-	)
+/**
+* Creates nodes for recording the histogram value.
+*
+* @param functionIdentifier {string} - the name of the function to create the default label on 
+* TODO: custom labels
+*/
+export function createAutometricsReturn(functionIdentifier: string): ts.Node[] {
+	return [
+		factory.createVariableStatement(
+			undefined,
+			factory.createVariableDeclarationList(
+				[factory.createVariableDeclaration(
+					factory.createIdentifier("__autometricsDuration"),
+					undefined,
+					undefined,
+					factory.createBinaryExpression(
+						factory.createCallExpression(
+							factory.createPropertyAccessExpression(
+								factory.createNewExpression(
+									factory.createIdentifier("Date"),
+									undefined,
+									[]
+								),
+								factory.createIdentifier("getTime")
+							),
+							undefined,
+							[]
+						),
+						factory.createToken(ts.SyntaxKind.MinusToken),
+						factory.createIdentifier("__autometricsStart")
+					)
+				)],
+				ts.NodeFlags.Const
+			)
+		),
+		factory.createCallExpression(
+			factory.createPropertyAccessExpression(
+				factory.createIdentifier("__autometricsHistogram"),
+				factory.createIdentifier("record")
+			),
+			undefined,
+			[
+				factory.createIdentifier("__autometricsDuration"),
+				factory.createObjectLiteralExpression(
+					[factory.createPropertyAssignment(
+						factory.createStringLiteral("function"),
+						factory.createStringLiteral(functionIdentifier)
+					)],
+					false
+				)
+			]
+		)
+	]
 }
 
