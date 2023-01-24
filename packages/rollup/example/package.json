@@ -1,0 +1,34 @@
+{
+	"name": "rollup-typescript-starter-lib",
+	"version": "1.0.0",
+	"type": "commonjs",
+	"description": "Bare-bones example of how to create a library using Rollup and TypeScript.",
+	"scripts": {
+		"build": "NODE_ENV=production rollup -c",
+		"dev": "rollup -c -w",
+		"start": "node dist/bundle.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/zollero/rollup-typescript-starter-lib.git"
+	},
+	"keywords": [],
+	"author": "zollero <corona7@163.com>",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/zollero/rollup-typescript-starter-lib/issues"
+	},
+	"homepage": "https://github.com/zollero/rollup-typescript-starter-lib#readme",
+	"devDependencies": {
+		"rollup": "^2.6.1",
+		"rollup-plugin-typescript2": "^0.34.1",
+		"tslib": "^2.4.1",
+		"typescript": "^4.9.4"
+	},
+	"dependencies": {
+		"@opentelemetry/exporter-prometheus": "^0.35.0",
+		"@opentelemetry/sdk-metrics": "^1.9.0",
+		"autometrics-docs": "file:../../autometrics-docs",
+		"rollup-plugin-autometrics": "file:.."
+	}
+}
