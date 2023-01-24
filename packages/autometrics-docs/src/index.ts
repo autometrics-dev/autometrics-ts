@@ -22,6 +22,8 @@ function init(modules: {
 			proxy[k] = (...args: Array<{}>) => x.apply(languageService, args);
 		}
 
+		const prometheusBase: string | undefined = config.url;
+
 		proxy.getQuickInfoAtPosition = (filename, position) => {
 			const prior = languageService.getQuickInfoAtPosition(
 				filename,
@@ -78,7 +80,8 @@ View the live metrics for this function:
 					{
 						kind: "string",
 						text: `- [Latency (95th and 99th percentiles)](${makePrometheusUrl(
-							latency
+							latency,
+							prometheusBase
 						)})`,
 					},
 					{
@@ -88,7 +91,8 @@ View the live metrics for this function:
 					{
 						kind: "string",
 						text: `- [Request rate](${makePrometheusUrl(
-							requestRate
+							requestRate,
+							prometheusBase
 						)})`,
 					},
 				];
@@ -114,8 +118,8 @@ View the live metrics for this function:
 		return proxy;
 	}
 
-	function makePrometheusUrl(query: string) {
-		const base = "http://localhost:9091/";
+	function makePrometheusUrl(query: string, base?: string) {
+		base != undefined ? base : "http://localhost:9090/";
 		return (
 			base + "graph?g0.expr=" + encodeURIComponent(query) + "&g0.tab=0"
 		);
