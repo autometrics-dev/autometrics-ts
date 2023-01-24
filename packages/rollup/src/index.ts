@@ -28,6 +28,7 @@ export default function autometrics(): Plugin {
 
 					newSrc = printer.printFile(newAst);
 
+					//FIXME: in here for debugging purposes
 					console.log(
 						"Original file:\n" +
 						src +
