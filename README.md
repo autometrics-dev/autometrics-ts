@@ -16,6 +16,8 @@ Unlike [Rust](github.com/fiberplane/autometrics-rs), Typescript (Javascript) doe
 - build step to inject the instrumentation code;
 - language service plugin to show LSP documentation screens on instrumented functions.
 
+> NOTE: this is very much a prototype stage still (full of FIXMEs and hardcoded assumptions)
+
 ### Adding build step: Rollup plugin
 
 Known issues:

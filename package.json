@@ -3,11 +3,17 @@
     "type": "module",
     "name": "autometrics",
     "workspaces": [
-        "packages/core",
-        "packages/playground"
+        "packages/autometrics-docs",
+        "packages/rollup",
+        "packages/vite",
+        "packages/core"
     ],
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
-    "scripts": {}
+    "scripts": {
+        "dev": "npm run dev --workspace=rollup --workspace=autometrics-docs",
+        "dev:docs": "npm run dev --workspace=autometrics-docs",
+        "dev:rollup": "npm run dev --workspace=rollup"
+    }
 }
