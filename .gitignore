@@ -4,3 +4,4 @@ node_modules
 packages/rollup/dist
 packages/vite/dist
 packages/autometrics-docs/dist
+packages/core/dist
