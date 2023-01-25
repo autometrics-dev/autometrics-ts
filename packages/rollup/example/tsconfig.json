@@ -1,0 +1,28 @@
+
+{
+    "compilerOptions": {
+        "module": "ESNext",
+		"esModuleInterop": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "removeComments": true,
+        "resolveJsonModule": true,
+        "moduleResolution": "Node",
+        "sourceMap": true,
+		"outDir": "temp",
+        "target": "es6",
+        "strictNullChecks": true,
+        "plugins": [{
+            "name": "autometrics-docs"
+        }]
+
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "**/*.spec.ts"
+   ]
+}
