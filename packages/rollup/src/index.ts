@@ -12,7 +12,7 @@ export default function autometrics(): Plugin {
 					const result = replaceInSrc(filename, src);
 
 					if (!result.replaced) {
-						return
+						return src
 					}
 
 					newSrc = result.fileText;
