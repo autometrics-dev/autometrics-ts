@@ -1,6 +1,3 @@
-
-examples/simple-server/node_modules
 node_modules
-packages/rollup/dist
-packages/vite/dist
-packages/autometrics-docs/dist
+packages/rollup/example/dist
+packages/**/*/dist
