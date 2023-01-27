@@ -21,7 +21,15 @@ export default function replaceInSrc(fileName: string, src: string): { fileText?
 
 }
 
-
+/**
+* The main transformer factory that takes each parsed ts.SourceFile node, 
+* checks if there's an @autometrics JSDoc tag, adds the necessary imports and setting up the meter.
+*
+* Individual tagged functions are instrumented in the functionTransformer
+*
+* NOTE: this can probably be done globally by requiring something like an instrumentation.ts
+* file with the necessary meter setups
+*/
 const transformer: ts.TransformerFactory<ts.SourceFile> = () => {
 	return (sourceFile) => {
 		const taggedFunction = sourceFile.statements.find((node: ts.Node) => {
@@ -58,6 +66,10 @@ const transformer: ts.TransformerFactory<ts.SourceFile> = () => {
 	};
 };
 
+/**
+* This is the transformer that traverses the syntax tree until it finds a function,
+* then calling calling functions that instrument them.
+*/
 const functionTransformer = <T extends ts.Node>(ctx: ts.TransformationContext) =>
 	(root: T) => {
 		function visit(node: ts.Node): ts.Node {
@@ -83,6 +95,7 @@ const functionTransformer = <T extends ts.Node>(ctx: ts.TransformationContext) =
 		return ts.visitNode(root, visit);
 	};
 
+
 function addAutometrics(
 	functionNode: ts.FunctionDeclaration,
 	ctx: ts.TransformationContext
@@ -107,6 +120,10 @@ function addAutometrics(
 	return functionNode
 }
 
+/**
+* This traverses the function node until it finds the ts.Block node (beginning of the body of the function), 
+* then inserts the initiation statements for autometrics
+*/
 function handleInitStatements(
 	node: ts.Node,
 	ctx: ts.TransformationContext
@@ -129,6 +146,10 @@ function handleInitStatements(
 	return ts.visitNode(node, visitor);
 }
 
+/**
+* This traverses the function node and for each return statement that it finds,
+* it prepends the autometrics returns (histogram record)
+*/
 function handleReturnStatements(
 	node: ts.Node,
 	ctx: ts.TransformationContext,
