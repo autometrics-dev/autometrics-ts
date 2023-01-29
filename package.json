@@ -6,6 +6,7 @@
         "packages/autometrics-docs",
         "packages/rollup",
         "packages/vite",
+        "packages/decorators",
         "packages/core"
     ],
     "version": "1.0.0",
@@ -15,5 +16,8 @@
         "dev": "npm run dev --workspace=rollup --workspace=autometrics-docs",
         "dev:docs": "npm run dev --workspace=autometrics-docs",
         "dev:rollup": "npm run dev --workspace=rollup"
+    },
+    "dependencies": {
+        "@autometricsjs/core": "^0.0.1"
     }
 }
