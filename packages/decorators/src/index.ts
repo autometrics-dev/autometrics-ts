@@ -33,6 +33,11 @@ export default function autometrics(_target: Object, propertyKey: string, descri
 
 type AnyFunction = (...args: any[]) => any
 
+/**
+ * Autometrics automatically instruments the wrapped function with OpenTelemetry-compatible metrics.
+ * 
+ * Hover over the function itself to get the links for generated queries (if you have the language service plugin installed)
+ */
 export function autometricsWrapper<T extends AnyFunction>(fn: T): (...params: Parameters<T>) => ReturnType<T> {
 
 	OtelMetrics.instance() // should ensure the instrumentation is initialized only once no matter how many times this function is called
