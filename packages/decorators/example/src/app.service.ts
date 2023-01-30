@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { autometricsWrapper } from "autometricsjs"
+import { autometricsWrapper } from "autometrics-decorators"
 
 @Injectable()
 export class AppService {

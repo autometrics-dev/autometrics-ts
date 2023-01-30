@@ -1,6 +1,6 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
-import autometrics from "autometricsjs"
+import autometrics from "autometrics-decorators"
 
 @Controller()
 export class AppController {
@@ -8,9 +8,6 @@ export class AppController {
 
 	@Get()
 	@autometrics
-	/**
-	 * @autometrics
-	 */
 	getHello(): string {
 		return this.appService.getHello();
 	}
