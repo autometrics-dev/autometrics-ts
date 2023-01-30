@@ -1,5 +1,3 @@
-import { Node, SyntaxKind, TypeChecker } from "typescript/lib/tsserverlibrary";
-
 function init(modules: {
 	typescript: typeof import("typescript/lib/tsserverlibrary");
 }) {
@@ -7,7 +5,7 @@ function init(modules: {
 
 	function create({
 		config,
-		languageService,
+		languageService: language_service,
 		project,
 	}: ts.server.PluginCreateInfo) {
 		// Diagnostic logging
@@ -17,64 +15,63 @@ function init(modules: {
 
 		// Set up decorator object
 		const proxy: ts.LanguageService = Object.create(null);
-		for (let k of Object.keys(languageService) as Array<
+		for (let k of Object.keys(language_service) as Array<
 			keyof ts.LanguageService
 		>) {
-			const x = languageService[k]!;
-			proxy[k] = (...args: Array<{}>) => x.apply(languageService, args);
+			const x = language_service[k]!;
+			proxy[k] = (...args: Array<{}>) => x.apply(language_service, args);
 		}
 
-		const prometheusBase: string | undefined = config.url;
+		const prometheus_base: string | undefined = config.url;
 
 		proxy.getQuickInfoAtPosition = (filename, position) => {
-			const typechecker = languageService.getProgram().getTypeChecker();
+			const typechecker = language_service.getProgram().getTypeChecker();
 
-			const prior: ts.QuickInfo = languageService.getQuickInfoAtPosition(
+			const prior: ts.QuickInfo = language_service.getQuickInfoAtPosition(
 				filename,
 				position
 			);
 
 			let { documentation } = prior;
 
-			const sourceFile = languageService
+			const source_file = language_service
 				.getProgram()
 				.getSourceFile(filename);
 
-			const nodeAtCursor = getNodeAtCursor(sourceFile, position);
+			const node_at_cursor = get_node_at_cursor(source_file, position);
 
-			const nodeType: "function" | "method" | undefined = getNodeType(
-				nodeAtCursor,
+			const node_type: "function" | "method" | undefined = get_node_type(
+				node_at_cursor,
 				typechecker
 			); // Currently these are the only two we care about
 
-			const nodeIdentifier = ((node) => {
+			//FIXME: change depending on function or method
+			const node_identifier = ((node) => {
 				if (ts.isIdentifier(node)) {
 					return node.escapedText as string;
 				}
-			})(nodeAtCursor);
+			})(node_at_cursor);
 
-			if (nodeType == undefined) {
+			if (node_type == undefined) {
 				return prior;
 			}
 
-			const autometricsTag: boolean = isAutometricsWrappedOrDecorated(
-				nodeAtCursor,
+			const autometrics_tag: boolean = is_autometrics_wrapped_or_decorated(
+				node_at_cursor,
 				typechecker,
-				nodeType
+				node_type
 			);
-			console.log(nodeType)
+			console.log(node_type);
 
-			//project.projectService.logger.info(nodeIdentifier + " " + nodeType + " " + autometricsTag.valueOf().toString());
-
-			if (autometricsTag) {
-				const latency = createLatencyQuery(nodeIdentifier, nodeType);
-				const requestRate = createRequestRateQuery(
-					nodeIdentifier,
-					nodeType
+			if (autometrics_tag) {
+				const latency = create_latency_query(node_identifier, node_type);
+				const request_rate = create_request_rate_query(
+					node_identifier,
+					node_type
 				);
-				const errorRatio = createErrorRatioQuery(
-					nodeIdentifier,
-					nodeType
+				const error_ratio = create_error_ratio_query(
+					node_identifier,
+					node_type
 				);
 
 				const preamble = {
@@ -91,9 +88,9 @@ View the live metrics for this function:
 					},
 					{
 						kind: "string",
-						text: `- [Request rate](${makePrometheusUrl(
-							requestRate,
-							prometheusBase
+						text: `- [Request rate](${make_prometheus_url(
+							request_rate,
+							prometheus_base
 						)})`,
 					},
 					{
@@ -102,9 +99,9 @@ View the live metrics for this function:
 					},
 					{
 						kind: "string",
-						text: `- [Error ratio](${makePrometheusUrl(
-							errorRatio,
-							prometheusBase
+						text: `- [Error ratio](${make_prometheus_url(
+							error_ratio,
+							prometheus_base
 						)})`,
 					},
 					{
@@ -113,9 +110,9 @@ View the live metrics for this function:
 					},
 					{
 						kind: "string",
-						text: `- [Latency (95th and 99th percentiles)](${makePrometheusUrl(
+						text: `- [Latency (95th and 99th percentiles)](${make_prometheus_url(
 							latency,
-							prometheusBase
+							prometheus_base
 						)})`,
 					},
 				];
@@ -141,9 +138,9 @@ View the live metrics for this function:
 		return proxy;
 	}
 
-	function isAutometricsWrappedOrDecorated(
-		node: Node,
-		typechecker: TypeChecker,
+	function is_autometrics_wrapped_or_decorated(
+		node: ts.Node,
+		typechecker: ts.TypeChecker,
 		nodeType: "function" | "method"
 	): boolean {
 		const declaration =
@@ -157,7 +154,7 @@ View the live metrics for this function:
 					if (ts.isIdentifier(declaration.initializer.expression)) {
 						if (
 							declaration.initializer.expression.escapedText ==
-							"autometricsWrapper"
+							"autometrics_wrapper"
 						) {
 							return true;
 						}
@@ -178,23 +175,23 @@ View the live metrics for this function:
 		}
 	}
 
-	function getNodeType(
-		node: Node,
-		typechecker: TypeChecker
+	function get_node_type(
+		node: ts.Node,
+		typechecker: ts.TypeChecker
 	): "function" | "method" | undefined {
 		const declaration =
 			typechecker.getSymbolAtLocation(node).valueDeclaration;
 
-		if (declaration.kind == SyntaxKind.VariableDeclaration) {
+		if (declaration.kind == ts.SyntaxKind.VariableDeclaration) {
 			return "function";
-		} else if (declaration.kind == SyntaxKind.MethodDeclaration) {
+		} else if (declaration.kind == ts.SyntaxKind.MethodDeclaration) {
 			return "method";
 		} else {
 			return undefined;
 		}
 	}
 
-	function getNodeAtCursor(
+	function get_node_at_cursor(
 		sourceFile: ts.SourceFile,
 		position: number
 	): ts.Node | undefined {
@@ -206,22 +203,22 @@ View the live metrics for this function:
 		return find(sourceFile);
 	}
 
-	function createLatencyQuery(nodeIdentifier: string, nodeType: string) {
+	function create_latency_query(nodeIdentifier: string, nodeType: string) {
 		const latency = `sum by (le, function, module) (rate(${nodeType}_calls_duration_bucket{${nodeType}="${nodeIdentifier}"}[5m]))`;
 		return `histogram_quantile(0.99, ${latency}) or histogram_quantile(0.95, ${latency})`;
 	}
 
-	function createRequestRateQuery(nodeIdentifier: string, nodeType: string) {
+	function create_request_rate_query(nodeIdentifier: string, nodeType: string) {
 		return `sum by (function, module) (rate(${nodeType}_calls_count{${nodeType}="${nodeIdentifier}"}[5m]))`;
 	}
 
-	function createErrorRatioQuery(nodeIdentifier: string, nodeType: string) {
-		const requestQuery = createRequestRateQuery(nodeIdentifier, nodeType);
+	function create_error_ratio_query(nodeIdentifier: string, nodeType: string) {
+		const requestQuery = create_request_rate_query(nodeIdentifier, nodeType);
 		return `sum by (function, module) (rate(${nodeType}_calls_count{{${nodeType}="${nodeIdentifier}",result="error"}}[5m])) / ${requestQuery}`;
 	}
 
-	function makePrometheusUrl(query: string, base?: string) {
-		if (base == undefined) {
+	function make_prometheus_url(query: string, base?: string) {
+		if (base == undefined || base == "") {
 			base = "http://localhost:9090/";
 		}
 		return (

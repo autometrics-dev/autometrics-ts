@@ -6,7 +6,7 @@ import otel from "@opentelemetry/api"
 *
 * Hover over the method/function itself to get the links for your metrics (if you have the language service plugin installed)
 */
-export default function autometrics(_target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
+export default function autometrics(_target: Object, property_key: string, descriptor: PropertyDescriptor) {
 	OtelMetrics.instance() // should ensure the instrumentation is initialized only once no matter how many times this function is called
 	const meter = otel.metrics.getMeter("autometrics-prometheus");
 
@@ -19,13 +19,13 @@ export default function autometrics(_target: Object, propertyKey: string, descri
 		const histogram = meter.createHistogram("method.calls.duration")
 		try {
 			result = original_function.apply(this, args)
-			counter.add(1, { "method": propertyKey, "result": "ok" })
+			counter.add(1, { "method": property_key, "result": "ok" })
 			const autometrics_duration = new Date().getTime() - autometrics_start;
-			histogram.record(autometrics_duration, { "method": propertyKey })
+			histogram.record(autometrics_duration, { "method": property_key })
 		} catch (error) {
 			const autometrics_duration = new Date().getTime() - autometrics_start;
-			counter.add(1, { "method": propertyKey, "result": "error" })
-			histogram.record(autometrics_duration, { "method": propertyKey })
+			counter.add(1, { "method": property_key, "result": "error" })
+			histogram.record(autometrics_duration, { "method": property_key })
 		}
 		return result
 	}
@@ -38,7 +38,7 @@ type AnyFunction = (...args: any[]) => any
  * 
  * Hover over the function itself to get the links for generated queries (if you have the language service plugin installed)
  */
-export function autometricsWrapper<T extends AnyFunction>(fn: T): (...params: Parameters<T>) => ReturnType<T> {
+export function autometrics_wrapper<T extends AnyFunction>(fn: T): (...params: Parameters<T>) => ReturnType<T> {
 
 	OtelMetrics.instance() // should ensure the instrumentation is initialized only once no matter how many times this function is called
 	const meter = otel.metrics.getMeter("autometrics-prometheus");
