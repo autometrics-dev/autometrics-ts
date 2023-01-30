@@ -1,6 +1,11 @@
 import { OtelMetrics } from "./instrumentation";
 import otel from "@opentelemetry/api"
 
+/**
+* Autometrics automatically instruments the decorated class method or a wrapped function.
+*
+* Hover over the method/function itself to get the links for your metrics (if you have the language service plugin installed)
+*/
 export default function autometrics(_target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
 	OtelMetrics.instance() // should ensure the instrumentation is initialized only once no matter how many times this function is called
 	const meter = otel.metrics.getMeter("autometrics-prometheus");
@@ -34,6 +39,9 @@ export function autometricsWrapper<T extends AnyFunction>(fn: T): (...params: Pa
 	const meter = otel.metrics.getMeter("autometrics-prometheus");
 
 	return function(...params: Parameters<T>): ReturnType<T> {
+		if (fn.name == undefined || fn.name == null) {
+			throw new TypeError("Autometrics decorated function must have a name to succesfully create a metric")
+		}
 		let result: any;
 		const autometrics_start = new Date().getTime();
 		const counter = meter.createCounter("function.calls.count")
