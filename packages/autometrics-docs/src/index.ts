@@ -1,3 +1,5 @@
+import { Node, SyntaxKind, TypeChecker } from "typescript/lib/tsserverlibrary";
+
 function init(modules: {
 	typescript: typeof import("typescript/lib/tsserverlibrary");
 }) {
@@ -25,46 +27,56 @@ function init(modules: {
 		const prometheusBase: string | undefined = config.url;
 
 		proxy.getQuickInfoAtPosition = (filename, position) => {
-			const prior = languageService.getQuickInfoAtPosition(
+			const typechecker = languageService.getProgram().getTypeChecker();
+
+			const prior: ts.QuickInfo = languageService.getQuickInfoAtPosition(
 				filename,
 				position
 			);
+
+			let { documentation } = prior;
 
 			const sourceFile = languageService
 				.getProgram()
 				.getSourceFile(filename);
 
-			const nodeAtCursor = findChildContainingPosition(
-				sourceFile,
-				position
-			);
+			const nodeAtCursor = getNodeAtCursor(sourceFile, position);
 
-			let function_label: string;
-			debugger;
+			const nodeType: "function" | "method" | undefined = getNodeType(
+				nodeAtCursor,
+				typechecker
+			); // Currently these are the only two we care about
 
-			if (ts.isIdentifier(nodeAtCursor)) {
-				function_label = nodeAtCursor.escapedText as string;
-			}
+			const nodeIdentifier = ((node) => {
+				if (ts.isIdentifier(node)) {
+					return node.escapedText as string;
+				}
+			})(nodeAtCursor);
 
-			let { tags, documentation } = prior;
-
-			if (tags == undefined) {
+			if (nodeType == undefined) {
 				return prior;
 			}
 
-			const autometricsTag = tags.find((tag) => {
-				if (tag.name == "autometrics") {
-					return true;
-				}
-			});
+			const autometricsTag: boolean = isAutometricsWrappedOrDecorated(
+				nodeAtCursor,
+				typechecker,
+				nodeType
+			);
+			console.log(nodeType)
 
-			if (autometricsTag != undefined) {
-				let latency = `sum by (le, function, module) (rate(function_calls_duration_bucket{function="${function_label}"}[5m]))`;
-				latency = `# 95th and 99th percentile latencies
-histogram_quantile(0.99, ${latency}) or
-histogram_quantile(0.95, ${latency})`;
+			//project.projectService.logger.info(nodeIdentifier + " " + nodeType + " " + autometricsTag.valueOf().toString());
 
-				const requestRate = `sum by (function, module) (rate(function_calls_duration_bucket"${function_label}"[5m]))`;
+			if (autometricsTag) {
+				const latency = createLatencyQuery(nodeIdentifier, nodeType);
+				const requestRate = createRequestRateQuery(
+					nodeIdentifier,
+					nodeType
+				);
+				const errorRatio = createErrorRatioQuery(
+					nodeIdentifier,
+					nodeType
+				);
+
 				const preamble = {
 					kind: "string",
 					text: `\n\n
@@ -79,8 +91,8 @@ View the live metrics for this function:
 					},
 					{
 						kind: "string",
-						text: `- [Latency (95th and 99th percentiles)](${makePrometheusUrl(
-							latency,
+						text: `- [Request rate](${makePrometheusUrl(
+							requestRate,
 							prometheusBase
 						)})`,
 					},
@@ -90,8 +102,19 @@ View the live metrics for this function:
 					},
 					{
 						kind: "string",
-						text: `- [Request rate](${makePrometheusUrl(
-							requestRate,
+						text: `- [Error ratio](${makePrometheusUrl(
+							errorRatio,
+							prometheusBase
+						)})`,
+					},
+					{
+						kind: "space",
+						text: "\n",
+					},
+					{
+						kind: "string",
+						text: `- [Latency (95th and 99th percentiles)](${makePrometheusUrl(
+							latency,
 							prometheusBase
 						)})`,
 					},
@@ -107,25 +130,71 @@ View the live metrics for this function:
 					kind: prior.kind,
 					kindModifiers: prior.kindModifiers,
 					textSpan: prior.textSpan,
-					tags,
+					tags: prior.tags,
 					documentation,
 				};
+			} else {
+				return prior;
 			}
-
-			return prior;
 		};
 
 		return proxy;
 	}
 
-	function makePrometheusUrl(query: string, base?: string) {
-		base != undefined ? base : "http://localhost:9090/";
-		return (
-			base + "graph?g0.expr=" + encodeURIComponent(query) + "&g0.tab=0"
-		);
+	function isAutometricsWrappedOrDecorated(
+		node: Node,
+		typechecker: TypeChecker,
+		nodeType: "function" | "method"
+	): boolean {
+		const declaration =
+			typechecker.getSymbolAtLocation(node).valueDeclaration;
+
+		// HACK:yeah soz this isn't the best but we're basically digging through to check
+		// if the called function was wrapped by autometricsWrapper
+		if (nodeType == "function") {
+			if (ts.isVariableDeclaration(declaration)) {
+				if (ts.isCallExpression(declaration.initializer)) {
+					if (ts.isIdentifier(declaration.initializer.expression)) {
+						if (
+							declaration.initializer.expression.escapedText ==
+							"autometricsWrapper"
+						) {
+							return true;
+						}
+					}
+				}
+			}
+		} else if (nodeType == "method") {
+			if (ts.canHaveDecorators(node.parent)) {
+				const decorators = ts.getDecorators(node.parent);
+				const autometricsTag = decorators.find(
+					(dec) => dec.getText() == "@autometrics"
+				);
+
+				return autometricsTag ? true : false;
+			}
+		} else {
+			throw new Error("Unhandled node type");
+		}
 	}
 
-	function findChildContainingPosition(
+	function getNodeType(
+		node: Node,
+		typechecker: TypeChecker
+	): "function" | "method" | undefined {
+		const declaration =
+			typechecker.getSymbolAtLocation(node).valueDeclaration;
+
+		if (declaration.kind == SyntaxKind.VariableDeclaration) {
+			return "function";
+		} else if (declaration.kind == SyntaxKind.MethodDeclaration) {
+			return "method";
+		} else {
+			return undefined;
+		}
+	}
+
+	function getNodeAtCursor(
 		sourceFile: ts.SourceFile,
 		position: number
 	): ts.Node | undefined {
@@ -135,6 +204,29 @@ View the live metrics for this function:
 			}
 		}
 		return find(sourceFile);
+	}
+
+	function createLatencyQuery(nodeIdentifier: string, nodeType: string) {
+		const latency = `sum by (le, function, module) (rate(${nodeType}_calls_duration_bucket{${nodeType}="${nodeIdentifier}"}[5m]))`;
+		return `histogram_quantile(0.99, ${latency}) or histogram_quantile(0.95, ${latency})`;
+	}
+
+	function createRequestRateQuery(nodeIdentifier: string, nodeType: string) {
+		return `sum by (function, module) (rate(${nodeType}_calls_count{${nodeType}="${nodeIdentifier}"}[5m]))`;
+	}
+
+	function createErrorRatioQuery(nodeIdentifier: string, nodeType: string) {
+		const requestQuery = createRequestRateQuery(nodeIdentifier, nodeType);
+		return `sum by (function, module) (rate(${nodeType}_calls_count{{${nodeType}="${nodeIdentifier}",result="error"}}[5m])) / ${requestQuery}`;
+	}
+
+	function makePrometheusUrl(query: string, base?: string) {
+		if (base == undefined) {
+			base = "http://localhost:9090/";
+		}
+		return (
+			base + "graph?g0.expr=" + encodeURIComponent(query) + "&g0.tab=0"
+		);
 	}
 
 	return { create };
