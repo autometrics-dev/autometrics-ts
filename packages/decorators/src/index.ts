@@ -36,7 +36,7 @@ type AnyFunction = (...args: any[]) => any
 /**
  * Autometrics automatically instruments the wrapped function with OpenTelemetry-compatible metrics.
  * 
- * Hover over the function itself to get the links for generated queries (if you have the language service plugin installed)
+ * Hover over the wrapped function to get the links for generated queries (if you have the language service plugin installed)
  */
 export function autometrics_wrapper<T extends AnyFunction>(fn: T): (...params: Parameters<T>) => ReturnType<T> {
 
