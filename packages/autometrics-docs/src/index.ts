@@ -43,36 +43,25 @@ function init(modules: {
 			const node_type: "function" | "method" | undefined = get_node_type(
 				node_at_cursor,
 				typechecker
-			); // Currently these are the only two we care about
+			);
 
-			//FIXME: change depending on function or method
-			const node_identifier = ((node) => {
-				if (ts.isIdentifier(node)) {
-					return node.escapedText as string;
-				}
-			})(node_at_cursor);
-
+			// If it's not a method or function - return early
 			if (node_type == undefined) {
 				return prior;
 			}
+
+			const node_identifier = get_node_identifier(node_at_cursor, node_type, typechecker);
 
 			const autometrics_tag: boolean = is_autometrics_wrapped_or_decorated(
 				node_at_cursor,
 				typechecker,
 				node_type
 			);
-			console.log(node_type);
 
 			if (autometrics_tag) {
 				const latency = create_latency_query(node_identifier, node_type);
-				const request_rate = create_request_rate_query(
-					node_identifier,
-					node_type
-				);
-				const error_ratio = create_error_ratio_query(
-					node_identifier,
-					node_type
-				);
+				const request_rate = create_request_rate_query(node_identifier, node_type);
+				const error_ratio = create_error_ratio_query(node_identifier, node_type);
 
 				const preamble = {
 					kind: "string",
@@ -115,6 +104,10 @@ View the live metrics for this function:
 							prometheus_base
 						)})`,
 					},
+					{
+						kind: "space",
+						text: "\n",
+					},
 				];
 				documentation = documentation.concat(
 					preamble,
@@ -138,6 +131,7 @@ View the live metrics for this function:
 		return proxy;
 	}
 
+	// Checks if the hovered element is decorated or wrapped by autometrics
 	function is_autometrics_wrapped_or_decorated(
 		node: ts.Node,
 		typechecker: ts.TypeChecker,
@@ -146,8 +140,6 @@ View the live metrics for this function:
 		const declaration =
 			typechecker.getSymbolAtLocation(node).valueDeclaration;
 
-		// HACK:yeah soz this isn't the best but we're basically digging through to check
-		// if the called function was wrapped by autometricsWrapper
 		if (nodeType == "function") {
 			if (ts.isVariableDeclaration(declaration)) {
 				if (ts.isCallExpression(declaration.initializer)) {
@@ -175,6 +167,30 @@ View the live metrics for this function:
 		}
 	}
 
+	function get_node_identifier(
+		node: ts.Node,
+		node_type: "function" | "method",
+		typechecker: ts.TypeChecker
+	): string {
+
+		if (node_type == "method") {
+			if (ts.isIdentifier(node)) {
+				return node.escapedText as string
+			}
+		} else {
+			const declaration = typechecker.getSymbolAtLocation(node).valueDeclaration;
+			if (ts.isVariableDeclaration(declaration)) {
+				if (ts.isCallExpression(declaration.initializer)) {
+					if (ts.isIdentifier(declaration.initializer.arguments[0])) { // The first element in the wrapper function will always be the original function
+						return declaration.initializer.arguments[0].escapedText as string
+					}
+				}
+			}
+		}
+
+	}
+
+	// Gets the type of the node (we care only about functions or methods)
 	function get_node_type(
 		node: ts.Node,
 		typechecker: ts.TypeChecker
@@ -191,6 +207,7 @@ View the live metrics for this function:
 		}
 	}
 
+	// Gets the node you're currently hovering over
 	function get_node_at_cursor(
 		sourceFile: ts.SourceFile,
 		position: number
@@ -202,6 +219,8 @@ View the live metrics for this function:
 		}
 		return find(sourceFile);
 	}
+
+	/* Functions below template creation of relevant queries and encode them in URL */
 
 	function create_latency_query(nodeIdentifier: string, nodeType: string) {
 		const latency = `sum by (le, function, module) (rate(${nodeType}_calls_duration_bucket{${nodeType}="${nodeIdentifier}"}[5m]))`;
