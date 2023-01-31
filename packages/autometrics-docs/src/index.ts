@@ -156,6 +156,11 @@ View the live metrics for this function:
 		} else if (nodeType == "method") {
 			if (ts.canHaveDecorators(node.parent)) {
 				const decorators = ts.getDecorators(node.parent);
+
+				if (decorators == undefined) {
+					return false
+				}
+
 				const autometricsTag = decorators.find(
 					(dec) => dec.getText() == "@autometrics"
 				);
@@ -195,6 +200,9 @@ View the live metrics for this function:
 		node: ts.Node,
 		typechecker: ts.TypeChecker
 	): "function" | "method" | undefined {
+		if (!ts.isVariableDeclaration(node.parent) && !ts.isMethodDeclaration(node.parent)) {
+			return undefined
+		}
 		const declaration =
 			typechecker.getSymbolAtLocation(node).valueDeclaration;
 
