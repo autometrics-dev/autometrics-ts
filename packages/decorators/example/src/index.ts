@@ -23,6 +23,23 @@ function bad_route(req: express.Request, res: express.Response) {
 	return res.status(200).send("bad request")
 }
 
+function resolveAfter2Seconds() {
+	return new Promise((resolve) => {
+		setTimeout(() => {
+			resolve("resolved");
+		}, 2000);
+	});
+}
+
+async function asyncCall() {
+	console.log("calling");
+	const result = await resolveAfter2Seconds();
+	console.log(result);
+	// Expected output: "resolved"
+}
+
+const asyncCallMetrics = autometrics(asyncCall); // works with async
+
 const root_route_instrumented = autometrics(root_route)
 const bad_route_instrumented = autometrics(bad_route);
 
