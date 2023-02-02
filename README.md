@@ -10,9 +10,8 @@ Autometrics currently generates the following queries for each instrumented func
 - Request rate
 - Error rate
 - Latency (95th and 99th percentiles)
-- Concurrent requests
 
-## Autometrics in Typescript (using decorators/wrappers)
+## Autometrics in Typescript 
 
 TODO:
 
@@ -32,14 +31,14 @@ Here's a snippet from the example code:
 ```diff
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-+ import autometrics from "autometrics-decorators";
++ import { Autometrics } from "autometrics-decorators";
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-+ @autometrics
++ @Autometrics
   getHello(): string {
     return this.appService.getHello();
   }
@@ -53,59 +52,18 @@ Wrappers are simple functions that wrap the original function declaration instru
 Call the wrapped function if you want to get its metrics.
 
 ```diff
-+ import { autometrics_wrapper } from "autometrics-decorators";
++ import { autometrics } from "autometrics-decorators";
 
 function createBye() {
   return "bye"
 }
 
-+ const createByeMetrics = autometrics_wrapper(createBye)
++ const createByeMetrics = autometrics(createBye)
 +
 + // Now call the instrumented function as opposed to the original one
 +
 + createByeMetrics()
 ```
-
-## Autometrics in Typescript (using build step)
-
-Unlike [Rust](github.com/fiberplane/autometrics-rs), Typescript (Javascript) does not have a language-built paradigm for compile-time code (macros). In the current prototype of autometrics for Typescript we're making use of two instruments:
-
-- build step to inject the instrumentation code;
-- language service plugin to show LSP documentation screens on instrumented functions.
-
-> NOTE: this is very much a prototype stage still (full of FIXMEs and hardcoded assumptions)
-
-### Adding build step: Rollup plugin
-
-Known issues:
-
-- the official [@rollup/plugin-typescript](https://www.npmjs.com/package/@rollup/plugin-typescript) strips out the JSDoc comments before the `autometrics` plugin can kick in, rendering it useless. Still investigating.
-
-The first prototype of autometrics is built using the Rollup bundler. To add autometrics to your rollup config:
-
-1. `npm install` the library `autometrics-ts/packages/rollup`
-2. In `rollup.config.ts` file:
-
-```diff
-import typescript from "rollup-plugin-typescript2";
-+ import autometrics from "rollup-plugin-autometrics";
-
-export default {
-	input: "src/index.ts",
-	output: {
-		file: "dist/bundle.js",
-		format: "cjs",
-	},
-
-	plugins: [
-+		autometrics(),
-		typescript()
-	],
-};
-
-```
-
-3. You can now instrument your functions using `@autometrics` JSDoc tag (note: they must be root level function declarations)
 
 ### Adding language service plugin
 
