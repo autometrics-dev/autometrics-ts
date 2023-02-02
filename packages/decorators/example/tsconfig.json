@@ -1,17 +1,18 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "es2017",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./",
-    "incremental": true,
-    "skipLibCheck": true,
-    "plugins": [{ "name": "autometrics-docs" }]
-  }
+	"compilerOptions": {
+		"module": "ESNext",
+		"esModuleInterop": true,
+		"noImplicitAny": true,
+		"noImplicitThis": true,
+		"removeComments": true,
+		"resolveJsonModule": true,
+		"moduleResolution": "Node",
+		"sourceMap": true,
+		"outDir": "dist",
+		"target": "es6",
+		"strictNullChecks": true,
+		"plugins": [{ "name": "autometrics-docs" }]
+	},
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "dist", "**/*.spec.ts"]
 }
