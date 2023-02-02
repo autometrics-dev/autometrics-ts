@@ -74,7 +74,7 @@ function init(modules: {
 
 				const preamble = {
 					kind: "string",
-					text: `\n\n## Autometrics\n\nView the live metrics for this function:\n `,
+					text: `\n\n## Autometrics\n\nView the live metrics for the \`${nodeIdentifier}\` function:\n `,
 				};
 				const queries = <ts.SymbolDisplayPart[]>[
 					{
