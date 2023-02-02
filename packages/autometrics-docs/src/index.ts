@@ -5,7 +5,7 @@ function init(modules: {
 
 	function create({
 		config,
-		languageService: language_service,
+		languageService: languageService,
 		project,
 	}: ts.server.PluginCreateInfo) {
 		// Diagnostic logging
@@ -15,60 +15,66 @@ function init(modules: {
 
 		// Set up decorator object
 		const proxy: ts.LanguageService = Object.create(null);
-		for (let k of Object.keys(language_service) as Array<
+		for (let k of Object.keys(languageService) as Array<
 			keyof ts.LanguageService
 		>) {
-			const x = language_service[k]!;
-			proxy[k] = (...args: Array<{}>) => x.apply(language_service, args);
+			const x = languageService[k]!;
+			proxy[k] = (...args: Array<{}>) => x.apply(languageService, args);
 		}
 
-		const prometheus_base: string | undefined = config.url;
+		const prometheusBase: string | undefined = config.url;
 
 		proxy.getQuickInfoAtPosition = (filename, position) => {
-			const typechecker = language_service.getProgram().getTypeChecker();
+			const typechecker = languageService.getProgram().getTypeChecker();
 
-			const prior: ts.QuickInfo = language_service.getQuickInfoAtPosition(
+			const prior: ts.QuickInfo = languageService.getQuickInfoAtPosition(
 				filename,
 				position
 			);
 
 			let { documentation } = prior;
 
-			const source_file = language_service
+			const sourceFile = languageService
 				.getProgram()
 				.getSourceFile(filename);
 
-			const node_at_cursor = get_node_at_cursor(source_file, position);
+			const nodeAtCursor = getNodeAtCursor(sourceFile, position);
 
-			const node_type: "function" | "method" | undefined = get_node_type(
-				node_at_cursor,
+			const nodeType: "function" | "method" | undefined = getNodeType(
+				nodeAtCursor,
 				typechecker
 			);
 
 			// If it's not a method or function - return early
-			if (node_type == undefined) {
+			if (nodeType == undefined) {
 				return prior;
 			}
 
-			const node_identifier = get_node_identifier(node_at_cursor, node_type, typechecker);
-
-			const autometrics_tag: boolean = is_autometrics_wrapped_or_decorated(
-				node_at_cursor,
+			const nodeIdentifier = getNodeIdentifier(
+				nodeAtCursor,
+				nodeType,
+				typechecker
+			);
+			const autometrics = isAutometricsWrappedOrDecorated(
+				nodeAtCursor,
 				typechecker,
-				node_type
+				nodeType
 			);
 
-			if (autometrics_tag) {
-				const latency = create_latency_query(node_identifier, node_type);
-				const request_rate = create_request_rate_query(node_identifier, node_type);
-				const error_ratio = create_error_ratio_query(node_identifier, node_type);
+			if (autometrics) {
+				const latency = create_latency_query(nodeIdentifier, nodeType);
+				const request_rate = create_request_rate_query(
+					nodeIdentifier,
+					nodeType
+				);
+				const error_ratio = create_error_ratio_query(
+					nodeIdentifier,
+					nodeType
+				);
 
 				const preamble = {
 					kind: "string",
-					text: `\n\n
-## Autometrics
-View the live metrics for this function:
-				`,
+					text: `\n\n## Autometrics\n\nView the live metrics for this function:\n `,
 				};
 				const queries = <ts.SymbolDisplayPart[]>[
 					{
@@ -79,7 +85,7 @@ View the live metrics for this function:
 						kind: "string",
 						text: `- [Request rate](${make_prometheus_url(
 							request_rate,
-							prometheus_base
+							prometheusBase
 						)})`,
 					},
 					{
@@ -90,7 +96,7 @@ View the live metrics for this function:
 						kind: "string",
 						text: `- [Error ratio](${make_prometheus_url(
 							error_ratio,
-							prometheus_base
+							prometheusBase
 						)})`,
 					},
 					{
@@ -101,7 +107,7 @@ View the live metrics for this function:
 						kind: "string",
 						text: `- [Latency (95th and 99th percentiles)](${make_prometheus_url(
 							latency,
-							prometheus_base
+							prometheusBase
 						)})`,
 					},
 					{
@@ -131,82 +137,149 @@ View the live metrics for this function:
 		return proxy;
 	}
 
-	// Checks if the hovered element is decorated or wrapped by autometrics
-	function is_autometrics_wrapped_or_decorated(
+	/**
+	 * Checks if the node is wrapped or decorated by Autometrics
+	 * @param node The node itself
+	 * @param typechecker The helper utility typechecker
+	 * @param nodeType So we know which branch to run
+	 */
+	function isAutometricsWrappedOrDecorated(
 		node: ts.Node,
 		typechecker: ts.TypeChecker,
 		nodeType: "function" | "method"
 	): boolean {
-		const declaration =
-			typechecker.getSymbolAtLocation(node).valueDeclaration;
-
 		if (nodeType == "function") {
-			if (ts.isVariableDeclaration(declaration)) {
-				if (ts.isCallExpression(declaration.initializer)) {
-					if (ts.isIdentifier(declaration.initializer.expression)) {
-						if (
-							declaration.initializer.expression.escapedText ==
-							"autometrics_wrapper"
-						) {
+			const type = typechecker.getTypeAtLocation(node);
+			const signature = typechecker
+				.getSignaturesOfType(type, ts.SignatureKind.Call)[0]
+				.getReturnType();
+
+			let autometricsProp: ts.Type | undefined;
+			if (signature.isUnionOrIntersection()) {
+				autometricsProp = signature.types.find((type) => {
+					const typeProps = type.getProperties();
+					const typePropsNames = typeProps.find((prop) => {
+						if (prop.escapedName == "_autometrics") {
 							return true;
 						}
-					}
-				}
+					});
+					return typePropsNames ? true : false;
+				});
 			}
+
+			return autometricsProp ? true : false;
 		} else if (nodeType == "method") {
-			if (ts.canHaveDecorators(node.parent)) {
+			if (
+				ts.canHaveDecorators(node.parent) &&
+				ts.getDecorators(node.parent)
+			) {
 				const decorators = ts.getDecorators(node.parent);
-
-				if (decorators == undefined) {
-					return false
-				}
-
-				const autometricsTag = decorators.find(
-					(dec) => dec.getText() == "@autometrics"
-				);
-
-				return autometricsTag ? true : false;
+				const autometricsDecorator = decorators.find((dec) => {
+					if (dec.getText() == "@Autometrics") {
+						return true;
+					}
+				});
+				return autometricsDecorator ? true : false;
 			}
 		} else {
-			throw new Error("Unhandled node type");
+			return false;
 		}
 	}
 
-	function get_node_identifier(
+	// function isAutometricsWrappedOrDecorated(
+	// 	node: ts.Node,
+	// 	typechecker: ts.TypeChecker,
+	// 	nodeType: "function" | "method"
+	// ): boolean {
+	// 	const declaration =
+	// 		typechecker.getSymbolAtLocation(node).valueDeclaration;
+
+	// 	if (nodeType == "function") {
+	// 		if (ts.isVariableDeclaration(declaration)) {
+	// 			if (ts.isCallExpression(declaration.initializer)) {
+	// 				if (ts.isIdentifier(declaration.initializer.expression)) {
+	// 					if (
+	// 						declaration.initializer.expression.escapedText ==
+	// 						"autometrics_wrapper"
+	// 					) {
+	// 						return true;
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	} else if (nodeType == "method") {
+	// 		if (ts.canHaveDecorators(node.parent)) {
+	// 			const decorators = ts.getDecorators(node.parent);
+
+	// 			if (decorators == undefined) {
+	// 				return false
+	// 			}
+
+	// 			const autometricsTag = decorators.find(
+	// 				(dec) => dec.getText() == "@autometrics"
+	// 			);
+
+	// 			return autometricsTag ? true : false;
+	// 		}
+	// 	} else {
+	// 		throw new Error("Unhandled node type");
+	// 	}
+	// }
+
+	/**
+	 * Gets the node identifier
+	 * @param node {ts.Node} - the node itself
+	 * @param nodeType {"function" | "method"} - so we know what kind of check to run
+	 * @param typechecker {ts.TypeChecker} - helper util
+	 */
+	function getNodeIdentifier(
 		node: ts.Node,
-		node_type: "function" | "method",
+		nodeType: "function" | "method",
 		typechecker: ts.TypeChecker
 	): string {
-
-		if (node_type == "method") {
+		if (nodeType == "method") {
 			if (ts.isIdentifier(node)) {
-				return node.escapedText as string
+				return node.escapedText as string;
 			}
 		} else {
-			const declaration = typechecker.getSymbolAtLocation(node).valueDeclaration;
+			const declaration =
+				typechecker.getSymbolAtLocation(node).valueDeclaration;
 			if (ts.isVariableDeclaration(declaration)) {
 				if (ts.isCallExpression(declaration.initializer)) {
-					if (ts.isIdentifier(declaration.initializer.arguments[0])) { // The first element in the wrapper function will always be the original function
-						return declaration.initializer.arguments[0].escapedText as string
+					if (ts.isIdentifier(declaration.initializer.arguments[0])) {
+						// The first element in the wrapper function will always be the original function
+						return declaration.initializer.arguments[0]
+							.escapedText as string;
 					}
 				}
 			}
 		}
-
 	}
 
-	// Gets the type of the node (we care only about functions or methods)
-	function get_node_type(
+	/**
+	 * Gets the type of the node (we care only about functions or methods)
+	 * @param node The node itself
+	 * @param typechecker The helper utility
+	 */
+	function getNodeType(
 		node: ts.Node,
 		typechecker: ts.TypeChecker
 	): "function" | "method" | undefined {
-		if (!ts.isVariableDeclaration(node.parent) && !ts.isMethodDeclaration(node.parent)) {
-			return undefined
+		const kind = ts.SyntaxKind[node.parent.kind];
+		if (
+			!ts.isVariableDeclaration(node.parent) &&
+			!ts.isMethodDeclaration(node.parent) &&
+			!ts.isCallExpression(node.parent)
+		) {
+			return undefined;
 		}
 		const declaration =
 			typechecker.getSymbolAtLocation(node).valueDeclaration;
 
-		if (declaration.kind == ts.SyntaxKind.VariableDeclaration) {
+		if (
+			declaration.kind == ts.SyntaxKind.VariableDeclaration ||
+			declaration.kind == ts.SyntaxKind.CallExpression
+		) {
 			return "function";
 		} else if (declaration.kind == ts.SyntaxKind.MethodDeclaration) {
 			return "method";
@@ -215,8 +288,12 @@ View the live metrics for this function:
 		}
 	}
 
-	// Gets the node you're currently hovering over
-	function get_node_at_cursor(
+	/**
+	 * Gets the node you're currently hovering over
+	 * @param sourceFile Source file node of the current file
+	 * @param position Current cursor/mouse position
+	 */
+	function getNodeAtCursor(
 		sourceFile: ts.SourceFile,
 		position: number
 	): ts.Node | undefined {
@@ -235,12 +312,21 @@ View the live metrics for this function:
 		return `histogram_quantile(0.99, ${latency}) or histogram_quantile(0.95, ${latency})`;
 	}
 
-	function create_request_rate_query(nodeIdentifier: string, nodeType: string) {
+	function create_request_rate_query(
+		nodeIdentifier: string,
+		nodeType: string
+	) {
 		return `sum by (function, module) (rate(${nodeType}_calls_count{${nodeType}="${nodeIdentifier}"}[5m]))`;
 	}
 
-	function create_error_ratio_query(nodeIdentifier: string, nodeType: string) {
-		const requestQuery = create_request_rate_query(nodeIdentifier, nodeType);
+	function create_error_ratio_query(
+		nodeIdentifier: string,
+		nodeType: string
+	) {
+		const requestQuery = create_request_rate_query(
+			nodeIdentifier,
+			nodeType
+		);
 		return `sum by (function, module) (rate(${nodeType}_calls_count{{${nodeType}="${nodeIdentifier}",result="error"}}[5m])) / ${requestQuery}`;
 	}
 
