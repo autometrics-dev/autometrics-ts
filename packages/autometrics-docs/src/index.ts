@@ -158,6 +158,7 @@ function init(modules: {
 				ts.canHaveDecorators(node.parent) &&
 				ts.getDecorators(node.parent)
 			) {
+				// Get the decorators of the hovered class method
 				const decorators = ts.getDecorators(node.parent);
 				const autometricsDecorator = decorators.find((dec) => {
 					if (dec.getText() == "@Autometrics") {
@@ -189,14 +190,18 @@ function init(modules: {
 		} else {
 			const declaration =
 				typechecker.getSymbolAtLocation(node).valueDeclaration;
-			if (ts.isVariableDeclaration(declaration)) {
-				if (ts.isCallExpression(declaration.initializer)) {
-					if (ts.isIdentifier(declaration.initializer.arguments[0])) {
-						// The first element in the wrapper function will always be the original function
-						return declaration.initializer.arguments[0]
-							.escapedText as string;
-					}
-				}
+				// We trace the AST to find the identifier of the original function that was wrapped
+				// So basically looking for this:
+				//
+				// const originalFuncWithMetrics = autometrics(originalFunc)
+			if (
+				ts.isVariableDeclaration(declaration) &&
+				ts.isCallExpression(declaration.initializer) &&
+				ts.isIdentifier(declaration.initializer.arguments[0])
+			) {
+				// The first element in the wrapper function will always be the original function
+				return declaration.initializer.arguments[0]
+					.escapedText as string;
 			}
 		}
 	}
