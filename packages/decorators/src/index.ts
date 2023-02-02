@@ -42,6 +42,7 @@ type AnyFunction<T extends FunctionSig> = (
 ) => ReturnType<T>;
 
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
+
 /**
  * Autometrics wrapper for **functions** that automatically instruments the wrapped function with OpenTelemetry-compatible metrics.
  *
@@ -59,5 +60,54 @@ export function autometrics<F extends AnyFunction<F>>(
 		);
 	}
 
+	return function (...params: Parameters<F>): ReturnType<F> {
+		let result: any | Promise<any>;
+		const autometricsStart = new Date().getTime();
+		const counter = meter.createCounter("function.calls.count");
+		const histogram = meter.createHistogram("function.calls.duration");
+
+		const onSuccess = () => {
+			counter.add(1, { function: fn.name, result: "ok" });
+			const autometricsDuration = new Date().getTime() - autometricsStart;
+			histogram.record(autometricsDuration, { function: fn.name });
+		};
+
+		const onError = () => {
+			const autometricsDuration = new Date().getTime() - autometricsStart;
+			counter.add(1, { method: fn.name, result: "error" });
+			histogram.record(autometricsDuration, { method: fn.name });
+		};
+
+		try {
+			result = fn(...params);
+			if (isPromise(result)) {
+				return result
+					.then((res) => {
+						onSuccess();
+						return res;
+					})
+					.catch((err) => {
+						onError();
+						throw err;
+					});
+			} else {
+				onSuccess();
 			}
+		} catch (error) {
+			onError();
+		}
+		return result;
+	};
+}
+
+function isPromise(res: any | Promise<any>): boolean {
+	if (
+		typeof res === "object" &&
+		typeof res.then === "function" &&
+		typeof res.catch === "function"
+	) {
+		return true;
+	}
+
+	return false;
 }
