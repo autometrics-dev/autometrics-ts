@@ -1,5 +1,6 @@
 import { OtelMetrics } from "./instrumentation";
 import otel from "@opentelemetry/api"
+import { otelMetrics } from "./instrumentation";
 
 /**
 * Autometrics automatically instruments the decorated class method or a wrapped function.
@@ -8,6 +9,7 @@ import otel from "@opentelemetry/api"
 */
 export default function autometrics(_target: Object, property_key: string, descriptor: PropertyDescriptor) {
 	OtelMetrics.instance() // should ensure the instrumentation is initialized only once no matter how many times this function is called
+	const _meterProvider = otelMetrics;
 	const meter = otel.metrics.getMeter("autometrics-prometheus");
 
 	const original_function = descriptor.value;
@@ -41,6 +43,7 @@ type AnyFunction = (...args: any[]) => any
 export function autometrics_wrapper<T extends AnyFunction>(fn: T): (...params: Parameters<T>) => ReturnType<T> {
 
 	OtelMetrics.instance() // should ensure the instrumentation is initialized only once no matter how many times this function is called
+	const _meterProvider = otelMetrics;
 	const meter = otel.metrics.getMeter("autometrics-prometheus");
 
 	return function(...params: Parameters<T>): ReturnType<T> {
