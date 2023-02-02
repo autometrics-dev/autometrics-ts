@@ -40,16 +40,20 @@ export function Autometrics(
 	);
 }
 
-type AnyFunction = (...args: any[]) => any;
+type AnyFunction<T extends (...args: any) => any> = (...params: Parameters<T>) => ReturnType<T>;
+
+interface AutometricsWrapper<T extends (...args: any) => any> extends AnyFunction<T> {
+	_autometrics: boolean
+}
 
 /**
  * Autometrics wrapper for **functions** that automatically instruments the wrapped function with OpenTelemetry-compatible metrics.
  *
  * Hover over the wrapped function to get the links for generated queries (if you have the language service plugin installed)
  */
-export function autometrics<T extends AnyFunction>(
+export function autometrics<T extends AnyFunction<T>>(
 	fn: T
-): (...params: Parameters<T>) => ReturnType<T> & { _autometrics: boolean } {
+): AutometricsWrapper<T> {
 	const _meterProvider = otelMetrics;
 	const meter = otel.metrics.getMeter("autometrics-prometheus");
 
