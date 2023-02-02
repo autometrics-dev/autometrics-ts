@@ -38,6 +38,23 @@ export function Autometrics(
 		},
 		{ _autometrics: true }
 	);
+	descriptor.value = function (...args: any) {
+		let result: any;
+		const autometricsStart = new Date().getTime();
+		const counter = meter.createCounter("method.calls.count");
+		const histogram = meter.createHistogram("method.calls.duration");
+		try {
+			result = originalFunction.apply(this, args);
+			counter.add(1, { method: propertyKey, result: "ok" });
+			const autometricsDuration = new Date().getTime() - autometricsStart;
+			histogram.record(autometricsDuration, { method: propertyKey });
+		} catch (error) {
+			const autometricsDuration = new Date().getTime() - autometricsStart;
+			counter.add(1, { method: propertyKey, result: "error" });
+			histogram.record(autometricsDuration, { method: propertyKey });
+		}
+		return result;
+	};
 }
 
 type AnyFunction<T extends (...args: any) => any> = (...params: Parameters<T>) => ReturnType<T>;
@@ -63,26 +80,5 @@ export function autometrics<T extends AnyFunction<T>>(
 		);
 	}
 
-	return Object.assign(
-		function(...params: Parameters<T>): ReturnType<T> {
-			let result: any;
-			const autometricsStart = new Date().getTime();
-			const counter = meter.createCounter("function.calls.count");
-			const histogram = meter.createHistogram("function.calls.duration");
-			try {
-				result = fn(...params);
-				counter.add(1, { function: fn.name, result: "ok" });
-				const autometricsDuration =
-					new Date().getTime() - autometricsStart;
-				histogram.record(autometricsDuration, { function: fn.name });
-			} catch (error) {
-				const autometricsDuration =
-					new Date().getTime() - autometricsStart;
-				counter.add(1, { method: fn.name, result: "error" });
-				histogram.record(autometricsDuration, { method: fn.name });
 			}
-			return result;
-		},
-		{ _autometrics: true }
-	);
 }
