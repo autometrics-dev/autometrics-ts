@@ -149,8 +149,10 @@ function init(modules: {
 		nodeType: "function" | "method"
 	): boolean {
 		if (nodeType == "function") {
-			const type = typechecker.getTypeAtLocation(node).symbol.getEscapedName() as string;
-			return type == "AutometricsWrapper" ? true : false
+			const type = typechecker
+				.getTypeAtLocation(node)
+				.symbol.getEscapedName() as string;
+			return type == "AutometricsWrapper" ? true : false;
 		} else if (nodeType == "method") {
 			if (
 				ts.canHaveDecorators(node.parent) &&
