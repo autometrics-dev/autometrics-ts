@@ -272,7 +272,7 @@ function init(modules: {
 			nodeIdentifier,
 			nodeType
 		);
-		return `sum by (function, module) (rate(${nodeType}_calls_count{{${nodeType}="${nodeIdentifier}",result="error"}}[5m])) / ${requestQuery}`;
+		return `sum by (function, module) (rate(${nodeType}_calls_count{${nodeType}="${nodeIdentifier}",result="error"}[5m])) / ${requestQuery}`;
 	}
 
 	function make_prometheus_url(query: string, base?: string) {
