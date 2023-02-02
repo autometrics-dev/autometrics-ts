@@ -4,20 +4,14 @@
     "name": "autometrics",
     "workspaces": [
         "packages/autometrics-docs",
-        "packages/rollup",
-        "packages/vite",
-        "packages/decorators",
-        "packages/core"
+        "packages/decorators"
     ],
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
     "scripts": {
-        "dev": "npm run dev --workspace=rollup --workspace=autometrics-docs",
+        "dev": "npm run dev --workspace=autometrics-docs --workspace=autometrics-decorators",
         "dev:docs": "npm run dev --workspace=autometrics-docs",
-        "dev:rollup": "npm run dev --workspace=rollup"
-    },
-    "dependencies": {
-        "@autometricsjs/core": "^0.0.1"
+        "dev:decorators": "npm run dev --workspace=autometrics-decorators"
     }
 }
