@@ -149,25 +149,8 @@ function init(modules: {
 		nodeType: "function" | "method"
 	): boolean {
 		if (nodeType == "function") {
-			const type = typechecker.getTypeAtLocation(node);
-			const signature = typechecker
-				.getSignaturesOfType(type, ts.SignatureKind.Call)[0]
-				.getReturnType();
-
-			let autometricsProp: ts.Type | undefined;
-			if (signature.isUnionOrIntersection()) {
-				autometricsProp = signature.types.find((type) => {
-					const typeProps = type.getProperties();
-					const typePropsNames = typeProps.find((prop) => {
-						if (prop.escapedName == "_autometrics") {
-							return true;
-						}
-					});
-					return typePropsNames ? true : false;
-				});
-			}
-
-			return autometricsProp ? true : false;
+			const type = typechecker.getTypeAtLocation(node).symbol.getEscapedName() as string;
+			return type == "AutometricsWrapper" ? true : false
 		} else if (nodeType == "method") {
 			if (
 				ts.canHaveDecorators(node.parent) &&
@@ -185,46 +168,6 @@ function init(modules: {
 			return false;
 		}
 	}
-
-	// function isAutometricsWrappedOrDecorated(
-	// 	node: ts.Node,
-	// 	typechecker: ts.TypeChecker,
-	// 	nodeType: "function" | "method"
-	// ): boolean {
-	// 	const declaration =
-	// 		typechecker.getSymbolAtLocation(node).valueDeclaration;
-
-	// 	if (nodeType == "function") {
-	// 		if (ts.isVariableDeclaration(declaration)) {
-	// 			if (ts.isCallExpression(declaration.initializer)) {
-	// 				if (ts.isIdentifier(declaration.initializer.expression)) {
-	// 					if (
-	// 						declaration.initializer.expression.escapedText ==
-	// 						"autometrics_wrapper"
-	// 					) {
-	// 						return true;
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	} else if (nodeType == "method") {
-	// 		if (ts.canHaveDecorators(node.parent)) {
-	// 			const decorators = ts.getDecorators(node.parent);
-
-	// 			if (decorators == undefined) {
-	// 				return false
-	// 			}
-
-	// 			const autometricsTag = decorators.find(
-	// 				(dec) => dec.getText() == "@autometrics"
-	// 			);
-
-	// 			return autometricsTag ? true : false;
-	// 		}
-	// 	} else {
-	// 		throw new Error("Unhandled node type");
-	// 	}
-	// }
 
 	/**
 	 * Gets the node identifier
