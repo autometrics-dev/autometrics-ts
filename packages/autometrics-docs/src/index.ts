@@ -5,7 +5,7 @@ function init(modules: {
 
 	function create({
 		config,
-		languageService: languageService,
+		languageService,
 		project,
 	}: ts.server.PluginCreateInfo) {
 		// Diagnostic logging
@@ -40,7 +40,7 @@ function init(modules: {
 
 			const nodeAtCursor = getNodeAtCursor(sourceFile, position);
 
-			const nodeType: "function" | "method" | undefined = getNodeType(
+			const nodeType = getNodeType(
 				nodeAtCursor,
 				typechecker
 			);
