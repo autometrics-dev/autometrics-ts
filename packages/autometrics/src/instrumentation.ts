@@ -14,24 +14,3 @@ export const OTEL_METRICS = (function(){
 	otel.metrics.setGlobalMeterProvider(autometricsMeterProvider);
 	return autometricsMeterProvider;
 })()
-
-//export class OtelMetrics {
-//	private static INSTANCE: OtelMetrics;
-//
-//	private constructor() {
-//		const exporter = new PrometheusExporter();
-//		const autometricsMeterProvider = new MeterProvider();
-//		autometricsMeterProvider.addMetricReader(exporter);
-//
-//		otel.metrics.setGlobalMeterProvider(autometricsMeterProvider);
-//		return autometricsMeterProvider;
-//	}
-//
-//	static instance() {
-//		if (!OtelMetrics.INSTANCE) {
-//			OtelMetrics.INSTANCE = new OtelMetrics();
-//		}
-//
-//		return OtelMetrics.INSTANCE;
-//	}
-//}

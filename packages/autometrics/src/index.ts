@@ -1,35 +1,42 @@
-import { otelMetrics } from "./instrumentation";
 import otel from "@opentelemetry/api";
+import { OTEL_METRICS } from "./instrumentation";
 
 /**
  * Autometrics decorator for **class methods** that automatically instruments the decorated method with OpenTelemetry-compatible metrics.
  *
  * Hover over the method to get the links for generated queries (if you have the language service plugin installed)
  */
-export function Autometrics(
+export function autometricsDecorator(
 	_target: Object,
 	propertyKey: string,
 	descriptor: PropertyDescriptor
 ) {
-	const _meterProvider = otelMetrics;
 	const meter = otel.metrics.getMeter("autometrics-prometheus");
-
 	const originalFunction = descriptor.value;
 
-	descriptor.value = function (...args: any) {
+	descriptor.value = function(...args: any) {
 		let result: any;
 		const autometricsStart = new Date().getTime();
 		const counter = meter.createCounter("method.calls.count");
 		const histogram = meter.createHistogram("method.calls.duration");
-		try {
-			result = originalFunction.apply(this, args);
+
+		const onSuccess = () => {
 			counter.add(1, { method: propertyKey, result: "ok" });
 			const autometricsDuration = new Date().getTime() - autometricsStart;
 			histogram.record(autometricsDuration, { method: propertyKey });
-		} catch (error) {
+		}
+
+		const onError = () => {
 			const autometricsDuration = new Date().getTime() - autometricsStart;
 			counter.add(1, { method: propertyKey, result: "error" });
 			histogram.record(autometricsDuration, { method: propertyKey });
+		}
+
+		try {
+			result = originalFunction.apply(this, args);
+			onSuccess()
+		} catch (error) {
+			onError()
 		}
 		return result;
 	};
@@ -41,26 +48,28 @@ type AnyFunction<T extends FunctionSig> = (
 	...params: Parameters<T>
 ) => ReturnType<T>;
 
-interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
+interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> { }
 
 /**
- * Autometrics wrapper for **functions** that automatically instruments the wrapped function with OpenTelemetry-compatible metrics.
- *
- * Hover over the wrapped function to get the links for generated queries (if you have the language service plugin installed)
- */
+* Autometrics wrapper for **functions** that automatically instruments the wrapped function with OpenTelemetry-compatible metrics.
+*
+* Hover over the wrapped function to get the links for generated queries (if you have the language service plugin installed)
+* @param - the function that will be wrapped and instrumented
+*/
 export function autometrics<F extends AnyFunction<F>>(
 	fn: F
 ): AutometricsWrapper<F> {
-	const _meterProvider = otelMetrics;
+
+	const _meterProvider = OTEL_METRICS;
 	const meter = otel.metrics.getMeter("autometrics-prometheus");
 
-	if (fn.name == undefined || fn.name == null) {
-		throw new TypeError(
-			"Autometrics decorated function must have a name to succesfully create a metric"
-		);
+	if (!fn.name) {
+		throw new TypeError("Autometrics decorated function must have a name to succesfully create a metric");
 	}
 
-	return function (...params: Parameters<F>): ReturnType<F> {
+
+	return function(...params: Parameters<F>): ReturnType<F> {
+
 		let result: any | Promise<any>;
 		const autometricsStart = new Date().getTime();
 		const counter = meter.createCounter("function.calls.count");
@@ -74,19 +83,19 @@ export function autometrics<F extends AnyFunction<F>>(
 
 		const onError = () => {
 			const autometricsDuration = new Date().getTime() - autometricsStart;
-			counter.add(1, { method: fn.name, result: "error" });
-			histogram.record(autometricsDuration, { method: fn.name });
+			counter.add(1, { function: fn.name, result: "error" });
+			histogram.record(autometricsDuration, { function: fn.name });
 		};
 
 		try {
 			result = fn(...params);
 			if (isPromise(result)) {
 				return result
-					.then((res) => {
+					.then((res: any) => {
 						onSuccess();
 						return res;
 					})
-					.catch((err) => {
+					.catch((err: any) => {
 						onError();
 						throw err;
 					});
@@ -98,6 +107,7 @@ export function autometrics<F extends AnyFunction<F>>(
 		}
 		return result;
 	};
+
 }
 
 function isPromise(res: any | Promise<any>): boolean {
@@ -111,3 +121,4 @@ function isPromise(res: any | Promise<any>): boolean {
 
 	return false;
 }
+
