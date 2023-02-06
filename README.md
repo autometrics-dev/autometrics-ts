@@ -1,89 +1,102 @@
-# Autometrics
+# AutometricsTS 📈
 
-> Understand your system easily using automatically generated metrics and pre-built Prometheus queries.
+**AutometricsTS is a library that makes it trivial to add useful metrics and see performance of any function or method in your codebase**
 
-Autometrics for Typescript provides a JSDoc tag for instrument functions throughout your code base.
-It creates metrics for you and then offers customized Prometheus queries for you to run to observe your system in production.
+> A TypeScript port of the Rust [autometrics-rs](https://github.com/fiberplane/autometrics-rs) library
 
-Autometrics currently generates the following queries for each instrumented function:
+Autometrics for Typescript provides a wrapper function and a decorator  that can create OpenTelemetry metrics for your functions and class methods throughout your code base, as well as a language service plugin that will write corresponding Prometheus queries for you.
 
-- Request rate
-- Error rate
-- Latency (95th and 99th percentiles)
+Currently Autometrics only works on the server with NodeJS. We're looking into extending support for Deno, other runtimes, and the client.
 
-## Autometrics in Typescript 
+## How it works
 
-TODO:
+The AutometricsTS library consists of two parts:
+- the wrapper and decorator helpers
+- the language service plugin
 
-- [ ] Async function supported
-- [ ] Prometheus exporter configurability
+The wrappers and decorators:
+- Automatically instruments your code with OpenTelemetry metrics
+- Uses a Prometheus Exporter to write metrics to a `/metrics` endpoint (by default on port `:9464`)
 
-You can add autometrics to Typescript class methods and functions by using decorators and wrappers.
+The language service plugin:
+- Automatically writes useful Prometheus queries for instrumented functions and shows them in the doc comments.
+
+
+### 1. Install and setup the library and the language service plugin
+
+Install both the helpers and the language service plugin using these commands:
+
+```shell
+npm install --save autometrics
+npm install --save-dev autometrics-docs
+```
+
+Add the language service plugin to the `tsconfig.json` file:
+
+```diff
+{
+    "compilerOptions": {
+       ...
++        "plugins": [{
++            "name": "autometrics-docs",
++            "prometheusUrl": "" // localhost:9090 by default
++        }]
+    },
+	...
+}
+```
+
+> **⚠️ Note** 
+> 
+> If on VSCode: make sure you select your VSCode Typescript server to local to the project (where you have Typescript installed in your `devDependencies`)
+
+### 2. Wrap functions or decorate class methods
+
+Use Autometrics wrappers to instrument the functions you want to track (e.g.: request handlers or database calls).
+
+
+### Adding wrappers
+
+Wrappers are simple functions that wrap the original function declaration instrumenting it with metrics, while preserving the original type signature (your type docs on hover will not be touched).
+
+Call the wrapped function to get metrics for the .
+
+```diff
++ import { autometrics } from "autometrics";
+
+function createHello() {
+  return "hello"
+}
+
++ // Now call the instrumented function as opposed to the original one
++ const hello = autometrics(createHello)
+```
 
 ### Adding decorators
 
-Decorators can be added to class methods (only methods supported for now). Decorators can have arguments (currently not supported). They can also be nested (autometrics decorator should come last)
-
-For methods where a decorator is added, they are wrapped in additional code that instruments it with a histogram and counter.
+For methods where a decorator is added, they are wrapped in additional code that instruments it with OpenTelemetry metrics.
 
 Here's a snippet from the example code:
 
 ```diff
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-+ import { Autometrics } from "autometrics-decorators";
++ import { autometricsDecorator as autometrics } from "autometrics";
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-+ @Autometrics
++ @autometrics
   getHello(): string {
     return this.appService.getHello();
   }
 }
 ```
 
-### Adding wrappers
+### 3. Hover over the function name to see the generated queries
 
-Wrappers are simple functions that wrap the original function declaration instrumenting it with a histogram and counter, while preserving the original type signature (your type docs on hover will not be touched).
+You can click on any of the links to go directly to the Prometheus chart for that function.
 
-Call the wrapped function if you want to get its metrics.
-
-```diff
-+ import { autometrics } from "autometrics-decorators";
-
-function createBye() {
-  return "bye"
-}
-
-+ const createByeMetrics = autometrics(createBye)
-+
-+ // Now call the instrumented function as opposed to the original one
-+
-+ createByeMetrics()
-```
-
-### Adding language service plugin
-
-In order to render Prometheus query helpers on hover you need to set up the language service plugin.
-
-1. Install `autometrics-ts/packages/autometrics-docs` package
-2. In `tsconfig.json`:
-
-```diff
-
-{
-    "compilerOptions": {
-       ...
-+        "plugins": [{
-+            "name": "autometrics-docs"
-+        }]
-    },
-	...
-}
-
-```
-
-3. Make sure you select your VSCode Typescript server to local to the project (where you have Typescript installed in your `devDependencies`)
+![picture: Generated queries inside doc comments](assets/hover.png)
