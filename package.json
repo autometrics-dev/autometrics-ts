@@ -1,17 +1,16 @@
 {
     "private": true,
     "type": "module",
-    "name": "autometrics",
+    "name": "autometrics-monorepo",
     "workspaces": [
         "packages/autometrics-docs",
-        "packages/decorators"
+        "packages/autometrics"
     ],
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
     "scripts": {
-        "dev": "npm run dev --workspace=autometrics-docs --workspace=autometrics-decorators",
         "dev:docs": "npm run dev --workspace=autometrics-docs",
-        "dev:decorators": "npm run dev --workspace=autometrics-decorators"
+        "dev:decorators": "npm run dev --workspace=autometrics"
     }
 }
