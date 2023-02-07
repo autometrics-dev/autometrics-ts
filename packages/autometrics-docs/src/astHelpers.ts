@@ -14,7 +14,7 @@ export function isAutometricsWrappedOrDecorated(
 	// in which case we should not show the queries
 	const checkIfWrapperItself = (node: ts.Node) => {
 		return (
-			typechecker.getTypeAtLocation(node)?.symbol?.getEscapedName() ==
+			typechecker.getTypeAtLocation(node)?.symbol?.getEscapedName() ===
 			"autometrics"
 		);
 	};
@@ -34,7 +34,7 @@ export function isAutometricsWrappedOrDecorated(
 	const type = checkWrapperType(node);
 	const parentType = checkWrapperType(node.parent);
 
-	if (type == "AutometricsWrapper" || parentType == "AutometricsWrapper") {
+	if (type === "AutometricsWrapper" || parentType === "AutometricsWrapper") {
 		return true;
 	}
 
@@ -44,7 +44,7 @@ export function isAutometricsWrappedOrDecorated(
 		const decorators = ts.getDecorators(node.parent);
 		const autometricsDecorator = decorators.find((dec) => {
 			// TODO: make this more flexible for when decorators will have parameters
-			if (dec.getText() == "@autometrics") {
+			if (dec.getText() === "@autometrics") {
 				return true;
 			}
 		});
@@ -67,11 +67,11 @@ export function getNodeIdentifier(
 	nodeType: "function" | "method",
 	typechecker: ts.TypeChecker,
 ): string {
-	if (nodeType == "method") {
+	if (nodeType === "method") {
 		if (ts.isIdentifier(node)) {
 			return node.escapedText as string;
 		}
-	} else if (nodeType == "function") {
+	} else if (nodeType === "function") {
 		const declaration = typechecker.getSymbolAtLocation(node).valueDeclaration;
 
 		const type = typechecker
@@ -86,7 +86,7 @@ export function getNodeIdentifier(
 		//
 		// The first element in the wrapper function will always be the original function
 		if (
-			type == "AutometricsWrapper" &&
+			type === "AutometricsWrapper" &&
 			ts.isVariableDeclaration(declaration) &&
 			ts.isCallExpression(declaration.initializer) &&
 			ts.isIdentifier(declaration.initializer.arguments[0]) &&

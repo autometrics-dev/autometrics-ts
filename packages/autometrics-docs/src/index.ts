@@ -45,7 +45,7 @@ function init(modules: {
 				position,
 			);
 
-			if (prior == undefined) {
+			if (prior === undefined) {
 				return prior;
 			}
 
@@ -54,7 +54,6 @@ function init(modules: {
 			const sourceFile = languageService.getProgram().getSourceFile(filename);
 
 			const nodeAtCursor = getNodeAtCursor(sourceFile, position);
-			debugger;
 
 			const nodeType = getNodeType(nodeAtCursor, typechecker);
 
@@ -65,7 +64,11 @@ function init(modules: {
 
 			// If either autometrics checker or node type is undefined
 			// return early
-			if (!autometrics || !nodeType) {
+			if (!autometrics) {
+				return prior;
+			}
+
+			if (!nodeType) {
 				return prior;
 			}
 
