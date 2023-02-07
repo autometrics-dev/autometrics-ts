@@ -42,6 +42,7 @@ export function autometricsDecorator(
 	};
 }
 
+// Function Wrapper
 type FunctionSig = (...args: any) => any;
 
 type AnyFunction<T extends FunctionSig> = (
