@@ -2,16 +2,15 @@ import {
 	getNodeAtCursor,
 	getNodeType,
 	getNodeIdentifier,
-	isAutometricsWrappedOrDecorated
+	isAutometricsWrappedOrDecorated,
 } from "./astHelpers";
 
 import {
 	createLatencyQuery,
 	createRequestRateQuery,
 	createErrorRatioQuery,
-	makePrometheusUrl
+	makePrometheusUrl,
 } from "./queryHelpers";
-
 
 function init(modules: {
 	typescript: typeof import("typescript/lib/tsserverlibrary");
@@ -25,7 +24,7 @@ function init(modules: {
 	}: ts.server.PluginCreateInfo) {
 		// Diagnostic logging
 		project.projectService.logger.info(
-			"I'm getting set up now! Check the log for this message."
+			"I'm getting set up now! Check the log for this message.",
 		);
 
 		// Set up decorator object
@@ -40,47 +39,40 @@ function init(modules: {
 		const prometheusBase: string | undefined = config.url;
 
 		proxy.getQuickInfoAtPosition = (filename, position) => {
-
 			const typechecker = languageService.getProgram().getTypeChecker();
 			const prior: ts.QuickInfo = languageService.getQuickInfoAtPosition(
 				filename,
-				position
+				position,
 			);
 
 			if (prior == undefined) {
-				return prior
+				return prior;
 			}
 
 			let { documentation } = prior;
 
-			const sourceFile = languageService
-				.getProgram()
-				.getSourceFile(filename);
-
+			const sourceFile = languageService.getProgram().getSourceFile(filename);
 
 			const nodeAtCursor = getNodeAtCursor(sourceFile, position);
-			debugger
+			debugger;
 
-			const nodeType = getNodeType(
-				nodeAtCursor,
-				typechecker
-			);
+			const nodeType = getNodeType(nodeAtCursor, typechecker);
 
 			const autometrics = isAutometricsWrappedOrDecorated(
 				nodeAtCursor,
-				typechecker
+				typechecker,
 			);
 
 			// If either autometrics checker or node type is undefined
 			// return early
 			if (!autometrics || !nodeType) {
-				return prior
+				return prior;
 			}
 
 			const nodeIdentifier = getNodeIdentifier(
 				nodeAtCursor,
 				nodeType,
-				typechecker
+				typechecker,
 			);
 
 			const latency = createLatencyQuery(nodeIdentifier, nodeType);
@@ -101,7 +93,7 @@ function init(modules: {
 					kind: "string",
 					text: `- [Request rate](${makePrometheusUrl(
 						requestRate,
-						prometheusBase
+						prometheusBase,
 					)})`,
 				},
 				{
@@ -112,7 +104,7 @@ function init(modules: {
 					kind: "string",
 					text: `- [Error ratio](${makePrometheusUrl(
 						errorRatio,
-						prometheusBase
+						prometheusBase,
 					)})`,
 				},
 				{
@@ -123,7 +115,7 @@ function init(modules: {
 					kind: "string",
 					text: `- [Latency (95th and 99th percentiles)](${makePrometheusUrl(
 						latency,
-						prometheusBase
+						prometheusBase,
 					)})`,
 				},
 				{
@@ -131,15 +123,11 @@ function init(modules: {
 					text: "\n",
 				},
 			];
-			documentation = documentation.concat(
-				preamble,
-				documentation,
-				queries
-			);
+			documentation = documentation.concat(preamble, documentation, queries);
 
 			return <ts.QuickInfo>{
 				...prior,
-				documentation
+				documentation,
 			};
 		};
 

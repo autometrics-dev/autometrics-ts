@@ -9,12 +9,12 @@ import { OTEL_METRICS } from "./instrumentation";
 export function autometricsDecorator(
 	_target: Object,
 	propertyKey: string,
-	descriptor: PropertyDescriptor
+	descriptor: PropertyDescriptor,
 ) {
 	const meter = otel.metrics.getMeter("autometrics-prometheus");
 	const originalFunction = descriptor.value;
 
-	descriptor.value = function(...args: any) {
+	descriptor.value = function (...args: any) {
 		let result: any;
 		const autometricsStart = new Date().getTime();
 		const counter = meter.createCounter("method.calls.count");
@@ -24,19 +24,19 @@ export function autometricsDecorator(
 			counter.add(1, { method: propertyKey, result: "ok" });
 			const autometricsDuration = new Date().getTime() - autometricsStart;
 			histogram.record(autometricsDuration, { method: propertyKey });
-		}
+		};
 
 		const onError = () => {
 			const autometricsDuration = new Date().getTime() - autometricsStart;
 			counter.add(1, { method: propertyKey, result: "error" });
 			histogram.record(autometricsDuration, { method: propertyKey });
-		}
+		};
 
 		try {
 			result = originalFunction.apply(this, args);
-			onSuccess()
+			onSuccess();
 		} catch (error) {
-			onError()
+			onError();
 		}
 		return result;
 	};
@@ -49,28 +49,27 @@ type AnyFunction<T extends FunctionSig> = (
 	...params: Parameters<T>
 ) => ReturnType<T>;
 
-interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> { }
+interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
 /**
-* Autometrics wrapper for **functions** that automatically instruments the wrapped function with OpenTelemetry-compatible metrics.
-*
-* Hover over the wrapped function to get the links for generated queries (if you have the language service plugin installed)
-* @param - the function that will be wrapped and instrumented
-*/
+ * Autometrics wrapper for **functions** that automatically instruments the wrapped function with OpenTelemetry-compatible metrics.
+ *
+ * Hover over the wrapped function to get the links for generated queries (if you have the language service plugin installed)
+ * @param - the function that will be wrapped and instrumented
+ */
 export function autometrics<F extends AnyFunction<F>>(
-	fn: F
+	fn: F,
 ): AutometricsWrapper<F> {
-
 	const _meterProvider = OTEL_METRICS;
 	const meter = otel.metrics.getMeter("autometrics-prometheus");
 
 	if (!fn.name) {
-		throw new TypeError("Autometrics decorated function must have a name to succesfully create a metric");
+		throw new TypeError(
+			"Autometrics decorated function must have a name to succesfully create a metric",
+		);
 	}
 
-
-	return function(...params: Parameters<F>): ReturnType<F> {
-
+	return function (...params: Parameters<F>): ReturnType<F> {
 		let result: any | Promise<any>;
 		const autometricsStart = new Date().getTime();
 		const counter = meter.createCounter("function.calls.count");
@@ -108,7 +107,6 @@ export function autometrics<F extends AnyFunction<F>>(
 		}
 		return result;
 	};
-
 }
 
 function isPromise(res: any | Promise<any>): boolean {
@@ -122,4 +120,3 @@ function isPromise(res: any | Promise<any>): boolean {
 
 	return false;
 }
-
