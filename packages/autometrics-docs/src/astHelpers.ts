@@ -86,23 +86,24 @@ export function getNodeIdentifier(
 		// If we find that we're hovering over a wrapped function,
 		// we trace the AST to find the identifier of the original function
 		// that was wrapped
+		//
+		// The first element in the wrapper function will always be the original function
 		if (
 			type == "AutometricsWrapper" &&
 			ts.isVariableDeclaration(declaration) &&
 			ts.isCallExpression(declaration.initializer) &&
-			ts.isIdentifier(declaration.initializer.arguments[0])
+			ts.isIdentifier(declaration.initializer.arguments[0]) &&
+			declaration.initializer.arguments[0]
 		) {
-			if (declaration.initializer.arguments[0]) {
-				// The first element in the wrapper function will always be the original function
-				return declaration.initializer.arguments[0].escapedText as string;
+
+			return declaration.initializer.arguments[0].escapedText as string;
+
+		} else {
+
+			// other wise just return the identifier user is currently hovering over
+			if (ts.isIdentifier(node)) {
+				return node.escapedText as string;
 			}
-		}
-
-	} else {
-
-		// other wise just return the identifier user is currently hovering over
-		if (ts.isIdentifier(node)) {
-			return node.escapedText as string;
 		}
 	}
 }
@@ -133,6 +134,13 @@ export function getNodeType(
 	} else if (
 		// If the original node declaration is a function declaration or expression
 		ts.isFunctionLike(declaration.valueDeclaration)
+	) {
+		return "function"
+	} else if (
+		// If the original node declaration is an declared with autometrics
+		// const originalFunc = () => {}
+		ts.isVariableDeclaration(declaration.valueDeclaration) &&
+		ts.isFunctionLike(declaration.valueDeclaration.initializer)
 	) {
 		return "function"
 	} else if (
