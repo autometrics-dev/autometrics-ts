@@ -10,14 +10,6 @@ const rootRoute = (req: express.Request, res: express.Response) => {
 	return res.status(200).send("did not delay - success");
 };
 
-const anotherRoute = autometrics(function anotherRoute(
-	req: express.Request,
-	res: express.Response,
-) {
-	console.log("request made");
-	return res.status(200).send("did not delay - success");
-});
-
 function badRoute(req: express.Request, res: express.Response) {
 	console.log("bad route request made");
 	throw new Error("Bad request");
@@ -46,12 +38,9 @@ async function asyncCall() {
 }
 
 app.get("/", autometrics(rootRoute));
-app.get("/another", (req, res) => anotherRoute(req, res));
 app.get("/bad", (req, res) => badRouteMetrics(req, res));
-app.get("/async", async (req, res) => asyncRouteMetrics(req, res));
+app.get("/async", autometrics(asyncRoute));
 
-const rootRouteMetrics = autometrics(rootRoute);
 const badRouteMetrics = autometrics(badRoute);
-const asyncRouteMetrics = autometrics(asyncRoute);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
