@@ -2,7 +2,7 @@
 	"compileOnSave": true,
 	"compilerOptions": {
 		"target": "esnext",
-		"module": "esnext",
+		"module": "commonjs",
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
