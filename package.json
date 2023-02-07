@@ -12,5 +12,8 @@
     "scripts": {
         "dev:docs": "npm run dev --workspace=autometrics-docs",
         "dev:decorators": "npm run dev --workspace=autometrics"
+    },
+    "dependencies": {
+        "rome": "^11.0.0"
     }
 }
