@@ -17,7 +17,7 @@ function badRoute(req: express.Request, res: express.Response) {
 
 async function asyncRoute(req: express.Request, res: express.Response) {
   console.log("async route request made");
-  const result = autometrics(asyncCall); // works with async
+  const result = await asyncCall(); // works with async
   return res.status(200).send(result);
 }
 
@@ -32,7 +32,6 @@ function resolveAfter2Seconds(): Promise<string> {
 async function asyncCall() {
   console.log("calling");
   const result = await resolveAfter2Seconds();
-  console.log(result);
   return result;
   // Expected output: "resolved"
 }
