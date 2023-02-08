@@ -13,8 +13,8 @@ export function autometricsDecorator(
   const meter = otel.metrics.getMeter("autometrics-prometheus");
   const originalFunction = descriptor.value;
 
-  descriptor.value = function(...args: any) {
-    let result: any;
+  descriptor.value = function(...args: unknown[]) {
+    let result: ReturnType<typeof originalFunction>;
     const autometricsStart = new Date().getTime();
     const counter = meter.createCounter("method.calls.count");
     const histogram = meter.createHistogram("method.calls.duration");
@@ -43,6 +43,7 @@ export function autometricsDecorator(
 }
 
 // Function Wrapper
+// rome-ignore lint/suspicious/noExplicitAny: this seems to be the preferred way for defining functions in typescript
 type FunctionSig = (...args: any[]) => any;
 
 type AnyFunction<T extends FunctionSig> = (
