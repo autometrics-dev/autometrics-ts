@@ -6,35 +6,35 @@ const app = express();
 const port = 8080;
 
 const rootRoute = (req: express.Request, res: express.Response) => {
-	console.log("request made");
-	return res.status(200).send("did not delay - success");
+  console.log("request made");
+  return res.status(200).send("did not delay - success");
 };
 
 function badRoute(req: express.Request, res: express.Response) {
-	console.log("bad route request made");
-	throw new Error("Bad request");
+  console.log("bad route request made");
+  throw new Error("Bad request");
 }
 
 async function asyncRoute(req: express.Request, res: express.Response) {
-	console.log("async route request made");
-	const result = autometrics(asyncCall); // works with async
-	return res.status(200).send(result);
+  console.log("async route request made");
+  const result = autometrics(asyncCall); // works with async
+  return res.status(200).send(result);
 }
 
 function resolveAfter2Seconds(): Promise<string> {
-	return new Promise((resolve) => {
-		setTimeout(() => {
-			resolve("resolved");
-		}, 2000);
-	});
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve("resolved");
+    }, 2000);
+  });
 }
 
 async function asyncCall() {
-	console.log("calling");
-	const result = await resolveAfter2Seconds();
-	console.log(result);
-	return result;
-	// Expected output: "resolved"
+  console.log("calling");
+  const result = await resolveAfter2Seconds();
+  console.log(result);
+  return result;
+  // Expected output: "resolved"
 }
 
 app.get("/", autometrics(rootRoute));

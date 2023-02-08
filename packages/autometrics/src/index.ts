@@ -13,7 +13,7 @@ export function autometricsDecorator(
   const meter = otel.metrics.getMeter("autometrics-prometheus");
   const originalFunction = descriptor.value;
 
-  descriptor.value = function(...args: unknown[]) {
+  descriptor.value = function (...args: unknown[]) {
     let result: ReturnType<typeof originalFunction>;
     const autometricsStart = new Date().getTime();
     const counter = meter.createCounter("method.calls.count");
@@ -50,7 +50,7 @@ type AnyFunction<T extends FunctionSig> = (
   ...params: Parameters<T>
 ) => ReturnType<T>;
 
-interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> { }
+interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
 /**
  * Autometrics wrapper for **functions** that automatically instruments the wrapped function with OpenTelemetry-compatible metrics.
@@ -69,7 +69,7 @@ export function autometrics<F extends FunctionSig>(
     );
   }
 
-  return function(...params) {
+  return function (...params) {
     const autometricsStart = new Date().getTime();
     const counter = meter.createCounter("function.calls.count");
     const histogram = meter.createHistogram("function.calls.duration");
@@ -89,11 +89,12 @@ export function autometrics<F extends FunctionSig>(
     try {
       const result = fn(...params);
       if (isPromise<ReturnType<F>>(result)) {
-        return result.then(
-          (res: Awaited<ReturnType<typeof result>>) => {
+        return result
+          .then((res: Awaited<ReturnType<typeof result>>) => {
             onSuccess();
             return res;
-          }).catch((err: unknown) => {
+          })
+          .catch((err: unknown) => {
             onError();
             throw err;
           });
@@ -109,10 +110,11 @@ export function autometrics<F extends FunctionSig>(
 }
 
 function isPromise<T extends Promise<void>>(val: unknown): val is T {
-  return typeof val === "object" &&
+  return (
+    typeof val === "object" &&
     "then" in val &&
     typeof val.then === "function" &&
     "catch" in val &&
-    typeof val.catch === "function";
+    typeof val.catch === "function"
+  );
 }
-

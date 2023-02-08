@@ -22,5 +22,7 @@ export function createErrorRatioQuery(
 
 const DEFAULT_URL = "http://localhost:9090/";
 export function makePrometheusUrl(query: string, base = DEFAULT_URL) {
-  return `${base && DEFAULT_URL}graph?g0.expr=${encodeURIComponent(query)}&g0.tab=0`;
+  return `${base && DEFAULT_URL}graph?g0.expr=${encodeURIComponent(
+    query,
+  )}&g0.tab=0`;
 }
