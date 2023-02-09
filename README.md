@@ -4,7 +4,7 @@
 
 > A TypeScript port of the Rust [autometrics-rs](https://github.com/fiberplane/autometrics-rs) library
 
-Autometrics for Typescript provides a wrapper function and a decorator  that can create OpenTelemetry metrics for your functions and class methods throughout your code base, as well as a language service plugin that will write corresponding Prometheus queries for you.
+Autometrics for Typescript provides a wrapper function and a decorator that can create OpenTelemetry metrics for your functions and class methods throughout your code base, as well as a language service plugin that will write corresponding Prometheus queries for you.
 
 Currently Autometrics only works on the server with NodeJS. We're looking into extending support for Deno, other runtimes, and the client.
 
@@ -55,7 +55,7 @@ Add the language service plugin to the `tsconfig.json` file:
 Use Autometrics wrappers to instrument the functions you want to track (e.g.: request handlers or database calls).
 
 
-### Adding wrappers
+#### Adding wrappers
 
 Wrappers are simple functions that wrap the original function declaration instrumenting it with metrics, while preserving the original type signature (your type docs on hover will not be touched).
 
