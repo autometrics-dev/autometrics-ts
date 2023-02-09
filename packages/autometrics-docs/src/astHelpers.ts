@@ -5,7 +5,6 @@ import ts from "typescript";
  * @param node The node itself
  * @param typechecker The helper utility typechecker
  */
-
 export function isAutometricsWrappedOrDecorated(
   node: ts.Node,
   typechecker: ts.TypeChecker,
