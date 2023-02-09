@@ -50,6 +50,9 @@ type AnyFunction<T extends FunctionSig> = (
   ...params: Parameters<T>
 ) => ReturnType<T>;
 
+/**
+ * This type signals to the language service plugin that it should show extra type documentation along with the queries.
+ */
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
 /**
@@ -75,8 +78,8 @@ export function autometrics<F extends FunctionSig>(
     const histogram = meter.createHistogram("function.calls.duration");
 
     const onSuccess = () => {
-      counter.add(1, { function: fn.name, result: "ok" });
       const autometricsDuration = new Date().getTime() - autometricsStart;
+      counter.add(1, { function: fn.name, result: "ok" });
       histogram.record(autometricsDuration, { function: fn.name });
     };
 
