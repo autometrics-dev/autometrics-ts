@@ -48,7 +48,14 @@ Add the language service plugin to the `tsconfig.json` file:
 
 > **⚠️ Note** 
 > 
-> If on VSCode: make sure you select your VSCode Typescript server to local to the project (where you have Typescript installed in your `devDependencies`)
+> If on VSCode: make sure you select your VSCode Typescript server to local to the project (where you have Typescript installed in your `devDependencies`).
+>
+> ```json
+> // .vscode/settings.json
+>{
+>    "typescript.tsdk": "node_modules/typescript/lib"
+>}
+> ```
 
 ### 2. Wrap functions or decorate class methods
 
@@ -57,7 +64,7 @@ Use Autometrics wrappers to instrument the functions you want to track (e.g.: re
 
 #### Adding wrappers
 
-Wrappers are simple functions that wrap the original function declaration instrumenting it with metrics, while preserving the original type signature (your type docs on hover will not be touched).
+Wrappers are simple functions that wrap the original function declaration instrumenting it with metrics and allowing the language service plugin to add additional information to the type docs.
 
 Call the wrapped function to get metrics for the .
 
