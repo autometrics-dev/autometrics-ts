@@ -2,14 +2,15 @@
 	"compileOnSave": true,
 	"compilerOptions": {
 		"target": "esnext",
-		"module": "commonjs",
+		"module": "esnext",
 		"declaration": true,
 		"declarationMap": true,
-		"sourceMap": true,
 		"esModuleInterop": true,
+		"moduleResolution": "node",
 		"resolveJsonModule": true,
 		"outDir": "dist"
 	},
 	"paths": ["src/**"],
 	"exclude": ["node_modules", "dist", "example"]
 }
+

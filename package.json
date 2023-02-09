@@ -1,19 +1,19 @@
 {
     "private": true,
     "type": "module",
-    "name": "autometrics",
+    "name": "autometrics-monorepo",
     "workspaces": [
         "packages/autometrics-docs",
-        "packages/rollup",
-        "packages/vite",
-        "packages/core"
+        "packages/autometrics"
     ],
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
     "scripts": {
-        "dev": "npm run dev --workspace=rollup --workspace=autometrics-docs",
         "dev:docs": "npm run dev --workspace=autometrics-docs",
-        "dev:rollup": "npm run dev --workspace=rollup"
+        "dev:decorators": "npm run dev --workspace=autometrics"
+    },
+    "dependencies": {
+        "rome": "^11.0.0"
     }
 }

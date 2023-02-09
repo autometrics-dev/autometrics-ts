@@ -1,73 +1,109 @@
-# Autometrics
-> Understand your system easily using automatically generated metrics and pre-built Prometheus queries.
+# AutometricsTS 📈
 
-Autometrics for Typescript provides a JSDoc tag for instrument functions throughout your code base.
-It creates metrics for you and then offers customized Prometheus queries for you to run to observe your system in production.
+**AutometricsTS is a library that makes it trivial to add useful metrics and see performance of any function or method in your codebase**
 
-Autometrics currently generates the following queries for each instrumented function:
-- Request rate
-- Error rate
-- Latency (95th and 99th percentiles)
-- Concurrent requests
+> A TypeScript port of the Rust [autometrics-rs](https://github.com/fiberplane/autometrics-rs) library
 
-## Autometrics in Typescript
+Autometrics for Typescript provides a wrapper function and a decorator that can create OpenTelemetry metrics for your functions and class methods throughout your code base, as well as a language service plugin that will write corresponding Prometheus queries for you.
 
-Unlike [Rust](github.com/fiberplane/autometrics-rs), Typescript (Javascript) does not have a language-built paradigm for compile-time code (macros). In the current prototype of autometrics for Typescript we're making use of two instruments:
-- build step to inject the instrumentation code;
-- language service plugin to show LSP documentation screens on instrumented functions.
+Currently Autometrics only works on the server with NodeJS. We're looking into extending support for Deno, other runtimes, and the client.
 
-> NOTE: this is very much a prototype stage still (full of FIXMEs and hardcoded assumptions)
+## How it works
 
-### Adding build step: Rollup plugin
+The AutometricsTS library consists of two parts:
+- the wrapper and decorator helpers
+- the language service plugin
 
-Known issues:
-- the official [@rollup/plugin-typescript](https://www.npmjs.com/package/@rollup/plugin-typescript) strips out the JSDoc comments before the `autometrics` plugin can kick in, rendering it useless. Still investigating.
+The wrappers and decorators:
+- Automatically instruments your code with OpenTelemetry metrics
+- Uses a Prometheus Exporter to write metrics to a `/metrics` endpoint (by default on port `:9464`)
 
-The first prototype of autometrics is built using the Rollup bundler. To add autometrics to your rollup config:
+The language service plugin:
+- Automatically writes useful Prometheus queries for instrumented functions and shows them in the doc comments.
 
-1. `npm install` the library `autometrics-ts/packages/rollup`
-2. In `rollup.config.ts` file:
 
-```diff
-import typescript from "rollup-plugin-typescript2";
-+ import autometrics from "rollup-plugin-autometrics";
+### 1. Install and setup the library and the language service plugin
 
-export default {
-	input: "src/index.ts",
-	output: {
-		file: "dist/bundle.js",
-		format: "cjs",
-	},
+Install both the helpers and the language service plugin using these commands:
 
-	plugins: [
-+		autometrics(), 
-		typescript()
-	],
-};
-
+```shell
+npm install --save autometrics
+npm install --save-dev autometrics-docs
 ```
 
-3. You can now instrument your functions using `@autometrics` JSDoc tag (note: they must be root level function declarations)
-
-### Adding language service plugin
-
-In order to render Prometheus query helpers on hover you need to set up the language service plugin.
-
-1. Install `autometrics-ts/packages/autometrics-docs` package
-2. In `tsconfig.json`:
+Add the language service plugin to the `tsconfig.json` file:
 
 ```diff
-
 {
     "compilerOptions": {
        ...
 +        "plugins": [{
-+            "name": "autometrics-docs"
++            "name": "autometrics-docs",
++            "prometheusUrl": "" // localhost:9090 by default
 +        }]
     },
 	...
 }
-
 ```
 
-3. Make sure you select your VSCode Typescript server to local to the project (where you have Typescript installed in your `devDependencies`)
+> **⚠️ Note** 
+> 
+> If on VSCode: make sure you select your VSCode Typescript server to local to the project (where you have Typescript installed in your `devDependencies`).
+>
+> ```json
+> // .vscode/settings.json
+>{
+>    "typescript.tsdk": "node_modules/typescript/lib"
+>}
+> ```
+
+### 2. Wrap functions or decorate class methods
+
+Use Autometrics wrappers to instrument the functions you want to track (e.g.: request handlers or database calls).
+
+
+#### Adding wrappers
+
+Wrappers are simple functions that wrap the original function declaration instrumenting it with metrics and allowing the language service plugin to add additional information to the type docs.
+
+Call the wrapped function to get metrics for the .
+
+```diff
++ import { autometrics } from "autometrics";
+
+function createHello() {
+  return "hello"
+}
+
++ // Now call the instrumented function as opposed to the original one
++ const hello = autometrics(createHello)
+```
+
+### Adding decorators
+
+For methods where a decorator is added, they are wrapped in additional code that instruments it with OpenTelemetry metrics.
+
+Here's a snippet from the example code:
+
+```diff
+import { Controller, Get } from '@nestjs/common';
+import { AppService } from './app.service';
++ import { autometricsDecorator as autometrics } from "autometrics";
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+  @Get()
++ @autometrics
+  getHello(): string {
+    return this.appService.getHello();
+  }
+}
+```
+
+### 3. Hover over the function name to see the generated queries
+
+You can click on any of the links to go directly to the Prometheus chart for that function.
+
+![picture: Generated queries inside doc comments](assets/hover.png)

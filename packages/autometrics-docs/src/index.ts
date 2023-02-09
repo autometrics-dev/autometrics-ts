@@ -1,143 +1,144 @@
+import {
+  getNodeAtCursor,
+  getNodeType,
+  getNodeIdentifier,
+  isAutometricsWrappedOrDecorated,
+} from "./astHelpers";
+
+import tsserver from "typescript/lib/tsserverlibrary";
+
+import {
+  createLatencyQuery,
+  createRequestRateQuery,
+  createErrorRatioQuery,
+  makePrometheusUrl,
+} from "./queryHelpers";
+
+const PLUGIN_NAME = "autometrics-docs"
+
 function init(modules: {
-	typescript: typeof import("typescript/lib/tsserverlibrary");
+  typescript: typeof tsserver;
 }) {
-	const ts = modules.typescript;
+  const ts = modules.typescript;
 
-	function create({
-		config,
-		languageService,
-		project,
-	}: ts.server.PluginCreateInfo) {
-		// Diagnostic logging
-		project.projectService.logger.info(
-			"I'm getting set up now! Check the log for this message."
-		);
+  function create({
+    config,
+    languageService,
+    project,
+  }: ts.server.PluginCreateInfo) {
+    // Diagnostic logging
+    function log(msg: string ) {
+      project.projectService.logger.info(`${PLUGIN_NAME}: ${msg}`);
+    } 
 
-		// Set up decorator object
-		const proxy: ts.LanguageService = Object.create(null);
-		for (let k of Object.keys(languageService) as Array<
-			keyof ts.LanguageService
-		>) {
-			const x = languageService[k]!;
-			proxy[k] = (...args: Array<{}>) => x.apply(languageService, args);
-		}
+    log("started")
 
-		const prometheusBase: string | undefined = config.url;
+    // Set up decorator object
+    const proxy: ts.LanguageService = Object.create(null);
+    for (let k of Object.keys(languageService) as Array<
+      keyof ts.LanguageService
+    >) {
+      const x = languageService[k]!;
+      proxy[k] = (...args: Array<{}>) => x.apply(languageService, args);
+    }
 
-		proxy.getQuickInfoAtPosition = (filename, position) => {
-			const prior = languageService.getQuickInfoAtPosition(
-				filename,
-				position
-			);
+    const prometheusBase: string | undefined = config.url;
 
-			const sourceFile = languageService
-				.getProgram()
-				.getSourceFile(filename);
+    proxy.getQuickInfoAtPosition = (filename, position) => {
+      const typechecker = languageService.getProgram().getTypeChecker();
+      const prior: ts.QuickInfo = languageService.getQuickInfoAtPosition(
+        filename,
+        position,
+      );
 
-			const nodeAtCursor = findChildContainingPosition(
-				sourceFile,
-				position
-			);
+      if (prior === undefined) {
+        return prior;
+      }
 
-			let function_label: string;
-			debugger;
+      let { documentation } = prior;
 
-			if (ts.isIdentifier(nodeAtCursor)) {
-				function_label = nodeAtCursor.escapedText as string;
-			}
+      const sourceFile = languageService.getProgram().getSourceFile(filename);
 
-			let { tags, documentation } = prior;
+      const nodeAtCursor = getNodeAtCursor(sourceFile, position);
 
-			if (tags == undefined) {
-				return prior;
-			}
+      const nodeType = getNodeType(nodeAtCursor, typechecker);
 
-			const autometricsTag = tags.find((tag) => {
-				if (tag.name == "autometrics") {
-					return true;
-				}
-			});
+      const autometrics = isAutometricsWrappedOrDecorated(
+        nodeAtCursor,
+        typechecker,
+      );
 
-			if (autometricsTag != undefined) {
-				let latency = `sum by (le, function, module) (rate(function_calls_duration_bucket{function="${function_label}"}[5m]))`;
-				latency = `# 95th and 99th percentile latencies
-histogram_quantile(0.99, ${latency}) or
-histogram_quantile(0.95, ${latency})`;
+      // If either autometrics checker or node type is undefined
+      // return early
+      if (!autometrics) {
+        return prior;
+      }
 
-				const requestRate = `sum by (function, module) (rate(function_calls_duration_bucket"${function_label}"[5m]))`;
-				const preamble = {
-					kind: "string",
-					text: `\n\n
-## Autometrics
-View the live metrics for this function:
-				`,
-				};
-				const queries = <ts.SymbolDisplayPart[]>[
-					{
-						kind: "space",
-						text: "\n",
-					},
-					{
-						kind: "string",
-						text: `- [Latency (95th and 99th percentiles)](${makePrometheusUrl(
-							latency,
-							prometheusBase
-						)})`,
-					},
-					{
-						kind: "space",
-						text: "\n",
-					},
-					{
-						kind: "string",
-						text: `- [Request rate](${makePrometheusUrl(
-							requestRate,
-							prometheusBase
-						)})`,
-					},
-				];
-				documentation = documentation.concat(
-					preamble,
-					documentation,
-					queries
-				);
+      if (!nodeType) {
+        return prior;
+      }
 
-				return <ts.QuickInfo>{
-					displayParts: prior.displayParts,
-					kind: prior.kind,
-					kindModifiers: prior.kindModifiers,
-					textSpan: prior.textSpan,
-					tags,
-					documentation,
-				};
-			}
+      const nodeIdentifier = getNodeIdentifier(
+        nodeAtCursor,
+        nodeType,
+        typechecker,
+      );
 
-			return prior;
-		};
+      const requestRate = createRequestRateQuery(nodeIdentifier, nodeType);
+      const errorRatio = createErrorRatioQuery(nodeIdentifier, nodeType);
+      const latency = createLatencyQuery(nodeIdentifier, nodeType);
 
-		return proxy;
-	}
+      const requestRateUrl = makePrometheusUrl(requestRate, prometheusBase);
+      const errorRatioUrl = makePrometheusUrl(errorRatio, prometheusBase);
+      const latencyUrl = makePrometheusUrl(latency,prometheusBase);
 
-	function makePrometheusUrl(query: string, base?: string) {
-		base != undefined ? base : "http://localhost:9090/";
-		return (
-			base + "graph?g0.expr=" + encodeURIComponent(query) + "&g0.tab=0"
-		);
-	}
+      const preamble = {
+        kind: "string",
+        text: `\n\n## Autometrics\n\nView the live metrics for the \`${nodeIdentifier}\` function:\n `,
+      };
 
-	function findChildContainingPosition(
-		sourceFile: ts.SourceFile,
-		position: number
-	): ts.Node | undefined {
-		function find(node: ts.Node): ts.Node | undefined {
-			if (position >= node.getStart() && position < node.getEnd()) {
-				return ts.forEachChild(node, find) || node;
-			}
-		}
-		return find(sourceFile);
-	}
+      const queries = <ts.SymbolDisplayPart[]>[
+        {
+          kind: "space",
+          text: "\n",
+        },
+        {
+          kind: "string",
+          text: `- [Request rate](${requestRateUrl})`,
+        },
+        {
+          kind: "space",
+          text: "\n",
+        },
+        {
+          kind: "string",
+          text: `- [Error ratio](${errorRatioUrl})`,
+        },
+        {
+          kind: "space",
+          text: "\n",
+        },
+        {
+          kind: "string",
+          text: `- [Latency (95th and 99th percentiles)](${latencyUrl})`,
+        },
+        {
+          kind: "space",
+          text: "\n",
+        },
+      ];
+      documentation = documentation.concat(preamble, documentation, queries);
 
-	return { create };
+      return <ts.QuickInfo>{
+        ...prior,
+        documentation,
+      };
+    };
+
+    return proxy;
+  }
+
+  return { create };
 }
 
 export = init;

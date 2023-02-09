@@ -10,7 +10,7 @@
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
-	"devDependencies": {
-		"typescript": "^4.9.4"
+	"peerDependencies": {
+		"typescript": ">=4.9.4"
 	}
 }
