@@ -1,15 +1,8 @@
 {
-	"compileOnSave": true,
+	"extends": "../../tsconfig.common.json",
 	"compilerOptions": {
-		"target": "esnext",
-		"module": "commonjs",
-		"declaration": true,
-		"declarationMap": true,
-		"sourceMap": true,
-		"esModuleInterop": true,
-		"resolveJsonModule": true,
-		"outDir": "dist"
+		"outDir": "./dist"
 	},
-	"paths": ["src/**"],
-	"exclude": ["node_modules", "dist", "example"]
+	"include": ["./src", "fixtures/utils/parseExample.ts", "fixtures/utils/parseExample.ts"],
+	"exclude": ["node_modules", "dist", "fixtures"]
 }
