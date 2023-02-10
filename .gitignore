@@ -1,7 +1,6 @@
 node_modules
-packages/rollup/example/dist
+examples/**/*/dist
+examples/**/*/package-lock.json
 packages/**/*/dist
-packages/**/*/package-lock.json
-
 .luarc.json
 .nvim.lua

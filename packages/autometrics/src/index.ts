@@ -1,6 +1,7 @@
 import otel from "@opentelemetry/api";
 import { initializeMetrics } from "./instrumentation";
 
+
 /**
  * Autometrics decorator for **class methods** that automatically instruments the decorated method with OpenTelemetry-compatible metrics.
  *
@@ -12,6 +13,7 @@ export function autometricsDecorator(
   descriptor: PropertyDescriptor,
 ) {
 	initializeMetrics()
+
   const meter = otel.metrics.getMeter("autometrics-prometheus");
   const originalFunction = descriptor.value;
 

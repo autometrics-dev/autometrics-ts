@@ -106,3 +106,4 @@ export class AppController {
 
 You can click on any of the links to go directly to the Prometheus chart for that function.
 
+![picture: Generated queries inside doc comments](assets/hover.png)

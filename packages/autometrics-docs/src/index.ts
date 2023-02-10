@@ -32,7 +32,6 @@ function init(modules: {
     };
 
     log("started");
-
     // Set up decorator object
     const proxy: ts.LanguageService = Object.create(null);
     for (let k of Object.keys(languageService) as Array<
@@ -91,6 +90,7 @@ function init(modules: {
       const requestRateUrl = makePrometheusUrl(requestRate, prometheusBase);
       const errorRatioUrl = makePrometheusUrl(errorRatio, prometheusBase);
       const latencyUrl = makePrometheusUrl(latency, prometheusBase);
+
 
       const preamble = {
         kind: "string",

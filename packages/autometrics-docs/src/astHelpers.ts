@@ -160,4 +160,3 @@ export function getNodeAtCursor(
   }
   return find(sourceFile);
 }
-
