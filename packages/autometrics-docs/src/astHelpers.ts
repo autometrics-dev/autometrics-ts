@@ -1,11 +1,10 @@
-import ts from "typescript";
+import ts from "typescript/lib/tsserverlibrary";
 
 /**
  * Checks if the node is wrapped or decorated by Autometrics (but not the wrapper or decorator itself!)
  * @param node The node itself
  * @param typechecker The helper utility typechecker
  */
-
 export function isAutometricsWrappedOrDecorated(
   node: ts.Node,
   typechecker: ts.TypeChecker,
@@ -161,3 +160,4 @@ export function getNodeAtCursor(
   }
   return find(sourceFile);
 }
+
