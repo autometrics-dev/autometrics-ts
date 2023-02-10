@@ -1,16 +1,26 @@
 {
 	"name": "autometrics-docs",
-	"version": "1.0.0",
-	"description": "",
+	"version": "0.0.1",
+	"description": "Language service plugin for autometrics",
+	"author": "Fiberplane<info@fiberplane.com>",
+	"contributors": [
+		"Laurynas Keturakis",
+		"Evan Schwartz",
+		"Jacco Flenter"
+	],
+	"repository": {"url": "https://github.com/fiberplane/autometrics-ts"},
+	"license": "MIT OR Apache-2.0",
+	"keywords": [],
 	"main": "dist/index",
 	"scripts": {
 		"dev": "tsc --watch",
-		"build": "tsc"
+		"build": "tsc",
+		"clean": "rm -rf dist/"
 	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
 	"peerDependencies": {
 		"typescript": ">=4.9.4"
+	},
+	"devDependencies": {
+		"vitest": "^0.28.4"
 	}
 }
