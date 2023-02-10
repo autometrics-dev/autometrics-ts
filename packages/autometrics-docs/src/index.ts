@@ -5,6 +5,8 @@ import {
   isAutometricsWrappedOrDecorated,
 } from "./astHelpers";
 
+import tsserver from "typescript/lib/tsserverlibrary";
+
 import {
   createLatencyQuery,
   createRequestRateQuery,
@@ -12,8 +14,10 @@ import {
   makePrometheusUrl,
 } from "./queryHelpers";
 
+const PLUGIN_NAME = "autometrics-docs";
+
 function init(modules: {
-  typescript: typeof import("typescript/lib/tsserverlibrary");
+  typescript: typeof tsserver;
 }) {
   const ts = modules.typescript;
 
@@ -23,9 +27,11 @@ function init(modules: {
     project,
   }: ts.server.PluginCreateInfo) {
     // Diagnostic logging
-    project.projectService.logger.info(
-      "I'm getting set up now! Check the log for this message.",
-    );
+    const log = (msg: string) => {
+      project.projectService.logger.info(`${PLUGIN_NAME}: ${msg}`);
+    };
+
+    log("started");
 
     // Set up decorator object
     const proxy: ts.LanguageService = Object.create(null);
@@ -78,9 +84,13 @@ function init(modules: {
         typechecker,
       );
 
-      const latency = createLatencyQuery(nodeIdentifier, nodeType);
       const requestRate = createRequestRateQuery(nodeIdentifier, nodeType);
       const errorRatio = createErrorRatioQuery(nodeIdentifier, nodeType);
+      const latency = createLatencyQuery(nodeIdentifier, nodeType);
+
+      const requestRateUrl = makePrometheusUrl(requestRate, prometheusBase);
+      const errorRatioUrl = makePrometheusUrl(errorRatio, prometheusBase);
+      const latencyUrl = makePrometheusUrl(latency, prometheusBase);
 
       const preamble = {
         kind: "string",
@@ -94,10 +104,7 @@ function init(modules: {
         },
         {
           kind: "string",
-          text: `- [Request rate](${makePrometheusUrl(
-            requestRate,
-            prometheusBase,
-          )})`,
+          text: `- [Request rate](${requestRateUrl})`,
         },
         {
           kind: "space",
@@ -105,10 +112,7 @@ function init(modules: {
         },
         {
           kind: "string",
-          text: `- [Error ratio](${makePrometheusUrl(
-            errorRatio,
-            prometheusBase,
-          )})`,
+          text: `- [Error ratio](${errorRatioUrl})`,
         },
         {
           kind: "space",
@@ -116,10 +120,7 @@ function init(modules: {
         },
         {
           kind: "string",
-          text: `- [Latency (95th and 99th percentiles)](${makePrometheusUrl(
-            latency,
-            prometheusBase,
-          )})`,
+          text: `- [Latency (95th and 99th percentiles)](${latencyUrl})`,
         },
         {
           kind: "space",
@@ -141,3 +142,4 @@ function init(modules: {
 }
 
 export = init;
+
