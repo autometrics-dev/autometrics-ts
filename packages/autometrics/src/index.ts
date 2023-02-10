@@ -1,4 +1,5 @@
 import otel from "@opentelemetry/api";
+import { initializeMetrics } from "./instrumentation";
 
 /**
  * Autometrics decorator for **class methods** that automatically instruments the decorated method with OpenTelemetry-compatible metrics.
@@ -10,6 +11,7 @@ export function autometricsDecorator(
   propertyKey: string,
   descriptor: PropertyDescriptor,
 ) {
+	initializeMetrics()
   const meter = otel.metrics.getMeter("autometrics-prometheus");
   const originalFunction = descriptor.value;
 
@@ -50,17 +52,21 @@ type AnyFunction<T extends FunctionSig> = (
   ...params: Parameters<T>
 ) => ReturnType<T>;
 
+/**
+ * This type signals to the language service plugin that it should show extra type documentation along with the queries.
+ */
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
 /**
  * Autometrics wrapper for **functions** that automatically instruments the wrapped function with OpenTelemetry-compatible metrics.
  *
  * Hover over the wrapped function to get the links for generated queries (if you have the language service plugin installed)
- * @param - the function that will be wrapped and instrumented
+ * @param the function that will be wrapped and instrumented
  */
 export function autometrics<F extends FunctionSig>(
   fn: F,
 ): AutometricsWrapper<F> {
+	initializeMetrics();
   const meter = otel.metrics.getMeter("autometrics-prometheus");
 
   if (!fn.name) {
@@ -75,8 +81,8 @@ export function autometrics<F extends FunctionSig>(
     const histogram = meter.createHistogram("function.calls.duration");
 
     const onSuccess = () => {
-      counter.add(1, { function: fn.name, result: "ok" });
       const autometricsDuration = new Date().getTime() - autometricsStart;
+      counter.add(1, { function: fn.name, result: "ok" });
       histogram.record(autometricsDuration, { function: fn.name });
     };
 
