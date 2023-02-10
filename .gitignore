@@ -2,3 +2,6 @@ node_modules
 packages/rollup/example/dist
 packages/**/*/dist
 packages/**/*/package-lock.json
+
+.luarc.json
+.nvim.lua

@@ -1,19 +1,20 @@
 {
-    "private": true,
-    "type": "module",
-    "name": "autometrics-monorepo",
-    "workspaces": [
-        "packages/autometrics-docs",
-        "packages/autometrics"
-    ],
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "dev:docs": "npm run dev --workspace=autometrics-docs",
-        "dev:decorators": "npm run dev --workspace=autometrics"
-    },
-    "dependencies": {
-        "rome": "^11.0.0"
-    }
+	"private": true,
+	"type": "module",
+	"name": "autometrics-monorepo",
+	"workspaces": [
+		"packages/autometrics-docs",
+		"packages/autometrics"
+	],
+	"main": "index.js",
+	"scripts": {
+		"dev:lib": "npm run dev --workspace=autometrics",
+		"clean:lib": "npm run clean --workspace=autometrics",
+		"dev:docs": "npm run dev --workspace=autometrics-docs",
+		"clean:docs": "npm run clean --workspace=autometrics-docs",
+		"test": "vitest"
+	},
+	"dependencies": {
+		"rome": "^11.0.0"
+	}
 }
