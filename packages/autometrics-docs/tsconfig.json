@@ -3,6 +3,7 @@
 	"compilerOptions": {
 		"outDir": "./dist"
 	},
-	"include": ["./src", "fixtures/utils/parseExample.ts", "fixtures/utils/parseExample.ts"],
+	"include": ["./src"],
 	"exclude": ["node_modules", "dist", "fixtures"]
 }
+
