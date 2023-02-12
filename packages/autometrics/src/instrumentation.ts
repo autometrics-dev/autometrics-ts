@@ -7,16 +7,20 @@ let initialized: boolean;
 /**
  * This initializes the OpenTelemetry meter and sets up the Prometheus exporter
  */
-export function initializeMetrics() {
-  const exporter = new PrometheusExporter();
-  if (initialized) {
-    return;
-  } else {
-    const autometricsMeterProvider = new MeterProvider();
-    autometricsMeterProvider.addMetricReader(exporter);
+export const initializeMetrics = (() => {
+  let autometricsMeterProvider: MeterProvider;
 
-    otel.metrics.setGlobalMeterProvider(autometricsMeterProvider);
-    initialized = true;
-  }
-  return;
-}
+  return () => {
+    if (!autometricsMeterProvider) {
+      autometricsMeterProvider = new MeterProvider();
+      const exporter = new PrometheusExporter();
+      autometricsMeterProvider.addMetricReader(exporter);
+      otel.metrics.setGlobalMeterProvider(autometricsMeterProvider);
+
+      return autometricsMeterProvider
+    } else {
+      return autometricsMeterProvider;
+    }
+  };
+
+})()
