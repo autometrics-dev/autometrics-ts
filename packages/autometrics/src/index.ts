@@ -62,7 +62,7 @@ interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
  * Autometrics wrapper for **functions** that automatically instruments the wrapped function with OpenTelemetry-compatible metrics.
  *
  * Hover over the wrapped function to get the links for generated queries (if you have the language service plugin installed)
- * @param the function that will be wrapped and instrumented
+ * @param {AnyFunction} function - the function that will be wrapped and instrumented (requests handler or database method)
  */
 export function autometrics<F extends FunctionSig>(
   fn: F,
