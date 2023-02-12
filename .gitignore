@@ -1,6 +1,14 @@
+.env
+.env*.local
+
 node_modules
 examples/**/*/dist
+examples/**/*/node_modules
 examples/**/*/package-lock.json
+examples/**/*/.next
+examples/**/*/out
+examples/**/*/data
+examples/**/*/next-env.d.ts
+
+
 packages/**/*/dist
-.luarc.json
-.nvim.lua
