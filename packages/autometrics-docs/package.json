@@ -1,5 +1,5 @@
 {
-	"name": "autometrics-docs",
+	"name": "@autometrics/docs",
 	"version": "0.0.1",
 	"description": "Language service plugin for autometrics",
 	"author": "Fiberplane<info@fiberplane.com>",
@@ -19,8 +19,5 @@
 	},
 	"peerDependencies": {
 		"typescript": ">=4.9.4"
-	},
-	"devDependencies": {
-		"vitest": "^0.28.4"
 	}
 }
