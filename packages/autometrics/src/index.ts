@@ -76,6 +76,7 @@ export function autometrics<F extends FunctionSig>(
   initializeMetrics();
 
   const meter = otel.metrics.getMeter("autometrics-prometheus");
+  const module = acquireModule();
 
   return function (...params) {
     const autometricsStart = new Date().getTime();
@@ -84,13 +85,13 @@ export function autometrics<F extends FunctionSig>(
 
     const onSuccess = () => {
       const autometricsDuration = new Date().getTime() - autometricsStart;
-      counter.add(1, { function: fn.name, result: "ok" });
+      counter.add(1, { module: module, function: fn.name, result: "ok" });
       histogram.record(autometricsDuration, { function: fn.name });
     };
 
     const onError = () => {
       const autometricsDuration = new Date().getTime() - autometricsStart;
-      counter.add(1, { function: fn.name, result: "error" });
+      counter.add(1, { module: module, function: fn.name, result: "error" });
       histogram.record(autometricsDuration, { function: fn.name });
     };
 
@@ -125,4 +126,49 @@ function isPromise<T extends Promise<void>>(val: unknown): val is T {
     "catch" in val &&
     typeof val.catch === "function"
   );
+}
+
+function acquireModule() {
+  const stack: string = (() => {
+    try {
+      throw new Error();
+    } catch (error) {
+      return error.stack;
+    }
+  })();
+
+  const parsedStack = stack.split("\n");
+
+  const bingo = parsedStack.findIndex((line) => {
+    return line.split(" ").find((el) => {
+      return el === "autometrics" ? true : false;
+    })
+      ? true
+      : false;
+  }) + 1;
+
+  const fullPath = parsedStack[bingo].split(" ").pop().split("/");
+
+  fullPath
+    .reverse()
+    .splice(0, 1, fullPath[0].substring(0, fullPath[0].indexOf(":")));
+
+  const module = fullPath
+    .slice(
+      0,
+      fullPath.findIndex((el) => {
+        if (
+          el === "dist" ||
+          el === "api" ||
+          el === "pages" ||
+          el === "routes"
+          ) {
+          return true;
+        }
+      }),
+    )
+    .reverse()
+    .join("/");
+
+  return module;
 }
