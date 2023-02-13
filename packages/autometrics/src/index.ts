@@ -54,7 +54,7 @@ type AnyFunction<T extends FunctionSig> = (
 ) => ReturnType<T>;
 
 /**
- * This type signals to the language service plugin that it should show extra type documentation along with the queries.
+ * This type signals to the language service plugin that it should show extra documentation along with the queries.
  */
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
@@ -76,7 +76,7 @@ export function autometrics<F extends FunctionSig>(
   initializeMetrics();
 
   const meter = otel.metrics.getMeter("autometrics-prometheus");
-  const module = acquireModule();
+  const module = getModulePath();
 
   return function (...params) {
     const autometricsStart = new Date().getTime();
@@ -85,13 +85,13 @@ export function autometrics<F extends FunctionSig>(
 
     const onSuccess = () => {
       const autometricsDuration = new Date().getTime() - autometricsStart;
-      counter.add(1, { module: module, function: fn.name, result: "ok" });
+      counter.add(1, { module, function: fn.name, result: "ok" });
       histogram.record(autometricsDuration, { function: fn.name });
     };
 
     const onError = () => {
       const autometricsDuration = new Date().getTime() - autometricsStart;
-      counter.add(1, { module: module, function: fn.name, result: "error" });
+      counter.add(1, { module, function: fn.name, result: "error" });
       histogram.record(autometricsDuration, { function: fn.name });
     };
 
@@ -128,47 +128,25 @@ function isPromise<T extends Promise<void>>(val: unknown): val is T {
   );
 }
 
-function acquireModule() {
-  const stack: string = (() => {
-    try {
-      throw new Error();
-    } catch (error) {
-      return error.stack;
-    }
-  })();
+// HACK: this entire function is a hacky way to acquire the module name
+// for a given function e.g.: dist/index.js
+function getModulePath(): string | undefined {
+  const stack = new Error()?.stack?.split("\n");
+  const rootDir = process.cwd(); // HACK: this assumes the entire app was run from the root directory of the project
 
-  const parsedStack = stack.split("\n");
+  if (!stack) {
+    return undefined;
+  }
 
-  const bingo = parsedStack.findIndex((line) => {
-    return line.split(" ").find((el) => {
-      return el === "autometrics" ? true : false;
-    })
-      ? true
-      : false;
-  }) + 1;
+  // 0: Error
+  // 1: at getModulePath() ...
+  // 2: at autometrics() ...
+  // 3: at ... -> 4th line is always the original caller
+  const originalCaller = 3 as const;
+  const fullPath = stack[originalCaller].split(" ").pop(); // the last element in this array will have the full path
 
-  const fullPath = parsedStack[bingo].split(" ").pop().split("/");
+  let modulePath = fullPath.split(rootDir).pop(); // we split away everything up to the root directory of the project
+  modulePath = modulePath.substring(0, modulePath.indexOf(":")); // we split away the line and column numbers index.js:14:6
 
-  fullPath
-    .reverse()
-    .splice(0, 1, fullPath[0].substring(0, fullPath[0].indexOf(":")));
-
-  const module = fullPath
-    .slice(
-      0,
-      fullPath.findIndex((el) => {
-        if (
-          el === "dist" ||
-          el === "api" ||
-          el === "pages" ||
-          el === "routes"
-          ) {
-          return true;
-        }
-      }),
-    )
-    .reverse()
-    .join("/");
-
-  return module;
+  return modulePath;
 }
