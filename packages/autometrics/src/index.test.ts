@@ -24,8 +24,7 @@ describe("Autometrics wrapper for functions", () => {
     const metRes = await fetch("http://localhost:9464/metrics");
     const data = await metRes.text();
 
-    const sample =
-      'function_calls_count_total{function="rootRoute",result="ok"}';
+    const sample = 'function_calls_duration_count{function="rootRoute"}';
 
     expect(metRes.status).toEqual(200);
     expect(isMetricRegistered(sample, data)).toBeTruthy();
