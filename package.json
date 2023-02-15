@@ -8,10 +8,10 @@
 	],
 	"main": "index.js",
 	"scripts": {
-		"dev:lib": "npm run dev --workspace=autometrics",
-		"clean:lib": "npm run clean --workspace=autometrics",
-		"dev:docs": "npm run dev --workspace=autometrics-docs",
-		"clean:docs": "npm run clean --workspace=autometrics-docs",
+		"dev:lib": "npm run dev --workspace=@autometrics/autometrics",
+		"clean:lib": "npm run clean --workspace=@autometrics/autometrics",
+		"dev:docs": "npm run dev --workspace=@autometrics/docs",
+		"clean:docs": "npm run clean --workspace=@autometrics/docs",
 		"test": "vitest"
 	},
 	"devDependencies": {
