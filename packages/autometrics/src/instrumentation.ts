@@ -1,27 +1,29 @@
 import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
-import { MeterProvider } from "@opentelemetry/sdk-metrics";
+import { MeterProvider, MetricReader } from "@opentelemetry/sdk-metrics";
 
 let autometricsMeterProvider: MeterProvider;
-let exporter: PrometheusExporter;
+let exporter: MetricReader;
 
 /**
  * If you have a Prometheus exporter already set up, this function allows you to get autometrics to use the same exporter
-*
-* @param 'userExporter' {PrometheusExporter}
+ *
+ * @param 'userExporter' {T extends MetricReader}
  */
-export function setMetricsExporter(userExporter: PrometheusExporter) {
-	console.log("Using the user's Prometheus Exporter configuration")
+export function setMetricsExporter<T extends MetricReader>(userExporter: T) {
+  logger("Using the user's Prometheus Exporter configuration");
   exporter = userExporter;
   return;
 }
 
 /**
- * Gets the instantiated meter provider
+ * Instantiates an autometrics meter provider and default Prometheus exporter (if none exist)
  */
 export function getMetricsProvider() {
   if (!autometricsMeterProvider) {
     if (!exporter) {
-			console.log("Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics")
+      logger(
+        "Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics",
+      );
       exporter = new PrometheusExporter();
     }
     autometricsMeterProvider = new MeterProvider();
@@ -34,6 +36,9 @@ export function getMetricsProvider() {
  * Gets the instantiated autometrics meter
  */
 export function getMeter(meter = "autometrics-prometheus") {
-	return getMetricsProvider().getMeter(meter)
+  return getMetricsProvider().getMeter(meter);
 }
 
+function logger(msg: string) {
+  console.log(`Autometrics: ${msg}`);
+}
