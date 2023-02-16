@@ -9,7 +9,7 @@ export function createRequestRateQuery(
   nodeIdentifier: string,
   nodeType: string,
 ) {
-  return `sum by (function, module) (rate(${nodeType}_calls_count{${nodeType}="${nodeIdentifier}"}[5m]))`;
+  return `sum by (function, module) (rate(${nodeType}_calls_count_total{${nodeType}="${nodeIdentifier}"}[5m]))`;
 }
 
 export function createErrorRatioQuery(
@@ -17,7 +17,7 @@ export function createErrorRatioQuery(
   nodeType: string,
 ) {
   const requestQuery = createRequestRateQuery(nodeIdentifier, nodeType);
-  return `sum by (function, module) (rate(${nodeType}_calls_count{${nodeType}="${nodeIdentifier}",result="error"}[5m])) / ${requestQuery}`;
+  return `sum by (function, module) (rate(${nodeType}_calls_count_total{${nodeType}="${nodeIdentifier}",result="error"}[5m])) / ${requestQuery}`;
 }
 
 const DEFAULT_URL = "http://localhost:9090/";
