@@ -1,24 +1,39 @@
-import otel from "@opentelemetry/api";
-import { MeterProvider, MetricReader } from "@opentelemetry/sdk-metrics";
 import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
+import { MeterProvider } from "@opentelemetry/sdk-metrics";
 
-let initialized = false;
+let autometricsMeterProvider: MeterProvider;
+let exporter: PrometheusExporter;
 
-export interface AutometricsConfig {
-  exporter?: MetricReader;
+/**
+ * If you have a Prometheus exporter already set up, this function allows you to get autometrics to use the same exporter
+*
+* @param 'userExporter' {PrometheusExporter}
+ */
+export function setMetricsExporter(userExporter: PrometheusExporter) {
+	console.log("Using the user's Prometheus Exporter configuration")
+  exporter = userExporter;
+  return;
 }
 
 /**
- * This initializes the OpenTelemetry meter and sets up the Prometheus exporter
+ * Gets the instantiated meter provider
  */
-export function initializeMetrics(config?: AutometricsConfig) {
-  if (initialized) {
-    return; // we return early if the metrics exporter is already initialized 
+export function getMetricsProvider() {
+  if (!autometricsMeterProvider) {
+    if (!exporter) {
+			console.log("Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics")
+      exporter = new PrometheusExporter();
+    }
+    autometricsMeterProvider = new MeterProvider();
+    autometricsMeterProvider.addMetricReader(exporter);
   }
-
-  initialized = true;
-  const exporter = config?.exporter || new PrometheusExporter();
-  const autometricsMeterProvider = new MeterProvider();
-  autometricsMeterProvider.addMetricReader(exporter);
-  otel.metrics.setGlobalMeterProvider(autometricsMeterProvider);
+  return autometricsMeterProvider;
 }
+
+/**
+ * Gets the instantiated autometrics meter
+ */
+export function getMeter(meter = "autometrics-prometheus") {
+	return getMetricsProvider().getMeter(meter)
+}
+
