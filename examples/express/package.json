@@ -17,6 +17,7 @@
 	},
 	"dependencies": {
 		"@opentelemetry/exporter-prometheus": "^0.35.1",
+		"@opentelemetry/sdk-metrics": "^1.9.1",
 		"autometrics": "file:../../packages/autometrics",
 		"express": "^4.18.2"
 	}

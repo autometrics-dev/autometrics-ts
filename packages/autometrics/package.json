@@ -9,7 +9,9 @@
 		"Evan Schwartz",
 		"Jacco Flenter"
 	],
-	"repository": {"url": "https://github.com/fiberplane/autometrics-ts"},
+	"repository": {
+		"url": "https://github.com/fiberplane/autometrics-ts"
+	},
 	"license": "MIT OR Apache-2.0",
 	"keywords": [],
 	"main": "dist/index.cjs",
@@ -27,7 +29,7 @@
 		"typescript": "^4.9.4"
 	},
 	"peerDependencies": {
-		"@opentelemetry/exporter-prometheus": "^0.35.0",
+		"@opentelemetry/exporter-prometheus": "^0.35.1",
 		"@opentelemetry/sdk-metrics": "^1.9.0"
 	}
 }
