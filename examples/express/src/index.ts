@@ -1,5 +1,9 @@
 import express from "express";
-import { autometrics } from "autometrics";
+import { autometrics, setMetricsExporter } from "autometrics";
+import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
+
+const exporter = new PrometheusExporter({port: 7777})
+setMetricsExporter(exporter)
 
 const app = express();
 

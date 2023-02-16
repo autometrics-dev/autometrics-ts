@@ -5,6 +5,7 @@ import {
 	RouteShorthandOptions,
 } from "fastify";
 import { autometrics } from "@autometrics/autometrics";
+
 const port = 7000;
 const server = fastify();
 
