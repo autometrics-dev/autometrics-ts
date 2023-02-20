@@ -91,7 +91,6 @@ function init(modules: {
       const errorRatioUrl = makePrometheusUrl(errorRatio, prometheusBase);
       const latencyUrl = makePrometheusUrl(latency, prometheusBase);
 
-
       const preamble = {
         kind: "string",
         text: `\n\n## Autometrics\n\nView the live metrics for the \`${nodeIdentifier}\` function:\n `,
@@ -142,4 +141,3 @@ function init(modules: {
 }
 
 export = init;
-
