@@ -11,10 +11,10 @@ export function autometricsDecorator(
   propertyKey: string,
   descriptor: PropertyDescriptor,
 ) {
-  const meter = getMeter();
   const originalFunction = descriptor.value;
 
   descriptor.value = function (...args: unknown[]) {
+    const meter = getMeter();
     let result: ReturnType<typeof originalFunction>;
     const autometricsStart = new Date().getTime();
     const counter = meter.createCounter("method.calls.count");
