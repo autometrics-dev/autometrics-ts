@@ -1,5 +1,5 @@
 
-# `@autometrics/typescript-plugin` 📈
+# `@autometrics/typescript-plugin` 📈✨
 
 ## Documentation
 
