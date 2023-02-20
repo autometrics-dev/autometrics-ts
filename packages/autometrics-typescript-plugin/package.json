@@ -1,5 +1,5 @@
 {
-	"name": "@autometrics/docs",
+	"name": "@autometrics/typescript-plugin",
 	"version": "0.0.1",
 	"description": "Language service plugin for autometrics",
 	"author": "Fiberplane<info@fiberplane.com>",
