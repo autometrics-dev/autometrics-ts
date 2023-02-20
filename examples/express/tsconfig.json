@@ -11,7 +11,7 @@
 		"outDir": "dist",
 		"target": "es6",
 		"strictNullChecks": true,
-		"plugins": [{ "name": "autometrics-docs" }]
+		"plugins": [{ "name": "@autometrics/typescript-plugin" }]
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules", "dist", "**/*.spec.ts"]

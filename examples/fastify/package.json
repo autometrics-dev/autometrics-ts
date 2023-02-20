@@ -15,7 +15,7 @@
 		"fastify": "^4.13.0"
 	},
 	"devDependencies": {
-		"@autometrics/docs": "file:../../packages/autometrics-docs",
+		"@autometrics/typescript-plugin": "file:../../packages/autometrics-typescript-plugin",
 		"@types/node": "^18.13.0",
 		"typescript": "^4.9.5"
 	}

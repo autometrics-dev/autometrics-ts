@@ -10,7 +10,7 @@
 		"Jacco Flenter"
 	],
 	"repository": {
-		"url": "https://github.com/fiberplane/autometrics-ts"
+		"url": "https://github.com/autometrics-dev/autometrics-ts.git"
 	},
 	"license": "MIT OR Apache-2.0",
 	"keywords": [],

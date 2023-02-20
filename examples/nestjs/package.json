@@ -21,7 +21,7 @@
 		"rxjs": "^7.2.0"
 	},
 	"devDependencies": {
-		"@autometrics/docs": "file:../../packages/autometrics-docs",
+		"@autometrics/typescript-plugin": "file:../../packages/autometrics-typescript-plugin",
 		"@nestjs/cli": "^9.0.0",
 		"@nestjs/schematics": "^9.0.0",
 		"@nestjs/testing": "^9.0.0",

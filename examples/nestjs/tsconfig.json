@@ -17,6 +17,6 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "plugins": [{"name": "@autometrics/docs"}]
+    "plugins": [{"name": "@autometrics/typescript-plugin"}]
   }
 }

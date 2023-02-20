@@ -8,6 +8,10 @@
 		"skipLibCheck": true,
 		"outDir": "./build",
 		"rootDir": "./src",
-		"plugins": [{"name": "@autometrics/docs"}]
+		"plugins": [
+			{
+				"name": "@autometrics/typescript-plugin"
+			}
+		]
 	}
 }
