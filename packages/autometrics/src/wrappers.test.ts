@@ -24,26 +24,16 @@ describe("Autometrics wrapper for functions", () => {
     const metRes = await fetch("http://localhost:9464/metrics");
     const data = await metRes.text();
 
-    const sample = 'function_calls_duration_count{function="rootRoute"}';
 
     expect(metRes.status).toEqual(200);
-    expect(isMetricRegistered(sample, data)).toBeTruthy();
+    expect(isMetricRegistered(data)).toBeTruthy();
   });
 });
 
-function isMetricRegistered(sample: string, data: string): boolean {
-  const match = data.split("\n").find((line) => {
-    const match = line.split(" ").find((str) => {
-      if (str === sample) {
-        return true;
-      }
-    });
-
-    if (match) {
-      return true;
-    }
-  });
-
-  return match ? true : false;
+function isMetricRegistered(data: string): boolean {
+	const sample = 'function_calls_duration_count{function="rootRoute"}';
+	return data
+		.split("\n")
+		.some((line) => line.split(" ").some((str) => str === sample))
 }
 
