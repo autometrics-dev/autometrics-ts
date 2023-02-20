@@ -22,8 +22,7 @@
 	"types": "dist/index",
 	"scripts": {
 		"build": "tsup",
-		"dev": "tsup --watch",
-		"lint": "rome check src/"
+		"dev": "tsup --watch"
 	},
 	"devDependencies": {
 		"@types/express": "^4.17.17",

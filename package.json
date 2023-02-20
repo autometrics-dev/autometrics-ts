@@ -13,7 +13,7 @@
 		"dev:plugin": "npm run dev --workspace=@autometrics/typescript-plugin",
 		"clean:plugin": "npm run clean --workspace=@autometrics/typescript-plugin",
 		"test": "vitest",
-		"lint": "npm run lint --workspace=@autometrics/autometrics && npm run lint --workspace=@autometrics/typescript-plugin"
+		"lint": "rome ci packages/autometrics/src packages/autometrics-typescript-plugin/src"
 	},
 	"devDependencies": {
 		"rome": "^11.0.0",
