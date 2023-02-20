@@ -20,6 +20,7 @@
 	"scripts": {
 		"dev": "tsc --watch",
 		"build": "tsc",
+		"lint": "rome check src/",
 		"clean": "rm -rf dist/"
 	},
 	"peerDependencies": {
