@@ -1,6 +1,6 @@
 // This is an example that makes use of the setMetricsExporter API to allow user to configure the exporter
 import express from "express";
-import { autometrics, setMetricsExporter } from "autometrics";
+import { autometrics, setMetricsExporter } from "@autometrics/autometrics";
 import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
 
 const exporter = new PrometheusExporter({port: 7777})
