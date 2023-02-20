@@ -1,4 +1,4 @@
-import ts from "typescript";
+import ts from "typescript/lib/tsserverlibrary";
 
 /**
  * Checks if the node is wrapped or decorated by Autometrics (but not the wrapper or decorator itself!)

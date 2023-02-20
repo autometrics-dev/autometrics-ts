@@ -1,16 +1,16 @@
 {
-	"compileOnSave": true,
+	"extends": "../../tsconfig.common.json",
 	"compilerOptions": {
-		"target": "esnext",
-		"module": "esnext",
-		"declaration": true,
-		"declarationMap": true,
-		"esModuleInterop": true,
-		"moduleResolution": "node",
-		"resolveJsonModule": true,
-		"outDir": "dist"
+		"outDir": "./dist",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true
 	},
-	"paths": ["src/**"],
-	"exclude": ["node_modules", "dist", "example"]
+	"include": [
+		"./src"
+	],
+	"exclude": [
+		"node_modules",
+		"dist"
+	]
 }
 

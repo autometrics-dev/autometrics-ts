@@ -14,7 +14,7 @@ import {
   makePrometheusUrl,
 } from "./queryHelpers";
 
-const PLUGIN_NAME = "autometrics-docs"
+const PLUGIN_NAME = "autometrics-docs";
 
 function init(modules: {
   typescript: typeof tsserver;
@@ -27,12 +27,11 @@ function init(modules: {
     project,
   }: ts.server.PluginCreateInfo) {
     // Diagnostic logging
-    function log(msg: string ) {
+    const log = (msg: string) => {
       project.projectService.logger.info(`${PLUGIN_NAME}: ${msg}`);
-    } 
+    };
 
-    log("started")
-
+    log("started");
     // Set up decorator object
     const proxy: ts.LanguageService = Object.create(null);
     for (let k of Object.keys(languageService) as Array<
@@ -90,7 +89,8 @@ function init(modules: {
 
       const requestRateUrl = makePrometheusUrl(requestRate, prometheusBase);
       const errorRatioUrl = makePrometheusUrl(errorRatio, prometheusBase);
-      const latencyUrl = makePrometheusUrl(latency,prometheusBase);
+      const latencyUrl = makePrometheusUrl(latency, prometheusBase);
+
 
       const preamble = {
         kind: "string",
@@ -142,3 +142,4 @@ function init(modules: {
 }
 
 export = init;
+

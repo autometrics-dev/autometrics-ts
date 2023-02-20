@@ -10,13 +10,15 @@
 	"keywords": [],
 	"license": "ISC",
 	"devDependencies": {
+		"@autometrics/typescript-plugin": "file:../../packages/autometrics-typescript-plugin",
 		"@types/express": "^4.17.16",
 		"@types/node": "^18.11.18",
-		"autometrics-docs": "file:../../autometrics-docs",
 		"typescript": "^4.9.4"
 	},
 	"dependencies": {
-		"autometrics": "file:..",
+		"@autometrics/autometrics": "file:../../packages/autometrics",
+		"@opentelemetry/exporter-prometheus": "^0.35.1",
+		"@opentelemetry/sdk-metrics": "^1.9.1",
 		"express": "^4.18.2"
 	}
 }
