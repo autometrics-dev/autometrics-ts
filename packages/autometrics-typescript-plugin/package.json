@@ -8,8 +8,13 @@
 		"Evan Schwartz",
 		"Jacco Flenter"
 	],
-	"repository": {"url": "https://github.com/fiberplane/autometrics-ts"},
+	"repository": {
+		"url": "https://github.com/autometrics-dev/autometrics-ts"
+	},
 	"license": "MIT OR Apache-2.0",
+	"publishConfig": {
+		"access": "public"
+	},
 	"keywords": [],
 	"main": "dist/index",
 	"scripts": {
