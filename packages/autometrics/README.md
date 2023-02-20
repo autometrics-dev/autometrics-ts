@@ -1,5 +1,5 @@
 
-# `@autometrics/autometrics` 📈
+# `@autometrics/autometrics` 📈✨
 
 ## Documentation
 
