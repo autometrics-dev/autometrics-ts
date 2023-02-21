@@ -1,5 +1,7 @@
 # AutometricsTS 📈✨
 
+![AutometricsTS demo](./assets/autometrics-ts-demo.gif)
+
 > A TypeScript port of the Rust
 > [autometrics-rs](https://github.com/fiberplane/autometrics-rs) library
 
@@ -53,11 +55,12 @@ The AutometricsTS library consists of two parts:
 
 ### 1. Install and setup the library and the language service plugin
 
-Install both the wrappers and the language service plugin using these commands:
+Install the wrappers, the language service plugin, and the peer dependencies:
 
 ```shell
 npm install --save @autometrics/autometrics
 npm install --save-dev @autometrics/typescript-plugin
+npm install --save @opentelemetry/sdk-metrics @opentelemetry/exporter-prometheus
 ```
 
 Add the language service plugin to the `tsconfig.json` file:
