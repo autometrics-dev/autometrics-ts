@@ -14,6 +14,7 @@ examples/**/*/out
 examples/**/*/data
 examples/**/*/next-env.d.ts
 examples/**/*/package-lock.json
+examples/**/*/dev.db
 
 # Logs
 logs
@@ -46,3 +47,5 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+
