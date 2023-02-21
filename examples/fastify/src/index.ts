@@ -1,34 +1,47 @@
 import {
   fastify,
   FastifyReply,
-  FastifyRequest,
-  RouteShorthandOptions,
+  FastifyRequest
 } from "fastify";
 import { autometrics } from "@autometrics/autometrics";
+import { PrismaClient } from "@prisma/client";
 
 const port = 7000;
 const server = fastify();
+const prisma = new PrismaClient();
 
-const opts: RouteShorthandOptions = {
-  schema: {
-    response: {
-      200: {
-        type: "object",
-        properties: {
-          body: {
-            type: "string",
-          },
-        },
-      },
-    },
-  },
-};
-
-async function rootHandler(req: FastifyRequest, response: FastifyReply) {
-  return { body: "Hello world" };
+interface Tulip {
+	id: number,
+	name: string,
+	price: number
 }
 
-server.get("/", opts, autometrics(rootHandler));
+async function handleGetAllTulips(req: FastifyRequest, res: FastifyReply) {
+	const tulips: Tulip[] = await prisma.tulip.findMany();
+	return {
+		data: tulips
+	}
+}
+
+async function handleCreateTulip( req: FastifyRequest<{Body: Tulip}>, res: FastifyReply) {
+	const tulip = req.body;
+	const createdTulip = await prisma.tulip.create({
+		data: tulip
+	});
+	return createdTulip
+}
+
+server.get(
+  "/",
+  async function healthcheck(req: FastifyRequest, res: FastifyReply) {
+    return { body: "OK" };
+  },
+);
+
+server.get("/tulips/", autometrics(handleGetAllTulips));
+
+
+server.post<{ Body: Tulip }>("/tulip/", autometrics(handleCreateTulip))
 
 const start = async () => {
   try {
