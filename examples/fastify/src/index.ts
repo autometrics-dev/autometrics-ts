@@ -12,22 +12,33 @@ interface Tulip {
   price: number;
 }
 
+async function getAllTulips() {
+  return prisma.tulip.findMany();
+}
+
 async function handleGetAllTulips(req: FastifyRequest, res: FastifyReply) {
-  const tulips: Tulip[] = await prisma.tulip.findMany();
+  const tulips = await getAllTulips();
   return {
     data: tulips,
   };
 }
+
+// Example internal function calling a database instrumented with autometrics
+const createTulipWithMetrics = autometrics(async function createTulip(
+  tulip: Tulip,
+) {
+  return prisma.tulip.create({
+    data: tulip,
+  });
+});
 
 async function handleCreateTulip(
   req: FastifyRequest<{ Body: Tulip }>,
   res: FastifyReply,
 ) {
   const tulip = req.body;
-  const createdTulip = await prisma.tulip.create({
-    data: tulip,
-  });
-  return createdTulip;
+  const created = await createTulipWithMetrics(tulip);
+  return created;
 }
 
 server.get(
@@ -37,9 +48,10 @@ server.get(
   },
 );
 
+// Example handler instrumented with autometrics
 server.get("/tulips/", autometrics(handleGetAllTulips));
 
-server.post<{ Body: Tulip }>("/tulip/", autometrics(handleCreateTulip));
+server.post<{ Body: Tulip }>("/tulips/", handleCreateTulip);
 
 const start = async () => {
   try {
@@ -52,4 +64,3 @@ const start = async () => {
 };
 
 start();
-
