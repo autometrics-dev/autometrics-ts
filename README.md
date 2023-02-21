@@ -1,4 +1,4 @@
-# AutometricsTS 📈
+# AutometricsTS 📈✨
 
 > A TypeScript port of the Rust
 > [autometrics-rs](https://github.com/fiberplane/autometrics-rs) library

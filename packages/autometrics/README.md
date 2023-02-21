@@ -29,6 +29,6 @@ async function createUser(payload: User) {
   // ...
 }
 
-const user = autometics(createUser)
+const user = autometrics(createUser)
 
 ```

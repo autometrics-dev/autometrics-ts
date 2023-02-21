@@ -1,2 +1,2 @@
-export { setMetricsExporter } from "./instrumentation"
-export * from "./wrappers"
+export { setMetricsExporter } from "./instrumentation";
+export * from "./wrappers";
