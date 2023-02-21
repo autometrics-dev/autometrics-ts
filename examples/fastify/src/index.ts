@@ -24,7 +24,7 @@ async function handleGetAllTulips(req: FastifyRequest, res: FastifyReply) {
 }
 
 // Example internal function calling a database instrumented with autometrics
-const createTulipWithMetrics = autometrics(async function createTulip(
+const createTulip = autometrics(async function createTulip(
   tulip: Tulip,
 ) {
   return prisma.tulip.create({
@@ -37,7 +37,7 @@ async function handleCreateTulip(
   res: FastifyReply,
 ) {
   const tulip = req.body;
-  const created = await createTulipWithMetrics(tulip);
+  const created = await createTulip(tulip);
   return created;
 }
 
