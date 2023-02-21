@@ -12,24 +12,27 @@ const server = fastify();
 const prisma = new PrismaClient();
 
 interface Tulip {
-	id: number,
-	name: string,
-	price: number
+  id: number;
+  name: string;
+  price: number;
 }
 
 async function handleGetAllTulips(req: FastifyRequest, res: FastifyReply) {
-	const tulips: Tulip[] = await prisma.tulip.findMany();
-	return {
-		data: tulips
-	}
+  const tulips: Tulip[] = await prisma.tulip.findMany();
+  return {
+    data: tulips,
+  };
 }
 
-async function handleCreateTulip( req: FastifyRequest<{Body: Tulip}>, res: FastifyReply) {
-	const tulip = req.body;
-	const createdTulip = await prisma.tulip.create({
-		data: tulip
-	});
-	return createdTulip
+async function handleCreateTulip(
+  req: FastifyRequest<{ Body: Tulip }>,
+  res: FastifyReply,
+) {
+  const tulip = req.body;
+  const createdTulip = await prisma.tulip.create({
+    data: tulip,
+  });
+  return createdTulip;
 }
 
 server.get(
@@ -41,8 +44,7 @@ server.get(
 
 server.get("/tulips/", autometrics(handleGetAllTulips));
 
-
-server.post<{ Body: Tulip }>("/tulip/", autometrics(handleCreateTulip))
+server.post<{ Body: Tulip }>("/tulip/", autometrics(handleCreateTulip));
 
 const start = async () => {
   try {
