@@ -79,7 +79,8 @@ export function autometrics<F extends FunctionSig>(
     );
   }
 
-  const module = getModulePath();
+  //const module = getModulePath();
+	const module = undefined
 
   return function (...params) {
     const meter = getMeter();
