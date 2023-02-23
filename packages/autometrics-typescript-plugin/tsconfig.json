@@ -1,9 +1,8 @@
 {
-	"extends": "../../tsconfig.common.json",
-	"compilerOptions": {
-		"outDir": "./dist"
-	},
-	"include": ["./src"],
-	"exclude": ["node_modules", "dist", "fixtures"]
+  "extends": "../../tsconfig.common.json",
+  "compilerOptions": {
+    "outDir": "./dist"
+  },
+  "include": ["./src"],
+  "exclude": ["node_modules", "dist", "fixtures"]
 }
-

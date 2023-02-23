@@ -1,4 +1,3 @@
-
 # `@autometrics/typescript-plugin` 📈✨
 
 ## Documentation
