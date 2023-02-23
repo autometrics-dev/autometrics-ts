@@ -1,5 +1,13 @@
-import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
-import { MeterProvider, MetricReader } from "@opentelemetry/sdk-metrics";
+import {
+  PrometheusExporter,
+  PrometheusSerializer,
+} from "@opentelemetry/exporter-prometheus";
+import {
+  InMemoryMetricExporter,
+  MeterProvider,
+  MetricReader,
+  PeriodicExportingMetricReader,
+} from "@opentelemetry/sdk-metrics";
 
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
@@ -10,9 +18,19 @@ let exporter: MetricReader;
  *
  * @param 'userExporter' {T extends MetricReader}
  */
-export function setMetricsExporter<T extends MetricReader>(userExporter: T) {
-  logger("Using the user's Prometheus Exporter configuration");
+export function setMetricsExporter<T extends MetricReader>(
+  userExporter?: T,
+  pushTarget?: string,
+  interval?: number,
+) {
+  logger("Using the user's Exporter configuration");
   exporter = userExporter;
+  if (pushTarget && interval) {
+		exporter = new PeriodicExportingMetricReader({
+			exporter: new InMemoryMetricExporter(0)
+		})
+    setInterval(() => pushToGateway(pushTarget), interval * 1000);
+  }
   return;
 }
 
@@ -45,4 +63,20 @@ export function getMeter(meter = "autometrics-prometheus") {
 
 function logger(msg: string) {
   console.log(`Autometrics: ${msg}`);
+}
+
+async function pushToGateway(gateway: string) {
+  const exporterResponse = await exporter.collect();
+  const metrics = exporterResponse.resourceMetrics;
+  const serialized = new PrometheusSerializer().serialize(metrics);
+
+  const res = await fetch(`http://${gateway}/metrics/`, {
+    method: "POST",
+    mode: "cors",
+    body: serialized,
+  });
+
+  console.log(res);
+
+  await exporter.forceFlush();
 }
