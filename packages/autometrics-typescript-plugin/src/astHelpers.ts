@@ -38,9 +38,8 @@ export function isAutometricsWrappedOrDecorated(
   // has the right decorators for class methods
   if (ts.canHaveDecorators(node.parent) && ts.getDecorators(node.parent)) {
     const decorators = ts.getDecorators(node.parent);
-    const hasAutometricsDecorator = decorators.some(
-      // TODO: make this more flexible for when decorators will have parameters
-      (decorator) => decorator.getText() === "@autometrics",
+    const hasAutometricsDecorator = decorators.some((decorator) =>
+      decorator.getText().startsWith("@autometrics"),
     );
 
     return hasAutometricsDecorator;
@@ -62,22 +61,22 @@ export function getNodeIdentifier(
   nodeType: "function" | "method",
   typechecker: ts.TypeChecker,
 ): string {
-  if (nodeType === "method") {
-    if (ts.isIdentifier(node)) {
-      return node.escapedText as string;
-    }
-  } else if (nodeType === "function") {
+  if (nodeType === "method" && ts.isIdentifier(node)) {
+    return node.escapedText.toString();
+  }
+
+  if (nodeType === "function") {
     const declaration = typechecker.getSymbolAtLocation(node).valueDeclaration;
 
     const type = typechecker
       .getTypeAtLocation(node)
-      .symbol.getEscapedName() as string;
+      .symbol.getEscapedName()
+      .toString();
 
-    // const funcWithMetrics = autometrics(originalFunc)
+    // const functionWithMetrics = autometrics(originalFunc);
     //
     // If we find that we're hovering over a wrapped function, we trace the AST
-    // to find the identifier of the original function
-    // that was wrapped
+    // to find the identifier of the original function that was wrapped
     //
     // The first element in the wrapper function will always be the original
     // function
@@ -88,12 +87,12 @@ export function getNodeIdentifier(
       ts.isIdentifier(declaration.initializer.arguments[0]) &&
       declaration.initializer.arguments[0]
     ) {
-      return declaration.initializer.arguments[0].escapedText as string;
-    } else {
-      // other wise just return the identifier user is currently hovering over
-      if (ts.isIdentifier(node)) {
-        return node.escapedText as string;
-      }
+      return declaration.initializer.arguments[0].escapedText.toString();
+    }
+
+    // otherwise just return the identifier user is currently hovering over
+    if (ts.isIdentifier(node)) {
+      return node.escapedText.toString();
     }
   }
 }
@@ -104,45 +103,46 @@ export function getNodeIdentifier(
  * @param typechecker The helper utility
  */
 export function getNodeType(node: ts.Node, typechecker: ts.TypeChecker) {
-  if (!node.parent) {
-    return undefined;
-  }
-
   const declaration = typechecker.getSymbolAtLocation(node);
 
-  if (!declaration.valueDeclaration) {
-    return undefined;
+  if (!(node.parent || declaration.valueDeclaration)) {
+    return;
   }
 
+  const { valueDeclaration } = declaration;
+
   // Check if the original node declaration is a method declaration
-  if (ts.isMethodDeclaration(declaration.valueDeclaration)) {
+  if (ts.isMethodDeclaration(valueDeclaration)) {
     return "method";
-  } else if (
-    // If the original node declaration is a function declaration or expression
-    ts.isFunctionLike(declaration.valueDeclaration)
+  }
+
+  // If the original node declaration is a function declaration or expression
+  if (ts.isFunctionLike(valueDeclaration)) {
+    return "function";
+  }
+
+  // If the original node is declared with autometrics
+  // const originalFunc = () => {}
+  if (
+    ts.isVariableDeclaration(valueDeclaration) &&
+    ts.isFunctionLike(valueDeclaration.initializer)
   ) {
     return "function";
-  } else if (
-    // If the original node declaration is an declared with autometrics
-    // const originalFunc = () => {}
-    ts.isVariableDeclaration(declaration.valueDeclaration) &&
-    ts.isFunctionLike(declaration.valueDeclaration.initializer)
-  ) {
-    return "function";
-  } else if (
-    // If the original node declaration is a wrapper function declared
-    // with autometrics const funcWithMetrics = autometrics(originalFunc)
+  }
+
+  // If the original node declaration is a wrapper function declared with
+  // autometrics
+  // const funcWithMetrics = autometrics(originalFunc);
+  if (
     ts.isVariableDeclaration(declaration.valueDeclaration) &&
     ts.isCallExpression(declaration.valueDeclaration.initializer)
   ) {
     return "function";
-  } else {
-    return undefined;
   }
 }
 
 /**
- * Gets the node you're currently hovering over
+ * Gets the node that is hovered over
  * @param sourceFile Source file node of the current file
  * @param position Current cursor/mouse position
  */
