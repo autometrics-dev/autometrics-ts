@@ -12,11 +12,13 @@
   "dependencies": {
     "@autometrics/autometrics": "file:../../packages/autometrics",
     "@opentelemetry/exporter-prometheus": "^0.35.1",
+    "@prisma/client": "^4.10.1",
     "fastify": "^4.13.0"
   },
   "devDependencies": {
     "@autometrics/typescript-plugin": "file:../../packages/autometrics-typescript-plugin",
     "@types/node": "^18.13.0",
+    "prisma": "^4.10.1",
     "typescript": "^4.9.5"
   }
 }

@@ -1,34 +1,59 @@
-import {
-  fastify,
-  FastifyReply,
-  FastifyRequest,
-  RouteShorthandOptions,
-} from "fastify";
+import { fastify, FastifyReply, FastifyRequest } from "fastify";
 import { autometrics } from "@autometrics/autometrics";
+import { PrismaClient } from "@prisma/client";
 
 const port = 7000;
 const server = fastify();
+const prisma = new PrismaClient();
 
-const opts: RouteShorthandOptions = {
-  schema: {
-    response: {
-      200: {
-        type: "object",
-        properties: {
-          body: {
-            type: "string",
-          },
-        },
-      },
-    },
-  },
-};
-
-async function rootHandler(req: FastifyRequest, response: FastifyReply) {
-  return { body: "Hello world" };
+interface Tulip {
+  id: number;
+  name: string;
+  price: number;
 }
 
-server.get("/", opts, autometrics(rootHandler));
+async function getAllTulips() {
+  return prisma.tulip.findMany();
+}
+
+async function handleGetAllTulips(req: FastifyRequest, res: FastifyReply) {
+  const tulips = await getAllTulips();
+  return {
+    data: tulips,
+  };
+}
+
+async function createTulip(
+	tulip: Tulip,
+) {
+	return prisma.tulip.create({
+		data: tulip,
+	});
+};
+
+// Example internal function calling a database instrumented with autometrics
+const createTulipWithMetrics = autometrics(createTulip);
+
+async function handleCreateTulip(
+  req: FastifyRequest<{ Body: Tulip }>,
+  res: FastifyReply,
+) {
+  const tulip = req.body;
+  const created = await createTulipWithMetrics(tulip);
+  return created;
+}
+
+server.get(
+  "/",
+  async function healthcheck(req: FastifyRequest, res: FastifyReply) {
+    return { body: "OK" };
+  },
+);
+
+// Example handler instrumented with autometrics
+server.get("/tulips/", autometrics(handleGetAllTulips));
+
+server.post<{ Body: Tulip }>("/tulips/", handleCreateTulip);
 
 const start = async () => {
   try {
