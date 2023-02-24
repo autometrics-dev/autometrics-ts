@@ -7,7 +7,9 @@
   "contributors": [
     "Laurynas Keturakis",
     "Evan Schwartz",
-    "Jacco Flenter"
+    "Jacco Flenter",
+    "Oscar van Zijverden",
+    "Stephan Lagerwaard"
   ],
   "repository": {
     "url": "https://github.com/autometrics-dev/autometrics-ts.git"
