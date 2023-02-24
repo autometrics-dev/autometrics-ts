@@ -1,4 +1,3 @@
-
 # `@autometrics/autometrics` 📈✨
 
 ## Documentation
@@ -22,13 +21,11 @@ pnpm add @autometrics/autometrics
 ## Basic example
 
 ```typescript
-
-import { autometrics } from "@autometrics/autometrics"
+import { autometrics } from "@autometrics/autometrics";
 
 async function createUser(payload: User) {
   // ...
 }
 
-const user = autometrics(createUser)
-
+const user = autometrics(createUser);
 ```
