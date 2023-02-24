@@ -10,7 +10,7 @@ production usage of any function in your code.** Jump straight from your IDE to
 live Prometheus charts for each HTTP/RPC handler, database method, or other
 piece of application logic.
 
-Autometrics for Typescript provides a wrapper function and a decorator that can
+Autometrics for TypeScript provides a wrapper function and a decorator that can
 create Prometheus or OpenTelemetry metrics for your functions and class methods
 throughout your code base, as well as a language service plugin that will write
 corresponding Prometheus queries for you.
@@ -76,8 +76,8 @@ Add the language service plugin to the `tsconfig.json` file:
 }
 ```
 
-> **Note:** If on VSCode: make sure you select your VSCode Typescript server to local to
-> the project (where you have Typescript installed in your `devDependencies`).
+> **Note:** If on VSCode: make sure you select your VSCode TypeScript server to local to
+> the project (where you have TypeScript installed in your `devDependencies`).
 >
 > In `.vscode/settings.json` set:
 >
