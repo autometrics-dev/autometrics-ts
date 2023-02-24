@@ -10,7 +10,6 @@ production usage of any function in your code.** Jump straight from your IDE to
 live Prometheus charts for each HTTP/RPC handler, database method, or other
 piece of application logic.
 
-
 Autometrics for Typescript provides a wrapper function and a decorator that can
 create Prometheus or OpenTelemetry metrics for your functions and class methods
 throughout your code base, as well as a language service plugin that will write
@@ -24,7 +23,7 @@ more details on the ideas behind autometrics
 - ✨ `autometrics` wrapper instruments any function or class method to track the
   most useful metrics
 - 🌳 Works in NodeJS server environments (Deno, serverless, and client support coming
-  soon)    
+  soon)
 - 💡 Writes Prometheus queries so you can understand the data generated without
   knowing PromQL
 - 🔗 Injects links to live Prometheus charts directly into each function's doc
@@ -34,7 +33,6 @@ more details on the ideas behind autometrics
 - 🚨 (Coming Soon!) Generates Prometheus alerting rules using SLO best practices
   from simple annotations in your code
 - ⚡ Minimal runtime overhead
-
 
 ## How it works
 
@@ -47,9 +45,9 @@ The AutometricsTS library consists of two parts:
   default on port `:9464`)
 
 #### The language service plugin:
+
 - Automatically writes useful Prometheus queries for instrumented functions and
   shows them in the doc comments.
-
 
 ## Getting started
 
@@ -80,14 +78,14 @@ Add the language service plugin to the `tsconfig.json` file:
 
 > **Note:** If on VSCode: make sure you select your VSCode Typescript server to local to
 > the project (where you have Typescript installed in your `devDependencies`).
-> 
+>
 > In `.vscode/settings.json` set:
+>
 > ```json
 > {
->     "typescript.tsdk": "node_modules/typescript/lib"
+>   "typescript.tsdk": "node_modules/typescript/lib"
 > }
 > ```
-
 
 ### 2. Wrap functions or decorate class methods
 
@@ -144,7 +142,6 @@ that function.
 
 ![Autometrics demo](./assets/demo.png)
 
-
 ## Configuration
 
 ### Set your own Exporter
@@ -156,12 +153,11 @@ however, by using the `setMetricsExporter` API.
 Example:
 
 ```javascript
-import { autometrics, setMetricsExporter} from "@autometrics/autometrics";
+import { autometrics, setMetricsExporter } from "@autometrics/autometrics";
 import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
 
 const exporter = new PrometheusExporter({ port: 7777 });
 setMetricsExporter(exporter);
-
 ```
 
 ### Language service plugin
@@ -170,8 +166,7 @@ Language service plugin can be configured in the `tsconfig.json` file.
 
 #### Options
 
-|key |description |
-|---|---|
-| `name` | always `@autometrics/docs` |
+| key             | description                                                     |
+| --------------- | --------------------------------------------------------------- |
+| `name`          | always `@autometrics/docs`                                      |
 | `prometheusUrl` | sets the base URL for PromQL queries. Default: `localhost:9090` |
-

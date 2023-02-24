@@ -10,6 +10,6 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "plugins": [{"name": "@autometrics/typescript-plugin"}]
+    "plugins": [{ "name": "@autometrics/typescript-plugin" }]
   }
 }

@@ -1,28 +1,28 @@
 {
-	"name": "@autometrics/typescript-plugin",
-	"version": "0.0.1",
-	"description": "Language service plugin for autometrics",
-	"author": "Fiberplane<info@fiberplane.com>",
-	"contributors": [
-		"Laurynas Keturakis",
-		"Evan Schwartz",
-		"Jacco Flenter"
-	],
-	"repository": {
-		"url": "https://github.com/autometrics-dev/autometrics-ts"
-	},
-	"license": "MIT OR Apache-2.0",
-	"publishConfig": {
-		"access": "public"
-	},
-	"keywords": [],
-	"main": "dist/index",
-	"scripts": {
-		"dev": "tsc --watch",
-		"build": "tsc",
-		"clean": "rm -rf dist/"
-	},
-	"peerDependencies": {
-		"typescript": ">=4.9.4"
-	}
+  "name": "@autometrics/typescript-plugin",
+  "version": "0.0.1",
+  "description": "Language service plugin for autometrics",
+  "author": "Fiberplane<info@fiberplane.com>",
+  "contributors": [
+    "Laurynas Keturakis",
+    "Evan Schwartz",
+    "Jacco Flenter"
+  ],
+  "repository": {
+    "url": "https://github.com/autometrics-dev/autometrics-ts"
+  },
+  "license": "MIT OR Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [],
+  "main": "dist/index",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "clean": "rm -rf dist/"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.9.4"
+  }
 }

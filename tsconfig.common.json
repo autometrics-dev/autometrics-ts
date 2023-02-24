@@ -2,15 +2,12 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
-		"declaration": true,
-		"declarationMap": true,
-		"sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
     "esModuleInterop": true,
-		"resolveJsonModule": true,
+    "resolveJsonModule": true,
     "moduleResolution": "node"
   },
-  "exclude": [
-    "examples/**",
-		"utils/**"
-  ]
+  "exclude": ["examples/**", "utils/**"]
 }

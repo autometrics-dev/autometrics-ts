@@ -1,17 +1,17 @@
 {
-	"compilerOptions": {
-		"target": "es2016",
-		"module": "commonjs",
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"strict": true,
-		"skipLibCheck": true,
-		"outDir": "./build",
-		"rootDir": "./src",
-		"plugins": [
-			{
-				"name": "@autometrics/typescript-plugin"
-			}
-		]
-	}
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "./build",
+    "rootDir": "./src",
+    "plugins": [
+      {
+        "name": "@autometrics/typescript-plugin"
+      }
+    ]
+  }
 }

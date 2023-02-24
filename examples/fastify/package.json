@@ -1,22 +1,22 @@
 {
-	"name": "fastify-example",
-	"main": "index.js",
-	"scripts": {
-		"build": "tsc",
-		"dev": "tsc --watch",
-		"start": "node build/index.js"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "MIT",
-	"dependencies": {
-		"@autometrics/autometrics": "file:../../packages/autometrics",
-		"@opentelemetry/exporter-prometheus": "^0.35.1",
-		"fastify": "^4.13.0"
-	},
-	"devDependencies": {
-		"@autometrics/typescript-plugin": "file:../../packages/autometrics-typescript-plugin",
-		"@types/node": "^18.13.0",
-		"typescript": "^4.9.5"
-	}
+  "name": "fastify-example",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node build/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@autometrics/autometrics": "file:../../packages/autometrics",
+    "@opentelemetry/exporter-prometheus": "^0.35.1",
+    "fastify": "^4.13.0"
+  },
+  "devDependencies": {
+    "@autometrics/typescript-plugin": "file:../../packages/autometrics-typescript-plugin",
+    "@types/node": "^18.13.0",
+    "typescript": "^4.9.5"
+  }
 }
