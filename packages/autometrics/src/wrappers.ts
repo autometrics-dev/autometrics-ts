@@ -16,18 +16,18 @@ export function autometricsDecorator(
   descriptor.value = function (...args: unknown[]) {
     const meter = getMeter();
     let result: ReturnType<typeof originalFunction>;
-    const autometricsStart = new Date().getTime();
+    const autometricsStart = performance.now();
     const counter = meter.createCounter("method.calls.count");
     const histogram = meter.createHistogram("method.calls.duration");
 
     const onSuccess = () => {
       counter.add(1, { method: propertyKey, result: "ok" });
-      const autometricsDuration = new Date().getTime() - autometricsStart;
+      const autometricsDuration = performance.now() - autometricsStart;
       histogram.record(autometricsDuration, { method: propertyKey });
     };
 
     const onError = () => {
-      const autometricsDuration = new Date().getTime() - autometricsStart;
+      const autometricsDuration = performance.now() - autometricsStart;
       counter.add(1, { method: propertyKey, result: "error" });
       histogram.record(autometricsDuration, { method: propertyKey });
     };
@@ -76,18 +76,18 @@ export function autometrics<F extends FunctionSig>(
 
   return function (...params) {
     const meter = getMeter();
-    const autometricsStart = new Date().getTime();
+    const autometricsStart = performance.now();
     const counter = meter.createCounter("function.calls.count");
     const histogram = meter.createHistogram("function.calls.duration");
 
     const onSuccess = () => {
-      const autometricsDuration = new Date().getTime() - autometricsStart;
+      const autometricsDuration = performance.now() - autometricsStart;
       counter.add(1, { module, function: fn.name, result: "ok" });
       histogram.record(autometricsDuration, { function: fn.name });
     };
 
     const onError = () => {
-      const autometricsDuration = new Date().getTime() - autometricsStart;
+      const autometricsDuration = performance.now() - autometricsStart;
       counter.add(1, { module, function: fn.name, result: "error" });
       histogram.record(autometricsDuration, { function: fn.name });
     };
