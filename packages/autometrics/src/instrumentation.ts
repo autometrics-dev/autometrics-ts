@@ -24,7 +24,7 @@ export function getMetricsProvider() {
   if (!autometricsMeterProvider) {
     if (!exporter) {
       logger(
-        "Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics"
+        "Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics",
       );
       exporter = new PrometheusExporter();
     }
