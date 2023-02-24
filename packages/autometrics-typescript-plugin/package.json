@@ -6,10 +6,12 @@
   "contributors": [
     "Laurynas Keturakis",
     "Evan Schwartz",
-    "Jacco Flenter"
+    "Jacco Flenter",
+    "Oscar van Zijverden",
+    "Stephan Lagerwaard"
   ],
   "repository": {
-    "url": "https://github.com/autometrics-dev/autometrics-ts"
+    "url": "https://github.com/autometrics-dev/autometrics-ts.git"
   },
   "license": "MIT OR Apache-2.0",
   "publishConfig": {
