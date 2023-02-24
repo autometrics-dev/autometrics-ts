@@ -23,13 +23,11 @@ async function handleGetAllTulips(req: FastifyRequest, res: FastifyReply) {
   };
 }
 
-async function createTulip(
-	tulip: Tulip,
-) {
-	return prisma.tulip.create({
-		data: tulip,
-	});
-};
+async function createTulip(tulip: Tulip) {
+  return prisma.tulip.create({
+    data: tulip,
+  });
+}
 
 // Example internal function calling a database instrumented with autometrics
 const createTulipWithMetrics = autometrics(createTulip);

@@ -1,6 +1,8 @@
-# AutometricsTS 📈✨
+![GitHub_headerImage](https://user-images.githubusercontent.com/3262610/221191767-73b8a8d9-9f8b-440e-8ab6-75cb3c82f2bc.png)
 
-![AutometricsTS demo](./assets/autometrics-ts-demo.gif)
+<div align="center">
+<h1>Autometrics</h1>
+</div>
 
 > A TypeScript port of the Rust
 > [autometrics-rs](https://github.com/fiberplane/autometrics-rs) library
@@ -17,6 +19,8 @@ corresponding Prometheus queries for you.
 
 See [Why Autometrics?](https://github.com/autometrics-dev#why-autometrics) for
 more details on the ideas behind autometrics
+
+![AutometricsTS demo](./assets/autometrics-ts-demo.gif)
 
 ## Features
 
