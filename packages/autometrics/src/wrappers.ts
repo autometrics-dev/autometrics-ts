@@ -2,9 +2,11 @@ import "./instrumentation";
 import { getMeter } from "./instrumentation";
 
 /**
- * Autometrics decorator for **class methods** that automatically instruments the decorated method with OpenTelemetry-compatible metrics.
+ * Autometrics decorator for **class methods** that automatically instruments
+ * the decorated method with OpenTelemetry-compatible metrics.
  *
- * Hover over the method to get the links for generated queries (if you have the language service plugin installed)
+ * Hover over the method to get the links for generated queries (if you have the
+ * language service plugin installed)
  */
 export function autometricsDecorator(
   _target: Object,
@@ -44,7 +46,8 @@ export function autometricsDecorator(
 }
 
 // Function Wrapper
-// rome-ignore lint/suspicious/noExplicitAny: this seems to be the preferred way for defining functions in typescript
+// This seems to be the preferred way for defining functions in TypeScript
+// rome-ignore lint/suspicious/noExplicitAny:
 type FunctionSig = (...args: any[]) => any;
 
 type AnyFunction<T extends FunctionSig> = (
@@ -52,16 +55,20 @@ type AnyFunction<T extends FunctionSig> = (
 ) => ReturnType<T>;
 
 /**
- * This type signals to the language service plugin that it should show extra documentation along with the queries.
+ * This type signals to the language service plugin that it should show extra
+ * documentation along with the queries.
  */
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
 /**
- * Autometrics wrapper for **functions** that automatically instruments the wrapped function with OpenTelemetry-compatible metrics.
+ * Autometrics wrapper for **functions** that automatically instruments the
+ * wrapped function with OpenTelemetry-compatible metrics.
  *
- * Hover over the wrapped function to get the links for generated queries (if you have the language service plugin installed)
+ * Hover over the wrapped function to get the links for generated queries (if
+ * you have the language service plugin installed)
  *
- * @param {AnyFunction} fn - the function that will be wrapped and instrumented (requests handler or database method)
+ * @param {AnyFunction} fn - the function that will be wrapped and instrumented
+ * (requests handler or database method)
  */
 export function autometrics<F extends FunctionSig>(
   fn: F,
@@ -129,10 +136,11 @@ function isPromise<T extends Promise<void>>(val: unknown): val is T {
 // for a given function e.g.: dist/index.js
 function getModulePath(): string | undefined {
   const stack = new Error()?.stack?.split("\n");
-  const rootDir = process.cwd(); // HACK: this assumes the entire app was run from the root directory of the project
+  // HACK: this assumes the entire app was run from the root directory of the project
+  const rootDir = process.cwd();
 
   if (!stack) {
-    return undefined;
+    return;
   }
 
   /**
@@ -143,10 +151,15 @@ function getModulePath(): string | undefined {
    * 3: at ... -> 4th line is always the original caller
    */
   const originalCaller = 3 as const;
-  const fullPath = stack[originalCaller].split(" ").pop(); // the last element in this array will have the full path
 
-  let modulePath = fullPath.split(rootDir).pop(); // we split away everything up to the root directory of the project
-  modulePath = modulePath.substring(0, modulePath.indexOf(":")); // we split away the line and column numbers index.js:14:6
+  // The last element in this array will have the full path
+  const fullPath = stack[originalCaller].split(" ").pop();
+
+  // We split away everything up to the root directory of the project
+  let modulePath = fullPath.split(rootDir).pop();
+
+  // We split away the line and column numbers index.js:14:6
+  modulePath = modulePath.substring(0, modulePath.indexOf(":"));
 
   return modulePath;
 }

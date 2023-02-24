@@ -5,7 +5,8 @@ let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
 
 /**
- * If you have a Prometheus exporter already set up, this function allows you to get autometrics to use the same exporter
+ * If you have a Prometheus exporter already set up, this function allows you to
+ * get autometrics to use the same exporter
  *
  * @param 'userExporter' {T extends MetricReader}
  */
@@ -16,7 +17,8 @@ export function setMetricsExporter<T extends MetricReader>(userExporter: T) {
 }
 
 /**
- * Instantiates an autometrics meter provider and default Prometheus exporter (if none exist)
+ * Instantiates an autometrics meter provider and default Prometheus exporter
+ * if none exist)
  */
 export function getMetricsProvider() {
   if (!autometricsMeterProvider) {
@@ -26,9 +28,11 @@ export function getMetricsProvider() {
       );
       exporter = new PrometheusExporter();
     }
+
     autometricsMeterProvider = new MeterProvider();
     autometricsMeterProvider.addMetricReader(exporter);
   }
+
   return autometricsMeterProvider;
 }
 
