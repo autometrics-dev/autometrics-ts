@@ -43,3 +43,35 @@ app.get("/async", autometrics(asyncRoute));
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
+async function generateRandomTraffic() {
+  const loopTimes = Math.floor(Math.random() * 30 + 20);
+  const http = await import("http");
+
+  for (let i = 0; i < loopTimes; i++) {
+    const type = Math.floor(Math.random() * 3);
+
+    switch (type) {
+      case 0: {
+        http.get("http://localhost:8080");
+        break;
+      }
+
+      case 1: {
+        http.get("http://localhost:8080/async");
+        break;
+      }
+
+      case 2: {
+        http.get("http://localhost:8080/bad");
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
+}
+
+// We delay firing the sample traffic 1s to ensure 
+// Prometheus can pick up the newly registered metrics
+setTimeout(() => generateRandomTraffic(), 1000);
