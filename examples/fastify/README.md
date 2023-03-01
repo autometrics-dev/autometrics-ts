@@ -24,38 +24,45 @@ prometheus --config.file=$(pwd)/examples/util/prometheus.yml
 Flag `--config.file` must point to the `prometheus.yml` configuration file
 (example provided in the `util/` directory)
 
-2. Copy `.env.example` as `.env`
+3. Copy `.env.example` as `.env`
 
-3. Install the dependencies
+4. Install the dependencies
 
 ```shell
 npm install
 ```
 
-4. Run the initial migration
+5. Run the initial migration
 
 ```shell
 npx prisma migrate dev --name init
 ```
 
-5. Generate the client
+6. Generate the client
 
 ```shell
 npx prisma generate
 ```
 
-6. Build and run the application
+7. Build and run the application
 
 ```shell
 npm run build && npm run start
 ```
 
-7. Open the example in VScode (or your editor of choice):
+8. Run `generate_traffic.sh` script to generate some traffic to the example
+	 application
+
+```shell
+examples/util/generate_traffic.sh
+```
+
+9. Open the example in VScode (or your editor of choice):
 
 ```shell
 code examples/fastify/
 ```
 
-8. Hover over the `autometrics(...)` wrapped functions to see the generated
+10. Hover over the `autometrics(...)` wrapped functions to see the generated
 	 query links for request, error rates and latency. Click on them to jump
 	 straight to the Prometheus chart
