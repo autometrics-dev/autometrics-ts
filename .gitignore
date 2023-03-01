@@ -14,7 +14,7 @@ examples/**/*/out
 examples/**/*/data
 examples/**/*/next-env.d.ts
 examples/**/*/package-lock.json
-examples/**/*/dev.db
+dev.db
 
 # Logs
 logs
