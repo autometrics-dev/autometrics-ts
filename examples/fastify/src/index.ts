@@ -2,7 +2,7 @@ import { fastify, FastifyReply, FastifyRequest } from "fastify";
 import { autometrics } from "@autometrics/autometrics";
 import { PrismaClient } from "@prisma/client";
 
-const port = 7000;
+const port = 8080;
 const server = fastify();
 const prisma = new PrismaClient();
 
@@ -64,3 +64,38 @@ const start = async () => {
 };
 
 start();
+
+async function generateRandomTraffic() {
+  const loopTimes = Math.floor(Math.random() * 30 + 20);
+  const http = await import("http");
+
+  for (let i = 0; i < loopTimes; i++) {
+    const type = Math.floor(Math.random() * 2);
+
+    switch (type) {
+      case 0: {
+        await fetch("http://localhost:8080/tulips/");
+        break;
+      }
+
+      case 1: {
+        await fetch("http://localhost:8080/tulips/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name: "Abernathy", price: 2.5 }),
+        });
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
+}
+
+// We delay firing the sample traffic 1s to ensure
+// Prometheus can pick up the newly registered metrics
+setTimeout(() => generateRandomTraffic(), 1000);
+

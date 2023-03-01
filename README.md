@@ -4,7 +4,6 @@
 <h1>Autometrics</h1>
 <a href="https://github.com/autometrics-dev/autometrics-ts/actions?query=branch%3Amain"><img src="https://github.com/autometrics-dev/autometrics-ts/actions/workflows/check_wrappers.yml/badge.svg?event=push&branch=main" alt="Autometrics CI status" /></a>
 <a href="https://opensource.org/licenses/MIT" rel="nofollow"><img src="https://img.shields.io/npm/l/@autometrics/autometrics" alt="License"></a>
-<a href="https://www.npmjs.com/package/@autometrics/autometrics" rel="nofollow"><img src="https://img.shields.io/npm/dw/@autometrics/autometrics.svg" alt="npm"></a>
 <a href="https://discord.gg/MJr7pYzZQ4" rel="nofollow"><img src="https://img.shields.io/discord/950489382626951178?label=Discord&logo=discord&logoColor=white" alt="discord server"></a>
 </div>
 

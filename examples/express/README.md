@@ -1,7 +1,6 @@
-## Fastify API + Prisma + Autometrics example
+## Express + Autometrics example
 
-This is a very simple example for an API built with Fastify and Prisma, and
-instrumented with Autometrics.
+Simple Express API instrumented with Autometrics
 
 ### Running the example
 
@@ -24,40 +23,30 @@ prometheus --config.file=$(pwd)/examples/util/prometheus.yml
 Flag `--config.file` must point to the `prometheus.yml` configuration file
 (example provided in the `util/` directory)
 
-3. Copy `.env.example` as `.env`
-
-4. Install the dependencies
+3. Install the dependencies
 
 ```shell
 npm install
 ```
 
-5. Run the initial migration
+4. Build and run the application
 
 ```shell
-npx prisma migrate dev --name init
+npm run build
 ```
 
-6. Generate the client
-
 ```shell
-npx prisma generate
-```
-
-7. Build and run the application
-
-```shell
-npm run build && npm run start
+npm run start
 ```
 
 The example should run and generate some sample traffic by itself
 
-8. Open the example in VScode (or your editor of choice):
+5. Open the example in VScode (or your editor of choice):
 
 ```shell
-code examples/fastify/
+code examples/express/
 ```
 
-9. Hover over the `autometrics(...)` wrapped functions to see the generated
+6. Hover over the `autometrics(...)` wrapped functions to see the generated
 	 query links for request, error rates and latency. Click on them to jump
 	 straight to the Prometheus chart
