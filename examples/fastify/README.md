@@ -50,19 +50,14 @@ npx prisma generate
 npm run build && npm run start
 ```
 
-8. Run `generate_traffic.sh` script to generate some traffic to the example
-	 application
+The example should run and generate some sample traffic by itself
 
-```shell
-examples/util/generate_traffic.sh
-```
-
-9. Open the example in VScode (or your editor of choice):
+8. Open the example in VScode (or your editor of choice):
 
 ```shell
 code examples/fastify/
 ```
 
-10. Hover over the `autometrics(...)` wrapped functions to see the generated
+9. Hover over the `autometrics(...)` wrapped functions to see the generated
 	 query links for request, error rates and latency. Click on them to jump
 	 straight to the Prometheus chart
