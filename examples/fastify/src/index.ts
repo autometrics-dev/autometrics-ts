@@ -2,7 +2,7 @@ import { fastify, FastifyReply, FastifyRequest } from "fastify";
 import { autometrics } from "@autometrics/autometrics";
 import { PrismaClient } from "@prisma/client";
 
-const port = 7000;
+const port = 8080;
 const server = fastify();
 const prisma = new PrismaClient();
 
