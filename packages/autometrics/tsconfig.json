@@ -1,10 +1,9 @@
 {
-  "extends": "../../tsconfig.common.json",
-  "compilerOptions": {
-    "outDir": "./dist",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
-  },
-  "include": ["./src"],
-  "exclude": ["node_modules", "dist"]
+	"extends": "../../tsconfig.common.json",
+	"compilerOptions": {
+		"outDir": "dist/"
+	},
+	"include": [
+		"./src"
+	]
 }
