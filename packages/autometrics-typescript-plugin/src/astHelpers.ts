@@ -105,7 +105,7 @@ export function getNodeIdentifier(
 export function getNodeType(node: ts.Node, typechecker: ts.TypeChecker) {
   const declaration = typechecker.getSymbolAtLocation(node);
 
-  if (!(node.parent || declaration.valueDeclaration)) {
+  if (!(declaration.valueDeclaration && node.parent)) {
     return;
   }
 
