@@ -106,7 +106,7 @@ export function getNodeType(node: ts.Node, typechecker: ts.TypeChecker) {
   const declaration = typechecker.getSymbolAtLocation(node);
 
   // rome-ignore lint/complexity/useSimplifiedLogicExpression: simplify if statement ignoring Rome's suggestion
-  if (!declaration.valueDeclaration && !node.parent) {
+  if (!declaration.valueDeclaration || !node.parent) {
     return;
   }
 
