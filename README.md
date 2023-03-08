@@ -43,48 +43,43 @@ more details on the ideas behind autometrics
 
 ## How it works
 
-The AutometricsTS library consists of two parts:
-
-#### The wrappers and decorators:
-
+The Autometrics library:
 - Automatically instruments your code with OpenTelemetry metrics
 - Uses a Prometheus Exporter to write metrics to a `/metrics` endpoint (by
-  default on port `:9464`)
+	default on port `:9464`)
+- Uses the TypeScript plugin to automatically write useful Prometheus queries
+	for instrumented functions and show them in the doc comments.
 
-#### The language service plugin:
-
-- Automatically writes useful Prometheus queries for instrumented functions and
-  shows them in the doc comments.
-
-## Getting started
-
-### 1. Install and setup the library and the language service plugin
-
-Install the wrappers, the language service plugin, and the peer dependencies:
+## Quickstart
 
 ```shell
-npm install --save @autometrics/autometrics
-npm install --save-dev @autometrics/typescript-plugin
-npm install --save @opentelemetry/sdk-metrics @opentelemetry/exporter-prometheus
+npm install autometrics
 ```
 
-Add the language service plugin to the `tsconfig.json` file:
+Enable TypeScript plugin by adding it to `tsconfig.json`:
 
-```diff
+```json
 {
-    "compilerOptions": {
-       ...
-+        "plugins": [{
-+            "name": "@autometrics/typescript-plugin",
-+            "prometheusUrl": ""
-+        }]
-    },
-	...
+  "compilerOptions": {
+   "plugins": [
+    {
+     "name": "autometrics",
+     "prometheusUrl": ""
+    }
+   ]
+  }
 }
 ```
 
-> **Note:** If on VSCode: make sure you select your VSCode TypeScript server to local to
-> the project (where you have TypeScript installed in your `devDependencies`).
+Use the library in your code:
+
+```typescript
+import { autometrics } from "autometrics"
+```
+
+> Note: for VSCode users: make sure you select your VSCode TypeScript server
+> to local to the project (where you have TypeScript installed in your
+> `devDependencies`).
 >
 > In `.vscode/settings.json` set:
 >
@@ -94,58 +89,101 @@ Add the language service plugin to the `tsconfig.json` file:
 > }
 > ```
 
-### 2. Wrap functions or decorate class methods
+### For projects already using OpenTelemetry metrics
+
+The default `autometrics` package bundles `@opentelemetry/sdk-metrics` and
+`@opentelemetry/exporter-prometheus` dependencies. If you are already using
+these in your codebase or want to use other custom metrics, use this
+installation option.
+
+Install the wrappers, the language service plugin:
+
+```shell
+npm install --save @autometrics/autometrics
+npm install --save-dev @autometrics/typescript-plugin
+```
+
+Add the language service plugin to the `tsconfig.json` file:
+
+```json
+{
+ "compilerOptions": {
+ ...
+ "plugins": [
+   {
+    "name": "@autometrics/typescript-plugin",
+    "prometheusUrl": ""
+   }
+  ]
+ }
+}
+```
+
+## Using wrappers and decorators
 
 Use Autometrics wrappers to instrument the functions you want to track (e.g.:
 request handlers or database calls).
 
-#### Adding wrappers
+### Adding function wrappers
 
 Wrappers are simple functions that wrap the original function declaration
 instrumenting it with metrics and allowing the language service plugin to add
 additional information to the type docs.
 
-Call the wrapped function to get metrics for the .
+Use function wrappers to wrap your request handlers, database calls, or other
+pieces of important business logic that you want to measure.
 
-```diff
-+ import { autometrics } from "@autometrics/autometrics";
+> **Note**: wrapped functions must be named. Autometrics will throw an error if
+> it can't access the name of the function.
+
+Example:
+
+```typescript
+import { autometrics } from "autometrics";
 
 async function createUser(payload: User) {
   // ...
 }
 
-+ // Now call the instrumented function as opposed to the original one
-+ const user = autometrics(createUser)
+// Now call the instrumented function as opposed to the original one
+const user = autometrics(createUser)
 ```
 
-#### Adding decorators
+> Note: if you're using the `@autometrics/autometrics` package instead of
+> `autometrics`, import the helper functions from there:
+> ```typescript
+> import { autometrics } from "@autometrics/autometrics"
+> ```
 
-For class methods where a decorator is added, they are wrapped in additional code that
-instruments it with OpenTelemetry metrics.
+### Adding decorators for class methods
+
+For class methods where a decorator is added, they are wrapped in additional
+code that instruments it with OpenTelemetry metrics.
 
 Here's a snippet from the example code:
 
-```diff
+```typescript
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-+ import { autometricsDecorator as autometrics } from "@autometrics/autometrics";
+import { autometricsDecorator as autometrics } from "autometrics";
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-+ @autometrics
+  @autometrics
   getHello(): string {
     return this.appService.getHello();
   }
 }
 ```
 
-### 3. Hover over the function name to see the generated queries
+### Getting the generated queries
 
-You can click on any of the links to go directly to the Prometheus chart for
-that function.
+Hover over any Autometrics-instrumented function or class to see the generated
+queries. You can click on any of the links to go directly to the Prometheus
+chart for that function.
 
 ![Autometrics demo](./assets/demo.png)
 
@@ -157,7 +195,7 @@ By default, autometrics exports your metrics with OpenTelemetry's Prometheus
 Exporter on port `:9464`, endpoint `/metrics`. You can configure it as you wish,
 however, by using the `setMetricsExporter` API.
 
-Example:
+Example if you want to set an exporter to port 7777:
 
 ```javascript
 import { autometrics, setMetricsExporter } from "@autometrics/autometrics";
@@ -175,5 +213,5 @@ Language service plugin can be configured in the `tsconfig.json` file.
 
 | key             | description                                                     |
 | --------------- | --------------------------------------------------------------- |
-| `name`          | always `@autometrics/docs`                                      |
+| `name`          | always `autometrics` or `@autometrics/typescript-plugin`        |
 | `prometheusUrl` | sets the base URL for PromQL queries. Default: `localhost:9090` |
