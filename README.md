@@ -78,7 +78,7 @@ Use the library in your code:
 import { autometrics } from "autometrics"
 ```
 
-> **Note:** for VSCode users: make sure you select your VSCode TypeScript server
+> Note: for VSCode users: make sure you select your VSCode TypeScript server
 > to local to the project (where you have TypeScript installed in your
 > `devDependencies`).
 >
