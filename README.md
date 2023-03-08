@@ -61,7 +61,6 @@ Enable TypeScript plugin by adding it to `tsconfig.json`:
 ```json
 {
   "compilerOptions": {
-   ...
    "plugins": [
     {
      "name": "autometrics",
