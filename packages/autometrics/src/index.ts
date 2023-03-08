@@ -7,4 +7,3 @@ exports = module.exports;
 
 // Other library APIs are exported as default
 export * from "@autometrics/autometrics";
-
