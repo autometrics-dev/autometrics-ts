@@ -1,40 +1,37 @@
 {
-  "name": "@autometrics/autometrics",
-  "type": "module",
-  "version": "0.1.1",
-  "description": "Easily add metrics to your system -- and actually understand them using automatically customized Prometheus queries",
-  "author": "Fiberplane<info@fiberplane.com>",
-  "contributors": [
-    "Laurynas Keturakis",
-    "Evan Schwartz",
-    "Jacco Flenter",
-    "Oscar van Zijverden",
-    "Stephan Lagerwaard"
-  ],
-  "repository": {
-    "url": "https://github.com/autometrics-dev/autometrics-ts.git"
-  },
-  "license": "MIT OR Apache-2.0",
-  "publishConfig": {
-    "access": "public"
-  },
-  "keywords": [],
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index",
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.17",
-    "@types/node": "^18.11.18",
-    "express": "^4.18.2",
-    "tsup": "^6.5.0",
-    "typescript": "^4.9.4"
-  },
-  "peerDependencies": {
-    "@opentelemetry/exporter-prometheus": "^0.35.1",
-    "@opentelemetry/sdk-metrics": "^1.9.0"
-  }
+	"name": "autometrics",
+	"version": "0.1.1",
+	"description": "Easily add metrics to your system -- and actually understand them using automatically customized Prometheus queries",
+	"author": "Fiberplane<info@fiberplane.com>",
+	"contributors": [
+		"Laurynas Keturakis",
+		"Evan Schwartz",
+		"Jacco Flenter",
+		"Oscar van Zijverden",
+		"Stephan Lagerwaard"
+	],
+	"repository": {
+		"url": "https://github.com/autometrics-dev/autometrics-ts.git"
+	},
+	"license": "MIT OR Apache-2.0",
+	"publishConfig": {
+		"access": "public"
+	},
+	"keywords": [],
+	"main": "dist/index.js",
+	"scripts": {
+		"clean": "rm -rf ./dist/",
+		"build": "tsc",
+		"dev": "tsc --watch"
+	},
+	"devDependencies": {
+		"@types/node": "^18.14.6",
+		"typescript": "^4.9.5"
+	},
+	"dependencies": {
+		"@autometrics/autometrics": "file:../autometrics-lib",
+		"@autometrics/typescript-plugin": "file:../autometrics-typescript-plugin",
+		"@opentelemetry/exporter-prometheus": "^0.35.1",
+		"@opentelemetry/sdk-metrics": "^1.9.0"
+	}
 }

@@ -4,14 +4,21 @@
   "name": "autometrics-monorepo",
   "workspaces": [
     "packages/autometrics-typescript-plugin",
+    "packages/autometrics-lib",
     "packages/autometrics"
   ],
   "main": "index.js",
   "scripts": {
+		"build:main": "npm run build --workspace=autometrics",
+    "dev:main": "npm run dev --workspace=autometrics",
+    "clean:main": "npm run clean --workspace=autometrics",
+    "build:lib": "npm run build --workspace=@autometrics/autometrics",
     "dev:lib": "npm run dev --workspace=@autometrics/autometrics",
     "clean:lib": "npm run clean --workspace=@autometrics/autometrics",
+    "build:plugin": "npm run build --workspace=@autometrics/typescript-plugin",
     "dev:plugin": "npm run dev --workspace=@autometrics/typescript-plugin",
     "clean:plugin": "npm run clean --workspace=@autometrics/typescript-plugin",
+		"build": "npm run build --workspaces",
     "test": "vitest",
     "lint": "rome ci packages/autometrics/src packages/autometrics-typescript-plugin/src"
   },
