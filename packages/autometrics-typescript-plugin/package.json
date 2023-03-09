@@ -1,7 +1,7 @@
 {
   "name": "@autometrics/typescript-plugin",
-  "version": "0.1.1",
-  "description": "Language service plugin for autometrics",
+  "version": "0.1.2",
+  "description": "Language service plugin for Autometrics",
   "author": "Fiberplane<info@fiberplane.com>",
   "contributors": [
     "Laurynas Keturakis",
