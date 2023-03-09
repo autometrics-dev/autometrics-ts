@@ -9,7 +9,7 @@
   ],
   "main": "index.js",
   "scripts": {
-		"build:main": "npm run build --workspace=autometrics",
+    "build:main": "npm run build --workspace=autometrics",
     "dev:main": "npm run dev --workspace=autometrics",
     "clean:main": "npm run clean --workspace=autometrics",
     "build:lib": "npm run build --workspace=@autometrics/autometrics",
