@@ -1,44 +1,83 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import { autometrics, setMetricsExporter } from '@autometrics/autometrics'
-import './App.css'
+import { useEffect, useState } from "react";
+import { autometrics, initAutometrics } from "@autometrics/autometrics";
+import "./App.css";
 
-setMetricsExporter(undefined, "0.0.0.0", 1)
+initAutometrics({ pushGateway: "http://0.0.0.0:8080", pushInterval: 1000 });
 
-const Counter = autometrics(function Counter() {
-  const [count, setCount] = useState(0)
+type Artwork = {
+  id: number;
+  thumbnail: {
+    lqip: string;
+    alt_text: string;
+    width: number;
+    height: number;
+  };
+  image_id: string;
+};
 
-  return (
-    <button onClick={() => setCount((count) => count + 1)}>
-      count is {count}
-    </button>
-  )
-})
+let artworks: Array<Artwork>;
+
+async function allArtworks() {
+  if (!artworks) {
+    const data = await fetch("https://api.artic.edu/api/v1/artworks?limit=100")
+      .then(async (res) => {
+        return await res.json();
+      })
+      .catch((err) => {
+        throw new Error(`API call error: ${err}`);
+      });
+
+    artworks = data.data;
+  }
+
+  return artworks;
+}
+
+const getRandomArtwork = autometrics(
+  {
+    functionName: "getRandomArtwork",
+    moduleName: "App",
+  },
+  async () => {
+    const rand = Math.floor(Math.random() * 100 + 1) - 1;
+    const artworks = await allArtworks();
+    console.log(artworks[rand]);
+    return artworks[rand];
+  },
+);
 
 function App() {
+  const [art, setArt] = useState<Artwork>();
+
+  const handleClick = async () => {
+    try {
+      const data = await getRandomArtwork();
+      setArt(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+      <h1>Artwork getter</h1>
       <div className="card">
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <button onClick={handleClick}>Get art</button>
+        <div>
+          {art ? (
+            <img
+              src={`https://www.artic.edu/iiif/2/${art.image_id}/full/843,/0/default.jpg`}
+              alt={art.thumbnail.alt_text ?? "no alt text from source"}
+              width="50%"
+              //height="400"
+            />
+          ) : (
+            <p />
+          )}
+        </div>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

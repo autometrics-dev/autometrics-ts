@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@autometrics/autometrics": "file:../../packages/autometrics",
+    "@autometrics/autometrics": "file:../../packages/autometrics-lib",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
