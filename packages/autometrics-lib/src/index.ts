@@ -1,2 +1,2 @@
-export { setMetricsExporter } from "./instrumentation";
+export { initAutometrics } from "./instrumentation";
 export * from "./wrappers";
