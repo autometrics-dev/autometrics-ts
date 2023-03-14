@@ -60,6 +60,11 @@ type AnyFunction<T extends FunctionSig> = (
  */
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
+interface AutometricsOptions {
+  functionName: string;
+  moduleName: string | "MODULE";
+}
+
 /**
  * Autometrics wrapper for **functions** that automatically instruments the
  * wrapped function with OpenTelemetry-compatible metrics.
@@ -67,20 +72,32 @@ interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
  * Hover over the wrapped function to get the links for generated queries (if
  * you have the language service plugin installed)
  *
- * @param {AnyFunction} fn - the function that will be wrapped and instrumented
+ * @param fnOrOptions {(F|AutometricsOptions)} - the function that will be wrapped and instrumented
  * (requests handler or database method)
  */
 export function autometrics<F extends FunctionSig>(
-  fn: F,
+  fnOrOptions: F | AutometricsOptions,
+  fnInput?: F,
 ): AutometricsWrapper<F> {
-  if (!fn.name) {
+  let functionName: string;
+  let module: string;
+  let fn: F;
+
+  if ("functionName" in fnOrOptions) {
+    fn = fnInput;
+    functionName = fnOrOptions.functionName;
+    module = fnOrOptions.moduleName;
+  } else {
+    fn = fnOrOptions;
+    functionName = fn.name;
+    module = getModulePath();
+  }
+
+  if (!functionName) {
     throw new TypeError(
       "Autometrics decorated function must have a name to succesfully create a metric",
     );
   }
-
-  //const module = getModulePath();
-	const module = undefined
 
   return function (...params) {
     const meter = getMeter();
@@ -90,14 +107,14 @@ export function autometrics<F extends FunctionSig>(
 
     const onSuccess = () => {
       const autometricsDuration = performance.now() - autometricsStart;
-      counter.add(1, { module, function: fn.name, result: "ok" });
-      histogram.record(autometricsDuration, { function: fn.name });
+      counter.add(1, { module, function: functionName, result: "ok" });
+      histogram.record(autometricsDuration, { function: functionName });
     };
 
     const onError = () => {
       const autometricsDuration = performance.now() - autometricsStart;
-      counter.add(1, { module, function: fn.name, result: "error" });
-      histogram.record(autometricsDuration, { function: fn.name });
+      counter.add(1, { module, function: functionName, result: "error" });
+      histogram.record(autometricsDuration, { function: functionName });
     };
 
     try {
