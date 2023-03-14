@@ -153,9 +153,21 @@ function isPromise<T extends Promise<void>>(val: unknown): val is T {
 // HACK: this entire function is a hacky way to acquire the module name
 // for a given function e.g.: dist/index.js
 function getModulePath(): string | undefined {
+  Error.stackTraceLimit = 5;
   const stack = new Error()?.stack?.split("\n");
-  // HACK: this assumes the entire app was run from the root directory of the project
-  const rootDir = process.cwd();
+
+  let rootDir: string;
+
+  if (typeof process === "object") {
+    // HACK: this assumes the entire app was run from the root directory of the project
+    rootDir = process.cwd();
+    //@ts-ignore
+  } else if (typeof Deno === "object") {
+    //@ts-ignore
+    rootDir = Deno.cwd();
+  } else {
+    rootDir = "";
+  }
 
   if (!stack) {
     return;
@@ -174,7 +186,7 @@ function getModulePath(): string | undefined {
   const fullPath = stack[originalCaller].split(" ").pop();
 
   // We split away everything up to the root directory of the project
-  let modulePath = fullPath.split(rootDir).pop();
+  let modulePath = fullPath.replace(rootDir, "");
 
   // We split away the line and column numbers index.js:14:6
   modulePath = modulePath.substring(0, modulePath.indexOf(":"));
