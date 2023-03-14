@@ -12,26 +12,34 @@ import {
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
 
+interface Exporter extends MetricReader {}
+
+interface InitAutometricsOptions {
+  exporter?: Exporter;
+  pushGateway?: string;
+  pushInterval?: number;
+}
+
 /**
- * If you have a Prometheus exporter already set up, this function allows you to
- * get autometrics to use the same exporter
+ *	Set your exporter. Required if used in the browser side
  *
- * @param 'userExporter' {T extends MetricReader}
+ * @param 'options' {InitAutometricsOptions}
  */
-export function setMetricsExporter<T extends MetricReader>(
-  userExporter?: T,
-  pushTarget?: string,
-  interval?: number,
-) {
+export function initAutometrics(options: InitAutometricsOptions) {
   logger("Using the user's Exporter configuration");
-  exporter = userExporter;
-  if (pushTarget && interval) {
-		exporter = new PeriodicExportingMetricReader({
-			exporter: new InMemoryMetricExporter(0)
-		})
-    setInterval(() => pushToGateway(pushTarget), interval * 1000);
+  exporter = options.exporter;
+	// if a pushGateway is added we overwrite the exporter 
+  if (options.pushGateway) {
+    exporter = new PeriodicExportingMetricReader({
+      exporter: new InMemoryMetricExporter(0),
+      // 0 denotes delta temporality setting
+      // has to be this way cozzz
+      // i.e.: FIXME: come back to this
+    });
+    // Make sure the provider is initialized and exporter is registered
+    getMetricsProvider();
+    setInterval(() => pushToGateway(options.pushGateway), options.pushInterval);
   }
-  return;
 }
 
 /**
