@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { autometrics, initAutometrics } from "@autometrics/autometrics";
+import { useState } from "react";
+import { autometrics, init } from "autometrics";
 import "./App.css";
 
-initAutometrics({ pushGateway: "http://0.0.0.0:8080", pushInterval: 1000 });
+init({ pushGateway: "http://0.0.0.0:8080", pushInterval: 1000 });
 
 type Artwork = {
   id: number;
