@@ -74,6 +74,7 @@ interface AutometricsOptions {
  *
  * @param fnOrOptions {(F|AutometricsOptions)} - the function that will be wrapped and instrumented
  * (requests handler or database method)
+ * @param fnInput {F}
  */
 export function autometrics<F extends FunctionSig>(
   fnOrOptions: F | AutometricsOptions,
@@ -94,7 +95,7 @@ export function autometrics<F extends FunctionSig>(
   }
 
   if (!functionName) {
-    throw new TypeError(
+    throw new Error(
       "Autometrics decorated function must have a name to succesfully create a metric",
     );
   }
