@@ -14,27 +14,26 @@ let exporter: MetricReader;
 
 interface Exporter extends MetricReader {}
 
-interface InitAutometricsOptions {
+interface initOptions {
   exporter?: Exporter;
   pushGateway?: string;
   pushInterval?: number;
 }
 
 /**
- *	Set your exporter. Required if used in the browser side
+ * Set your exporter. Required if used in the browser side
  *
- * @param 'options' {InitAutometricsOptions}
+ * @param {initOptions} options
  */
-export function initAutometrics(options: InitAutometricsOptions) {
+export function init(options: initOptions) {
   logger("Using the user's Exporter configuration");
   exporter = options.exporter;
-	// if a pushGateway is added we overwrite the exporter 
+  // if a pushGateway is added we overwrite the exporter
   if (options.pushGateway) {
     exporter = new PeriodicExportingMetricReader({
+      // 0 - using delta aggregation temporality setting
+      // to ensure data submitted to the gateway is accurate
       exporter: new InMemoryMetricExporter(0),
-      // 0 denotes delta temporality setting
-      // has to be this way cozzz
-      // i.e.: FIXME: come back to this
     });
     // Make sure the provider is initialized and exporter is registered
     getMetricsProvider();

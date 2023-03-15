@@ -1,2 +1,2 @@
-export { initAutometrics } from "./instrumentation";
+export { init } from "./instrumentation";
 export * from "./wrappers";
