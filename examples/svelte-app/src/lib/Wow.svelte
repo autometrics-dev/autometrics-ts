@@ -3,16 +3,18 @@
 
 	let promise: Promise<any>;
 
-	const getWow = autometrics({
-		functionName: "getWow",
-		moduleName: "MODULE",
-		fn: async () => {
+	const getWow = autometrics(
+		{
+			functionName: "getWow",
+			moduleName: "MODULE",
+		},
+		async () => {
 			const res = await fetch(
 				"https://owen-wilson-wow-api.onrender.com/wows/random"
 			);
 			return await res.json();
-		},
-	});
+		}
+	);
 
 	async function handleClick() {
 		promise = getWow();
