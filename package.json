@@ -18,7 +18,7 @@
     "build:plugin": "npm run build --workspace=@autometrics/typescript-plugin",
     "dev:plugin": "npm run dev --workspace=@autometrics/typescript-plugin",
     "clean:plugin": "npm run clean --workspace=@autometrics/typescript-plugin",
-		"build": "npm run build --workspaces",
+    "build": "npm run build --workspaces",
     "test": "vitest",
     "lint": "rome ci packages/autometrics/src packages/autometrics-typescript-plugin/src"
   },
@@ -27,3 +27,4 @@
     "vitest": "^0.28.4"
   }
 }
+
