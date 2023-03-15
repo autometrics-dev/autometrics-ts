@@ -37,7 +37,10 @@ export function init(options: initOptions) {
     });
     // Make sure the provider is initialized and exporter is registered
     getMetricsProvider();
-    setInterval(() => pushToGateway(options.pushGateway), options.pushInterval);
+    setInterval(
+      () => pushToGateway(options.pushGateway),
+      options.pushInterval ?? 5000,
+    );
   }
 }
 
