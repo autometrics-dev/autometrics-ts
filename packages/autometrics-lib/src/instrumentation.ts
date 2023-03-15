@@ -14,11 +14,20 @@ let exporter: MetricReader;
 
 interface Exporter extends MetricReader {}
 
-interface initOptions {
+export type initOptions = {
+  /**
+   * A custom exporter to be used instead of the bundled Prometheus Exporter on port 9464
+   */
   exporter?: Exporter;
+  /**
+   * The full URL of the aggregating push gateway for metrics to be submitted to.
+   */
   pushGateway?: string;
+  /**
+   * Set a custom push interval in ms (default: 5000ms)
+   */
   pushInterval?: number;
-}
+};
 
 /**
  * Set your exporter. Required if used in the browser side
