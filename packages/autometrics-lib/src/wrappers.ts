@@ -60,10 +60,16 @@ type AnyFunction<T extends FunctionSig> = (
  */
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
-interface AutometricsOptions {
+export type AutometricsOptions = {
+  /**
+   * Name of your function
+   */
   functionName: string;
-  moduleName: string | "MODULE";
-}
+  /**
+   * Name of the module (usually filename)
+   */
+  moduleName: string;
+};
 
 /**
  * Autometrics wrapper for **functions** that automatically instruments the
