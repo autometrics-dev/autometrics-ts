@@ -2,7 +2,7 @@ import { useState } from "react";
 import { autometrics, init } from "autometrics";
 import "./App.css";
 
-init({ pushGateway: "http://0.0.0.0:8080", pushInterval: 1000 });
+init({ pushGateway: "http://0.0.0.0:8080/metrics" });
 
 type Artwork = {
   id: number;
