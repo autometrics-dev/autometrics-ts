@@ -1,34 +1,34 @@
 <script lang="ts">
-	import { autometrics } from "@autometrics/autometrics";
+  import { autometrics } from "@autometrics/autometrics";
 
-	let promise: Promise<any>;
+  let promise: Promise<any>;
 
-	const getWow = autometrics(
-		{
-			functionName: "getWow",
-			moduleName: "MODULE",
-		},
-		async () => {
-			const res = await fetch(
-				"https://owen-wilson-wow-api.onrender.com/wows/random"
-			);
-			return await res.json();
-		}
-	);
+  const getWow = autometrics(
+    {
+      functionName: "getWow",
+      moduleName: "MODULE",
+    },
+    async () => {
+      const res = await fetch(
+        "https://owen-wilson-wow-api.onrender.com/wows/random"
+      );
+      return await res.json();
+    }
+  );
 
-	async function handleClick() {
-		promise = getWow();
-	}
+  async function handleClick() {
+    promise = getWow();
+  }
 </script>
 
 <div>
-	<button on:click={handleClick}>GET WOW</button>
+  <button on:click={handleClick}>GET WOW</button>
 
-	<div>
-		{#await promise then data}
-			<pre>
+  <div>
+    {#await promise then data}
+      <pre>
 				{JSON.stringify(data)}
 			</pre>
-		{/await}
-	</div>
+    {/await}
+  </div>
 </div>

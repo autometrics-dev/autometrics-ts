@@ -78,24 +78,24 @@ export type AutometricsOptions = {
  * Hover over the wrapped function to get the links for generated queries (if
  * you have the language service plugin installed)
  *
- * @param fnOrOptions {(F|AutometricsOptions)} - the function that will be wrapped and instrumented
+ * @param functionOrOptions {(F|AutometricsOptions)} - the function that will be wrapped and instrumented
  * (requests handler or database method)
  * @param fnInput {F}
  */
 export function autometrics<F extends FunctionSig>(
-  fnOrOptions: F | AutometricsOptions,
+  functionOrOptions: F | AutometricsOptions,
   fnInput?: F,
 ): AutometricsWrapper<F> {
   let functionName: string;
   let module: string;
   let fn: F;
 
-  if ("functionName" in fnOrOptions) {
+  if ("functionName" in functionOrOptions) {
     fn = fnInput;
-    functionName = fnOrOptions.functionName;
-    module = fnOrOptions.moduleName;
+    functionName = functionOrOptions.functionName;
+    module = functionOrOptions.moduleName;
   } else {
-    fn = fnOrOptions;
+    fn = functionOrOptions;
     functionName = fn.name;
     module = getModulePath();
   }

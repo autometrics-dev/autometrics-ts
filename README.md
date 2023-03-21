@@ -108,7 +108,6 @@ Add the language service plugin to the `tsconfig.json` file:
 ```json
 {
  "compilerOptions": {
- ...
  "plugins": [
    {
     "name": "@autometrics/typescript-plugin",
