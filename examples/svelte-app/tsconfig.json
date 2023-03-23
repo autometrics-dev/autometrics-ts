@@ -8,8 +8,21 @@
     "allowJs": true,
     "checkJs": true,
     "isolatedModules": true,
-		"plugins": [{"name": "@autometrics/typescript-plugin"}]
+    "plugins": [
+      {
+        "name": "autometrics"
+      }
+    ]
   },
-  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.ts",
+    "src/**/*.js",
+    "src/**/*.svelte"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }
