@@ -1,4 +1,3 @@
-// This is an example that makes use of the setMetricsExporter API to allow user to configure the exporter
 import express from "express";
 import { autometrics } from "@autometrics/autometrics";
 
