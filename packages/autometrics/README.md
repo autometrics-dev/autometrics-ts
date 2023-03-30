@@ -1,11 +1,11 @@
 # `autometrics`
 
-This is the basic convenience package that bundles both the wrapper library and
-the TypeScript plugin into one package.
+This is the basic convenience package that bundles the wrapper library and
+OpenTelemetry dependencies.
 
 ## Documentation
 
-Full documentation for `@autometrics/autometrics` library can be found
+Full documentation for `autometrics` library can be found
 [here](https://github.com/autometrics-dev/autometrics-ts).
 
 ## Installation
@@ -23,24 +23,7 @@ pnpm add autometrics
 
 ## Usage
 
-1. In `tsconfig.json`:
-
-```jsonc
-// tsconfig.json
-
-{
-  "compilerOptions": {
-    ...
-    "plugins": [{
-      "name": "autometrics",
-      "prometheusUrl": "" // default: localhost:9090
-    }]
-  },
-...
-}
-```
-
-2. Anywhere in your source code:
+1. Anywhere in your source code:
 
 ```typescript
 import { autometrics } from "autometrics";
@@ -50,5 +33,6 @@ async function createUser(payload: User) {
 }
 
 const user = autometrics(createUser);
+    // ^ instrumented function
 ```
 

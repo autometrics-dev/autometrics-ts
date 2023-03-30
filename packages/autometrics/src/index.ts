@@ -1,9 +1,4 @@
-import startTSPlugin from "@autometrics/typescript-plugin";
-
-// the TypeScript plugin must be the default entry point for the library
-// and it has to be a CommonJS export
-module.exports = startTSPlugin;
-exports = module.exports;
-
-// Other library APIs are exported as default
+// This is a convenience package that re-exports all available
+// APIs in the @autometrics/autometrics package and also bundles
+// @opentelemetry dependencies
 export * from "@autometrics/autometrics";

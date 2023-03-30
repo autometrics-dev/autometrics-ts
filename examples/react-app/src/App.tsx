@@ -4,55 +4,48 @@ import "./App.css";
 
 init({ pushGateway: "http://0.0.0.0:8080/metrics" });
 
-type Artwork = {
+type Post = {
+  userId: number;
   id: number;
-  thumbnail: {
-    lqip: string;
-    alt_text: string;
-    width: number;
-    height: number;
-  };
-  image_id: string;
+  title: string;
+  body: string;
 };
 
-let artworks: Array<Artwork>;
+let posts: Array<Post>;
 
-async function allArtworks() {
-  if (!artworks) {
-    const data = await fetch("https://api.artic.edu/api/v1/artworks?limit=100")
-      .then(async (res) => {
-        return await res.json();
-      })
-      .catch((err) => {
-        throw new Error(`API call error: ${err}`);
-      });
-
-    artworks = data.data;
+async function allPosts() {
+  if (!posts) {
+    try {
+      const res = await fetch("https://jsonplaceholder.typicode.com/posts");
+      const data = await res.json();
+      posts = data;
+    } catch (err) {
+      throw new Error(`API call error: ${err}`);
+    }
   }
-
-  return artworks;
+  return posts;
 }
 
-const getRandomArtwork = autometrics(
+const getRandomPost = autometrics(
   {
-    functionName: "getRandomArtwork",
+    functionName: "getRandomPost",
     moduleName: "App",
   },
   async () => {
-    const rand = Math.floor(Math.random() * 100 + 1) - 1;
-    const artworks = await allArtworks();
-    console.log(artworks[rand]);
-    return artworks[rand];
+    const rand = Math.floor(Math.random() * 100 + 1);
+    const posts = await allPosts();
+    console.log(posts[rand]);
+    return posts[rand];
   },
 );
 
 function App() {
-  const [art, setArt] = useState<Artwork>();
+  const [post, setPost] = useState<Post>();
 
   const handleClick = async () => {
     try {
-      const data = await getRandomArtwork();
-      setArt(data);
+      const data = await getRandomPost();
+      setPost(data);
     } catch (err) {
       console.log(err);
     }
@@ -60,17 +53,15 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Artwork getter</h1>
+      <h1>Post getter</h1>
       <div className="card">
-        <button onClick={handleClick}>Get art</button>
+        <button onClick={handleClick}>Get post</button>
         <div>
-          {art ? (
-            <img
-              src={`https://www.artic.edu/iiif/2/${art.image_id}/full/843,/0/default.jpg`}
-              alt={art.thumbnail.alt_text ?? "no alt text from source"}
-              width="50%"
-              //height="400"
-            />
+          {post ? (
+            <div>
+              <h2>{post.title}</h2>
+              <p>{post.body}</p>
+            </div>
           ) : (
             <p />
           )}

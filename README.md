@@ -53,7 +53,8 @@ The Autometrics library:
 ## Quickstart
 
 ```shell
-npm install autometrics
+npm install --save autometrics 
+npm install --save-dev @autometrics/typescript-plugin
 ```
 
 Enable TypeScript plugin by adding it to `tsconfig.json`:
@@ -63,7 +64,7 @@ Enable TypeScript plugin by adding it to `tsconfig.json`:
   "compilerOptions": {
    "plugins": [
     {
-     "name": "autometrics",
+     "name": "@autometrics/typescript-plugin",
      "prometheusUrl": ""
     }
    ]
@@ -93,7 +94,7 @@ import { autometrics } from "autometrics"
 
 The default `autometrics` package bundles `@opentelemetry/sdk-metrics` and
 `@opentelemetry/exporter-prometheus` dependencies. If you are already using
-these in your codebase or want to use other custom metrics, use this
+these in your codebase or want to use other custom metrics, use the following
 installation option.
 
 Install the wrappers, the language service plugin:
@@ -247,5 +248,5 @@ Language service plugin can be configured in the `tsconfig.json` file.
 
 | key             | description                                                     |
 | --------------- | --------------------------------------------------------------- |
-| `name`          | always `autometrics` or `@autometrics/typescript-plugin`        |
+| `name`          | always `@autometrics/typescript-plugin`                         |
 | `prometheusUrl` | sets the base URL for PromQL queries. Default: `localhost:9090` |

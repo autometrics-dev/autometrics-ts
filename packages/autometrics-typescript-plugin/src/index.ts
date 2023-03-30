@@ -14,7 +14,7 @@ import {
   makePrometheusUrl,
 } from "./queryHelpers";
 
-const PLUGIN_NAME = "autometrics-docs";
+const PLUGIN_NAME = "Autometrics TypeScript Plugin";
 
 function init(modules: {
   typescript: typeof tsserver;
