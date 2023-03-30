@@ -15,17 +15,14 @@ let posts: Array<Post>;
 
 async function allPosts() {
   if (!posts) {
-    const data = await fetch("https://jsonplaceholder.typicode.com/posts")
-      .then(async (res) => {
-        return await res.json();
-      })
-      .catch((err) => {
-        throw new Error(`API call error: ${err}`);
-      });
-
-    posts = data;
+    try {
+      const res = await fetch("https://jsonplaceholder.typicode.com/posts");
+      const data = await res.json();
+      posts = data;
+    } catch (err) {
+      throw new Error(`API call error: ${err}`);
+    }
   }
-
   return posts;
 }
 
