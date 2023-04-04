@@ -1,9 +1,11 @@
 {
-	"extends": "../../tsconfig.common.json",
-	"compilerOptions": {
-		"outDir": "dist/"
-	},
-	"include": [
-		"./src"
-	]
+  "extends": "../../tsconfig.common.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "outDir": "dist/"
+  },
+  "include": [
+    "./src"
+  ]
 }

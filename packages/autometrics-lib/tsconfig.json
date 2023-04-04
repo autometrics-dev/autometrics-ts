@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.common.json",
   "compilerOptions": {
+    "module": "esnext",
     "outDir": "./dist",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true

@@ -1,19 +1,71 @@
-import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
-import { MeterProvider, MetricReader } from "@opentelemetry/sdk-metrics";
+import {
+  PrometheusExporter,
+  PrometheusSerializer,
+} from "@opentelemetry/exporter-prometheus";
+import {
+  InMemoryMetricExporter,
+  MeterProvider,
+  MetricReader,
+  PeriodicExportingMetricReader,
+} from "@opentelemetry/sdk-metrics";
 
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
 
+interface Exporter extends MetricReader {}
+
+export type initOptions = {
+  /**
+   * A custom exporter to be used instead of the bundled Prometheus Exporter on port 9464
+   */
+  exporter?: Exporter;
+  /**
+   * The full URL of the aggregating push gateway for metrics to be submitted to.
+   */
+  pushGateway?: string;
+  /**
+   * Set a custom push interval in ms (default: 5000ms)
+   */
+  pushInterval?: number;
+};
+
 /**
- * If you have a Prometheus exporter already set up, this function allows you to
- * get autometrics to use the same exporter
+ * Set your exporter. Required if used in the browser side
  *
- * @param 'userExporter' {T extends MetricReader}
+ * @param {initOptions} options
  */
-export function setMetricsExporter<T extends MetricReader>(userExporter: T) {
-  logger("Using the user's Prometheus Exporter configuration");
-  exporter = userExporter;
-  return;
+export function init(options: initOptions) {
+  logger("Using the user's Exporter configuration");
+  exporter = options.exporter;
+  // if a pushGateway is added we overwrite the exporter
+  if (options.pushGateway) {
+    exporter = new PeriodicExportingMetricReader({
+      // 0 - using delta aggregation temporality setting
+      // to ensure data submitted to the gateway is accurate
+      exporter: new InMemoryMetricExporter(0),
+    });
+    // Make sure the provider is initialized and exporter is registered
+    getMetricsProvider();
+    setInterval(
+      () => pushToGateway(options.pushGateway),
+      options.pushInterval ?? 5000,
+    );
+  }
+}
+
+async function pushToGateway(gateway: string) {
+  const exporterResponse = await exporter.collect();
+  const serialized = new PrometheusSerializer().serialize(
+    exporterResponse.resourceMetrics,
+  );
+
+  await fetch(gateway, {
+    method: "POST",
+    mode: "cors",
+    body: serialized,
+  });
+  // we flush the metrics at the end of the submission to ensure the data is not repeated
+  await exporter.forceFlush();
 }
 
 /**

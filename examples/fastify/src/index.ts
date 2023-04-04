@@ -1,4 +1,9 @@
-import { fastify, FastifyReply, FastifyRequest } from "fastify";
+import {
+  fastify,
+  FastifyReply,
+  FastifyRequest,
+  RouteShorthandOptions,
+} from "fastify";
 import { autometrics } from "@autometrics/autometrics";
 import { PrismaClient } from "@prisma/client";
 
@@ -23,21 +28,21 @@ async function handleGetAllTulips(req: FastifyRequest, res: FastifyReply) {
   };
 }
 
-async function createTulip(tulip: Tulip) {
+// Example internal function calling a database instrumented with autometrics
+const createTulip = autometrics(async function createTulip(
+  tulip: Tulip,
+) {
   return prisma.tulip.create({
     data: tulip,
   });
-}
-
-// Example internal function calling a database instrumented with autometrics
-const createTulipWithMetrics = autometrics(createTulip);
+});
 
 async function handleCreateTulip(
   req: FastifyRequest<{ Body: Tulip }>,
   res: FastifyReply,
 ) {
   const tulip = req.body;
-  const created = await createTulipWithMetrics(tulip);
+  const created = await createTulip(tulip);
   return created;
 }
 
