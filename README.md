@@ -187,7 +187,7 @@ chart for that function.
 
 ![Autometrics demo](./assets/demo.png)
 
-## Using wrappers in browser
+## Using wrappers in the browser
 
 ### Set up the push gateway
 
