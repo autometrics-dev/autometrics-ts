@@ -28,11 +28,11 @@ pnpm add autometrics
 ```typescript
 import { autometrics } from "autometrics";
 
-async function createUser(payload: User) {
+async function createUserRaw(payload: User) {
   // ...
 }
 
-const user = autometrics(createUser);
+const createUser = autometrics(createUserRaw);
     // ^ instrumented function
 ```
 

@@ -30,9 +30,7 @@
 
       <div>
         {#await promise then data}
-          <pre>
-				{JSON.stringify(data)}
-			</pre>
+          <pre>{JSON.stringify(data)}</pre>
         {/await}
       </div>
     </div>
