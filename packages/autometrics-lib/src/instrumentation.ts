@@ -12,7 +12,7 @@ import {
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
 
-interface Exporter extends MetricReader {}
+type Exporter = MetricReader
 
 export type initOptions = {
   /**
@@ -20,7 +20,7 @@ export type initOptions = {
    */
   exporter?: Exporter;
   /**
-   * The full URL of the aggregating push gateway for metrics to be submitted to.
+   * The full URL (including http://) of the aggregating push gateway for metrics to be submitted to.
    */
   pushGateway?: string;
   /**
@@ -30,7 +30,8 @@ export type initOptions = {
 };
 
 /**
- * Set your exporter. Required if used in the browser side
+ * Optional initialization function to set a custom exporter or push gateway for client-side applications.
+ * Required if using autometrics in a client-side application.
  *
  * @param {initOptions} options
  */
