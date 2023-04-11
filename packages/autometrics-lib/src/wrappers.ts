@@ -1,4 +1,6 @@
 import "./instrumentation";
+import { Attributes } from "@opentelemetry/api";
+import { Objective } from "./types";
 import { getMeter } from "./instrumentation";
 
 /**
@@ -11,7 +13,7 @@ import { getMeter } from "./instrumentation";
 export function autometricsDecorator(
   _target: Object,
   propertyKey: string,
-  descriptor: PropertyDescriptor,
+  descriptor: PropertyDescriptor
 ) {
   const originalFunction = descriptor.value;
 
@@ -60,16 +62,29 @@ type AnyFunction<T extends FunctionSig> = (
  */
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
-export type AutometricsOptions = {
-  /**
-   * Name of your function
-   */
-  functionName: string;
-  /**
-   * Name of the module (usually filename)
-   */
-  moduleName: string;
-};
+export type AutometricsOptions =
+  | {
+      /**
+       * Name of your function
+       */
+      functionName: string;
+      /**
+       * Name of the module (usually filename)
+       */
+      moduleName?: string;
+      objective?: Objective;
+    }
+  | { objective: Objective };
+
+function isAutometricsOptions<F extends FunctionSig>(
+  functionOrOptions: F | AutometricsOptions
+): functionOrOptions is AutometricsOptions {
+  if (typeof functionOrOptions === "function") {
+    return false;
+  }
+
+  return true;
+}
 
 /**
  * Autometrics wrapper for **functions** that automatically instruments the
@@ -84,26 +99,58 @@ export type AutometricsOptions = {
  */
 export function autometrics<F extends FunctionSig>(
   functionOrOptions: F | AutometricsOptions,
-  fnInput?: F,
+  fnInput?: F
 ): AutometricsWrapper<F> {
   let functionName: string;
-  let module: string;
+  let moduleName: string;
   let fn: F;
+  let objective: Objective | undefined;
 
-  if ("functionName" in functionOrOptions) {
-    fn = fnInput;
-    functionName = functionOrOptions.functionName;
-    module = functionOrOptions.moduleName;
-  } else {
+  if (typeof functionOrOptions === "function") {
     fn = functionOrOptions;
     functionName = fn.name;
-    module = getModulePath();
+    moduleName = getModulePath();
+  } else {
+    fn = fnInput;
+    functionName =
+      "functionName" in functionOrOptions
+        ? functionOrOptions.functionName
+        : fn.name;
+
+    moduleName =
+      "moduleName" in functionOrOptions
+        ? functionOrOptions.moduleName
+        : getModulePath();
+
+    if ("objective" in functionOrOptions) {
+      objective = functionOrOptions.objective;
+    }
   }
 
   if (!functionName) {
     throw new Error(
-      "Autometrics decorated function must have a name to succesfully create a metric",
+      "Autometrics decorated function must have a name to successfully create a metric"
     );
+  }
+
+  const counterObjectiveAttributes: Attributes = {};
+  const histogramObjectiveAttributes: Attributes = {};
+
+  if (objective) {
+    const { latency, name, success_rate } = objective;
+
+    counterObjectiveAttributes.objective_name = name;
+    histogramObjectiveAttributes.objective_name = name;
+
+    if (latency) {
+      const [threshold, latency_percentile] = latency;
+      histogramObjectiveAttributes.objective_latency_threshold = threshold;
+      histogramObjectiveAttributes.objective_percentile = latency_percentile;
+    }
+
+    if (success_rate) {
+      counterObjectiveAttributes.objective_percentile = success_rate;
+    }
   }
 
   return function (...params) {
@@ -114,14 +161,36 @@ export function autometrics<F extends FunctionSig>(
 
     const onSuccess = () => {
       const autometricsDuration = performance.now() - autometricsStart;
-      counter.add(1, { module, function: functionName, result: "ok" });
-      histogram.record(autometricsDuration, { function: functionName });
+
+      counter.add(1, {
+        function: functionName,
+        module: moduleName,
+        result: "ok",
+        ...counterObjectiveAttributes,
+      });
+
+      histogram.record(autometricsDuration, {
+        function: functionName,
+        module: moduleName,
+        ...histogramObjectiveAttributes,
+      });
     };
 
     const onError = () => {
       const autometricsDuration = performance.now() - autometricsStart;
-      counter.add(1, { module, function: functionName, result: "error" });
-      histogram.record(autometricsDuration, { function: functionName });
+
+      counter.add(1, {
+        function: functionName,
+        module: moduleName,
+        result: "error",
+        ...counterObjectiveAttributes,
+      });
+
+      histogram.record(autometricsDuration, {
+        function: functionName,
+        module: moduleName,
+        ...histogramObjectiveAttributes,
+      });
     };
 
     try {

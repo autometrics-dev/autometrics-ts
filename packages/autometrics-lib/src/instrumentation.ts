@@ -12,7 +12,7 @@ import {
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
 
-type Exporter = MetricReader
+type Exporter = MetricReader;
 
 export type initOptions = {
   /**
@@ -49,7 +49,7 @@ export function init(options: initOptions) {
     getMetricsProvider();
     setInterval(
       () => pushToGateway(options.pushGateway),
-      options.pushInterval ?? 5000,
+      options.pushInterval ?? 5000
     );
   }
 }
@@ -57,7 +57,7 @@ export function init(options: initOptions) {
 async function pushToGateway(gateway: string) {
   const exporterResponse = await exporter.collect();
   const serialized = new PrometheusSerializer().serialize(
-    exporterResponse.resourceMetrics,
+    exporterResponse.resourceMetrics
   );
 
   await fetch(gateway, {
@@ -77,7 +77,7 @@ export function getMetricsProvider() {
   if (!autometricsMeterProvider) {
     if (!exporter) {
       logger(
-        "Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics",
+        "Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics"
       );
       exporter = new PrometheusExporter();
     }
