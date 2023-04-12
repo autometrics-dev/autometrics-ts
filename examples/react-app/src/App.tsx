@@ -33,7 +33,13 @@ async function fetchRandomPost() {
   }
 }
 
-const getRandomPost = autometrics(fetchRandomPost);
+const getRandomPost = autometrics(
+  {
+    functionName: "getRandomPost",
+    moduleName: "App",
+  },
+  fetchRandomPost,
+);
 
 function App() {
   const [post, setPost] = useState<Post>();
