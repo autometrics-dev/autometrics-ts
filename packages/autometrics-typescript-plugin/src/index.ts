@@ -18,7 +18,7 @@ import { createLogger, getProxy } from "./utils";
 
 type Config = {
   prometheusUrl: string | undefined;
-}
+};
 
 function init(modules: {
   typescript: typeof tsserver;
@@ -31,7 +31,6 @@ function init(modules: {
     languageService,
     project,
   }: ts.server.PluginCreateInfo) {
-
     const log = createLogger(project);
     log("started");
 
@@ -51,7 +50,7 @@ function init(modules: {
       }
 
       const prometheusBase: string | undefined = pluginConfig.prometheusUrl;
-      log(prometheusBase)
+      log(prometheusBase);
 
       let { documentation } = prior;
 
