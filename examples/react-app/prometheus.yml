@@ -1,3 +1,6 @@
+# For local testing you can use this file to configure Prometheus to scrape
+# the metrics endpoint of your app. For more info, see:
+# https://github.com/autometrics-dev#51-local-prometheus-for-testing
 scrape_configs:
   - job_name: my-app
     metrics_path: /metrics

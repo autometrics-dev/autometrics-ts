@@ -2,6 +2,8 @@ import { useState } from "react";
 import { autometrics, init } from "autometrics";
 import "./App.css";
 
+// In order for Prometheus to succesfully get your client-side app metrics, you
+// will need to push them to an aggregating push gateway. For more info, see:
 // https://github.com/autometrics-dev/autometrics-ts#using-wrappers-in-the-browser
 init({ pushGateway: "http://0.0.0.0:8080/metrics" });
 
