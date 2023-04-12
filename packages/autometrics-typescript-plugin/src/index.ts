@@ -16,9 +16,14 @@ import {
 
 import { createLogger, getProxy } from "./utils";
 
+type Config = {
+  prometheusUrl: string | undefined;
+}
+
 function init(modules: {
   typescript: typeof tsserver;
 }) {
+  let pluginConfig: Config;
   const ts = modules.typescript;
 
   function create({
@@ -26,13 +31,13 @@ function init(modules: {
     languageService,
     project,
   }: ts.server.PluginCreateInfo) {
-    // Diagnostic logging
-    const log = (msg: string) => {
-      project.projectService.logger.info(`${PLUGIN_NAME}: ${msg}`);
-    };
 
+    const log = createLogger(project);
     log("started");
 
+    pluginConfig = config;
+
+    const proxy = getProxy(languageService);
 
     proxy.getQuickInfoAtPosition = (filename, position) => {
       const typechecker = languageService.getProgram().getTypeChecker();
@@ -44,6 +49,9 @@ function init(modules: {
       if (prior === undefined) {
         return prior;
       }
+
+      const prometheusBase: string | undefined = pluginConfig.prometheusUrl;
+      log(prometheusBase)
 
       let { documentation } = prior;
 
@@ -128,7 +136,11 @@ function init(modules: {
     return proxy;
   }
 
-  return { create };
+  function onConfigurationChanged(newConfig: Config) {
+    pluginConfig = newConfig;
+  }
+
+  return { create, onConfigurationChanged };
 }
 
 export = init;
