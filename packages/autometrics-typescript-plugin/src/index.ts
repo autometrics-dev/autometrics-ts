@@ -14,7 +14,7 @@ import {
   makePrometheusUrl,
 } from "./queryHelpers";
 
-const PLUGIN_NAME = "Autometrics TypeScript Plugin";
+import { createLogger, getProxy } from "./utils";
 
 function init(modules: {
   typescript: typeof tsserver;
@@ -32,16 +32,7 @@ function init(modules: {
     };
 
     log("started");
-    // Set up decorator object
-    const proxy: ts.LanguageService = Object.create(null);
-    for (let k of Object.keys(languageService) as Array<
-      keyof ts.LanguageService
-    >) {
-      const x = languageService[k]!;
-      proxy[k] = (...args: Array<{}>) => x.apply(languageService, args);
-    }
 
-    const prometheusBase: string | undefined = config.url;
 
     proxy.getQuickInfoAtPosition = (filename, position) => {
       const typechecker = languageService.getProgram().getTypeChecker();
