@@ -12,7 +12,7 @@ import {
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
 
-type Exporter = MetricReader
+type Exporter = MetricReader;
 
 export type initOptions = {
   /**
