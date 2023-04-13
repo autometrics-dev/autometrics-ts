@@ -1,6 +1,6 @@
 import "./instrumentation";
 import { Attributes } from "@opentelemetry/api";
-import { Objective } from "./types";
+import type { Objective } from "./objectives";
 import { getMeter } from "./instrumentation";
 
 /**
@@ -76,16 +76,6 @@ export type AutometricsOptions =
     }
   | { objective: Objective };
 
-function isAutometricsOptions<F extends FunctionSig>(
-  functionOrOptions: F | AutometricsOptions
-): functionOrOptions is AutometricsOptions {
-  if (typeof functionOrOptions === "function") {
-    return false;
-  }
-
-  return true;
-}
-
 /**
  * Autometrics wrapper for **functions** that automatically instruments the
  * wrapped function with OpenTelemetry-compatible metrics.
@@ -137,19 +127,19 @@ export function autometrics<F extends FunctionSig>(
   const histogramObjectiveAttributes: Attributes = {};
 
   if (objective) {
-    const { latency, name, success_rate } = objective;
+    const { latency, name, successRate } = objective;
 
     counterObjectiveAttributes.objective_name = name;
     histogramObjectiveAttributes.objective_name = name;
 
     if (latency) {
-      const [threshold, latency_percentile] = latency;
+      const [threshold, latencyPercentile] = latency;
       histogramObjectiveAttributes.objective_latency_threshold = threshold;
-      histogramObjectiveAttributes.objective_percentile = latency_percentile;
+      histogramObjectiveAttributes.objective_percentile = latencyPercentile;
     }
 
-    if (success_rate) {
-      counterObjectiveAttributes.objective_percentile = success_rate;
+    if (successRate) {
+      counterObjectiveAttributes.objective_percentile = successRate;
     }
   }
 

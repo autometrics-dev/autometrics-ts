@@ -1,3 +1,3 @@
 export { init } from "./instrumentation";
-export * from "./types";
+export * from "./objectives";
 export * from "./wrappers";
