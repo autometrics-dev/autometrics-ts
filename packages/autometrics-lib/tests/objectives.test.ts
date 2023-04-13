@@ -17,6 +17,8 @@ let exporter: PeriodicExportingMetricReader;
 describe("Autometrics objectives test", () => {
   beforeAll(async () => {
     exporter = new PeriodicExportingMetricReader({
+      // 0 - using delta aggregation temporality setting
+      // to ensure data submitted to the gateway is accurate
       exporter: new InMemoryMetricExporter(0),
     });
 
