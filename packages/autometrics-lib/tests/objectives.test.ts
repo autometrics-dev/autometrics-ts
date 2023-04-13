@@ -33,7 +33,7 @@ describe("Autometrics objectives test", () => {
       {
         objective: {
           name: "test",
-          success_rate: ObjectivePercentile.P99,
+          successRate: ObjectivePercentile.P99,
         },
       },
       function successRate() {}
@@ -77,7 +77,7 @@ describe("Autometrics objectives test", () => {
       {
         objective: {
           name: "test",
-          success_rate: ObjectivePercentile.P99,
+          successRate: ObjectivePercentile.P99,
           latency: [ObjectiveLatency.Ms100, ObjectivePercentile.P99_9],
         },
       },
