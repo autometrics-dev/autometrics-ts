@@ -1,4 +1,4 @@
-import { autometrics } from "./index";
+import { autometrics } from "../src";
 import { describe, test, expect, beforeAll } from "vitest";
 import express from "express";
 
@@ -17,21 +17,17 @@ describe("Autometrics wrapper for functions", () => {
   });
 
   test("Test if /metrics endpoint on :9464 port returns metrics with instrumented func", async () => {
+    const countMetric = /function_calls_duration_count{function="rootRoute"/gm;
+
     const res = await fetch("http://localhost:8080/");
     expect(res.status).toEqual(200);
     expect(await res.text()).toEqual("Hello world");
 
     const metRes = await fetch("http://localhost:9464/metrics");
+    expect(metRes.status).toEqual(200);
+
     const data = await metRes.text();
 
-    expect(metRes.status).toEqual(200);
-    expect(isMetricRegistered(data)).toBeTruthy();
+    expect(data).toMatch(countMetric);
   });
 });
-
-function isMetricRegistered(data: string): boolean {
-  const sample = 'function_calls_duration_count{function="rootRoute"}';
-  return data
-    .split("\n")
-    .some((line) => line.split(" ").some((str) => str === sample));
-}

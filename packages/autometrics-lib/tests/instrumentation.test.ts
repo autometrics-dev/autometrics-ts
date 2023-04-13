@@ -1,4 +1,4 @@
-import { getMetricsProvider } from "./instrumentation";
+import { getMetricsProvider } from "../src/instrumentation";
 import { describe, test, expect } from "vitest";
 
 describe("Autometrics initializer", () => {
