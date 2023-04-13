@@ -13,7 +13,7 @@ import { getMeter } from "./instrumentation";
 export function autometricsDecorator(
   _target: Object,
   propertyKey: string,
-  descriptor: PropertyDescriptor
+  descriptor: PropertyDescriptor,
 ) {
   const originalFunction = descriptor.value;
 
@@ -89,7 +89,7 @@ export type AutometricsOptions =
  */
 export function autometrics<F extends FunctionSig>(
   functionOrOptions: F | AutometricsOptions,
-  fnInput?: F
+  fnInput?: F,
 ): AutometricsWrapper<F> {
   let functionName: string;
   let moduleName: string;
@@ -119,7 +119,7 @@ export function autometrics<F extends FunctionSig>(
 
   if (!functionName) {
     throw new Error(
-      "Autometrics decorated function must have a name to successfully create a metric"
+      "Autometrics decorated function must have a name to successfully create a metric",
     );
   }
 
