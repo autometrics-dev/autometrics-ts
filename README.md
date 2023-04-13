@@ -36,7 +36,7 @@ more details on the ideas behind autometrics
   comments
 - 📊 (Coming Soon!) Grafana dashboard showing the performance of all
   instrumented functions
-- 🚨 (Coming Soon!) Generates Prometheus alerting rules using SLO best practices
+- 🚨 Generates Prometheus alerting rules using SLO best practices
   from simple annotations in your code
 - ⚡ Minimal runtime overhead
 
@@ -117,6 +117,29 @@ Add the language service plugin to the `tsconfig.json` file:
   ]
  }
 }
+```
+
+## Alerts / SLOs
+
+Autometrics makes it easy to add Prometheus alerts using Service-Level Objectives (SLOs) to a function or group of functions.
+
+This works using pre-defined [Prometheus alerting rules](./autometrics.rules.yml) (read more about alerting rules in general [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)).
+By default, most of the recording rules are dormaint. They are enabled by specific metric labels that can be automatically attached by autometrics.
+
+To use autometrics SLOs and alerts, create one or multiple [`Objective`s](https://github.com/autometrics-dev/autometrics-ts/blob/main/packages/autometrics-lib/src/objectives.ts) based on the function(s) success rate and/or latency, as shown below. The `Objective` can be passed as an argument to the `autometrics` wrapper function to include the given function in that objective.
+
+```ts
+import { autometrics } from "@autometrics/autometrics";
+
+const API_SLO: Objective = {
+ name: 'api',
+ successRate: ObjectivePercentile.P99_9,
+ latency: [ObjectiveLatency.Ms250, ObjectivePercentile.P99],
+};
+
+const apiHandlerFn = autometrics({ objective: API_SLO }, function apiHandler(
+ // ...
+));
 ```
 
 ## Using wrappers and decorators in NodeJS
