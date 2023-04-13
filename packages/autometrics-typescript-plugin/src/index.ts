@@ -14,11 +14,16 @@ import {
   makePrometheusUrl,
 } from "./queryHelpers";
 
-const PLUGIN_NAME = "Autometrics TypeScript Plugin";
+import { createLogger, getProxy } from "./utils";
+
+type Config = {
+  prometheusUrl: string | undefined;
+};
 
 function init(modules: {
   typescript: typeof tsserver;
 }) {
+  let pluginConfig: Config;
   const ts = modules.typescript;
 
   function create({
@@ -26,22 +31,12 @@ function init(modules: {
     languageService,
     project,
   }: ts.server.PluginCreateInfo) {
-    // Diagnostic logging
-    const log = (msg: string) => {
-      project.projectService.logger.info(`${PLUGIN_NAME}: ${msg}`);
-    };
-
+    const log = createLogger(project);
     log("started");
-    // Set up decorator object
-    const proxy: ts.LanguageService = Object.create(null);
-    for (let k of Object.keys(languageService) as Array<
-      keyof ts.LanguageService
-    >) {
-      const x = languageService[k]!;
-      proxy[k] = (...args: Array<{}>) => x.apply(languageService, args);
-    }
 
-    const prometheusBase: string | undefined = config.url;
+    pluginConfig = config;
+
+    const proxy = getProxy(languageService);
 
     proxy.getQuickInfoAtPosition = (filename, position) => {
       const typechecker = languageService.getProgram().getTypeChecker();
@@ -53,6 +48,9 @@ function init(modules: {
       if (prior === undefined) {
         return prior;
       }
+
+      const prometheusBase: string | undefined = pluginConfig.prometheusUrl;
+      log(prometheusBase);
 
       let { documentation } = prior;
 
@@ -137,7 +135,11 @@ function init(modules: {
     return proxy;
   }
 
-  return { create };
+  function onConfigurationChanged(newConfig: Config) {
+    pluginConfig = newConfig;
+  }
+
+  return { create, onConfigurationChanged };
 }
 
 export = init;

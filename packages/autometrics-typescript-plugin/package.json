@@ -24,7 +24,7 @@
     "build": "tsc",
     "clean": "rm -rf dist/"
   },
-  "peerDependencies": {
+  "devDependencies": {
     "typescript": ">=4.9.4"
   }
 }
