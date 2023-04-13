@@ -30,7 +30,7 @@
  * and [alerting rules](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
  * that will fire alerts when the given objective is being violated.
  *
- * By default, these recording rules will effectively lay dormaint.
+ * By default, these recording rules will effectively lay dormant.
  * However, they are enabled when the special labels are present on certain metrics.
  */
 export type Objective = {
