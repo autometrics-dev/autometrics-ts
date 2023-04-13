@@ -1,0 +1,12 @@
+# For local testing you can use this file to configure Prometheus to scrape
+# the metrics endpoint of your app. For more info, see:
+# https://github.com/autometrics-dev#51-local-prometheus-for-testing
+scrape_configs:
+  - job_name: my-app
+    metrics_path: /metrics
+    static_configs:
+      # Replace the port with the port your app listens on
+      - targets: ['localhost:5173']
+    # For a real deployment, you would want the scrape interval to be
+    # longer but for testing, you want the data to show up quickly
+    scrape_interval: 200ms

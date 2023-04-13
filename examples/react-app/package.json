@@ -9,11 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@autometrics/autometrics": "file:../../packages/autometrics-lib",
+    "autometrics": "file:../../packages/autometrics",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@autometrics/typescript-plugin": "file:../../packages/autometrics-typescript-plugin",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",

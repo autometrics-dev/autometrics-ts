@@ -2,6 +2,9 @@ import { useState } from "react";
 import { autometrics, init } from "autometrics";
 import "./App.css";
 
+// In order for Prometheus to succesfully get your client-side app metrics, you
+// will need to push them to an aggregating push gateway. For more info, see:
+// https://github.com/autometrics-dev/autometrics-ts#using-wrappers-in-the-browser
 init({ pushGateway: "http://0.0.0.0:8080/metrics" });
 
 type Post = {
@@ -11,19 +14,23 @@ type Post = {
   body: string;
 };
 
-let posts: Array<Post>;
+async function fetchRandomPost() {
+  const randomPostId = Math.floor(Math.random() * 100 + 1);
 
-async function allPosts() {
-  if (!posts) {
-    try {
-      const res = await fetch("https://jsonplaceholder.typicode.com/posts");
-      const data = await res.json();
-      posts = data;
-    } catch (err) {
-      throw new Error(`API call error: ${err}`);
+  try {
+    const response = await fetch(
+      `https://jsonplaceholder.typicode.com/posts/${randomPostId}`,
+    );
+
+    if (!response.ok) {
+      throw new Error(`API call error: ${response.statusText}`);
     }
+
+    const post: Post = await response.json();
+    return post;
+  } catch (error) {
+    throw new Error(`API call error: ${error}`);
   }
-  return posts;
 }
 
 const getRandomPost = autometrics(
@@ -31,41 +38,35 @@ const getRandomPost = autometrics(
     functionName: "getRandomPost",
     moduleName: "App",
   },
-  async () => {
-    const rand = Math.floor(Math.random() * 100 + 1);
-    const posts = await allPosts();
-    console.log(posts[rand]);
-    return posts[rand];
-  },
+  fetchRandomPost,
 );
 
 function App() {
   const [post, setPost] = useState<Post>();
 
   const handleClick = async () => {
-    try {
-      const data = await getRandomPost();
-      setPost(data);
-    } catch (err) {
-      console.log(err);
+    const post = await getRandomPost();
+
+    if (post) {
+      setPost(post);
     }
   };
 
   return (
     <div className="App">
       <h1>Post getter</h1>
+
       <div className="card">
-        <button onClick={handleClick}>Get post</button>
-        <div>
-          {post ? (
-            <div>
-              <h2>{post.title}</h2>
-              <p>{post.body}</p>
-            </div>
-          ) : (
-            <p />
-          )}
-        </div>
+        <button onClick={handleClick}>
+          Get {post ? "new " : ""}random post
+        </button>
+
+        {post && (
+          <div>
+            <h2>{post.title}</h2>
+            <p>{post.body}</p>
+          </div>
+        )}
       </div>
     </div>
   );
