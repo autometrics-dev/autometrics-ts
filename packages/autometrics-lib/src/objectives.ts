@@ -5,7 +5,7 @@
  *
  * @example
  * ```ts
- * import { autometrics } from "@autometrics/autometrics";
+ * import { autometrics, Objective, ObjectiveLatency, ObjectivePercentile } from "@autometrics/autometrics";
  *
  * const API_SLO: Objective = {
  *   name: 'api',

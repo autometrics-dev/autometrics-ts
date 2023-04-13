@@ -129,7 +129,7 @@ By default, most of the recording rules are dormaint. They are enabled by specif
 To use autometrics SLOs and alerts, create one or multiple [`Objective`s](https://github.com/autometrics-dev/autometrics-ts/blob/main/packages/autometrics-lib/src/objectives.ts) based on the function(s) success rate and/or latency, as shown below. The `Objective` can be passed as an argument to the `autometrics` wrapper function to include the given function in that objective.
 
 ```ts
-import { autometrics } from "@autometrics/autometrics";
+import { autometrics, Objective, ObjectiveLatency, ObjectivePercentile } from "@autometrics/autometrics";
 
 const API_SLO: Objective = {
  name: 'api',
@@ -162,7 +162,7 @@ pieces of important business logic that you want to measure.
 Example:
 
 ```typescript
-import { autometrics } from "autometrics";
+import { autometrics, Objective } from "autometrics";
 
 const createUser = autometrics(async function createUser(payload: User) {
   // ...
