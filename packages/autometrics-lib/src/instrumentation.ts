@@ -9,33 +9,22 @@ import {
   PeriodicExportingMetricReader,
 } from "@opentelemetry/sdk-metrics";
 
+import { InitOptions, getInitConfigFromEnv, mergeInitOptions } from "./config";
+
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
-
-type Exporter = MetricReader;
-
-export type initOptions = {
-  /**
-   * A custom exporter to be used instead of the bundled Prometheus Exporter on port 9464
-   */
-  exporter?: Exporter;
-  /**
-   * The full URL (including http://) of the aggregating push gateway for metrics to be submitted to.
-   */
-  pushGateway?: string;
-  /**
-   * Set a custom push interval in ms (default: 5000ms)
-   */
-  pushInterval?: number;
-};
 
 /**
  * Optional initialization function to set a custom exporter or push gateway for client-side applications.
  * Required if using autometrics in a client-side application.
  *
- * @param {initOptions} options
+ * @param {InitOptions} options
  */
-export function init(options: initOptions) {
+export function init(options: InitOptions) {
+  // Read options from the environment and merge with the options supplied to this function
+  // The options supplied to this function take precedence
+  options = mergeInitOptions(getInitConfigFromEnv(), options);
+
   logger("Using the user's Exporter configuration");
   exporter = options.exporter;
   // if a pushGateway is added we overwrite the exporter

@@ -225,8 +225,12 @@ data to. You can also set the push interval with the `pushInterval` property
 (default is every 5000 miliseconds);
 
 ```typescript
-init({ pushGateway: "<link_to_gateway>" });
+init({ pushGateway: "<link_to_gateway>", pushInterval: 10000 });
 ```
+
+For both the `pushGateway` and `pushInterval` options, the init function will try to fall back to the `PROMETHEUS_PUSHGATEWAY_URL` and `PROMETHEUS_PUSHGATEWAY_INTERVAL` environment variables, respectively.
+
+**The options supplied to the `init` function always take precedence over their corresponding environment variables.**
 
 ### Use Autometrics wrapper with options
 
