@@ -51,7 +51,6 @@ function init(modules: { typescript: typeof tsserver }) {
       const sourceFile = languageService.getProgram().getSourceFile(filename);
       const nodeAtCursor = getNodeAtCursor(sourceFile, position);
       const nodeType = getNodeType(nodeAtCursor, typechecker);
-
       const autometrics = isAutometricsWrappedOrDecorated(
         nodeAtCursor,
         typechecker,
