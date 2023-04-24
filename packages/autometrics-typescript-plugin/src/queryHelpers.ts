@@ -22,7 +22,14 @@ export function createErrorRatioQuery(
 
 const DEFAULT_URL = "http://localhost:9090/";
 export function makePrometheusUrl(query: string, base: string = DEFAULT_URL) {
-  return `${base}graph?g0.expr=${urlEncodeString(query)}&g0.tab=0`;
+  function createValidBaseUrl(url: string) {
+    const regex = /\/$/;
+    return regex.test(url) ? url : `${url}/`;
+  }
+
+  return `${createValidBaseUrl(base)}graph?g0.expr=${urlEncodeString(
+    query,
+  )}&g0.tab=0`;
 }
 
 // Utility to ensure that parens and other characters are encoded as well

@@ -18,7 +18,6 @@
     "plugins": [
       {
         "name": "@autometrics/typescript-plugin",
-        "prometheusUrl": ""
       }
     ]
   },

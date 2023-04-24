@@ -76,11 +76,6 @@ function init(modules: { typescript: typeof tsserver }) {
       const errorRatioUrl = makePrometheusUrl(errorRatio, prometheusBase);
       const latencyUrl = makePrometheusUrl(latency, prometheusBase);
 
-      const preamble = {
-        kind: "string",
-        text: `\n\n## Autometrics\n\nView the live metrics for the \`${nodeIdentifier}\` function:\n `,
-      };
-
       const queries = <ts.SymbolDisplayPart[]>[
         {
           kind: "space",
@@ -112,6 +107,10 @@ function init(modules: { typescript: typeof tsserver }) {
         },
       ];
 
+      const preamble = {
+        kind: "string",
+        text: `\n\n## Autometrics\n\nView the live metrics for the \`${nodeIdentifier}\` function:\n `,
+      };
       const { documentation } = prior;
       const enrichedDocumentation = documentation.concat(
         preamble,
