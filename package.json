@@ -25,5 +25,8 @@
   "devDependencies": {
     "rome": "^11.0.0",
     "vitest": "^0.28.4"
+  },
+  "dependencies": {
+    "@swc/core": "^1.3.53"
   }
 }
