@@ -23,7 +23,6 @@
     "lint": "rome ci packages/**/src"
   },
   "devDependencies": {
-    "@swc/core": "^1.3.53",
     "rome": "^11.0.0",
     "vitest": "^0.28.4"
   }
