@@ -73,7 +73,17 @@ export type AutometricsOptions = {
    * Name of the module (usually filename)
    */
   moduleName?: string;
+  /**
+   * Include this function's metrics in the specified objective or SLO.
+   *
+   * See the docs for {@link Objective} for details on how to create objectives.
+   */
   objective?: Objective;
+  /**
+   * Pass this argument to track the number of concurrent calls to the function (using a gauge).
+   * This may be most useful for top-level functions such as the main HTTP handler that
+   * passes requests off to other functions. (default: `false`)
+   */
   trackConcurrency?: boolean;
 };
 
