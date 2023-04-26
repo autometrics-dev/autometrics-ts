@@ -60,6 +60,8 @@ type AnyFunction<T extends FunctionSig> = (
  * This type signals to the language service plugin that it should show extra
  * documentation along with the queries.
  */
+
+// rome-ignore lint/suspicious/noEmptyInterface: Converting this to a type breaks the language server plugin
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
 export type AutometricsOptions = {

@@ -23,7 +23,7 @@
     "lint": "rome ci packages/**/src"
   },
   "devDependencies": {
-    "rome": "^11.0.0",
-    "vitest": "^0.28.4"
+    "rome": "^12.0.0",
+    "vitest": "^0.30.1"
   }
 }
