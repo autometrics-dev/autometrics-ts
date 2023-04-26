@@ -71,6 +71,6 @@ async function generateRandomTraffic() {
   }
 }
 
-// We delay firing the sample traffic 1s to ensure 
+// We delay firing the sample traffic 1s to ensure
 // Prometheus can pick up the newly registered metrics
 setTimeout(() => generateRandomTraffic(), 1000);

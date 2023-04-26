@@ -1,0 +1,38 @@
+{
+  "name": "@autometrics/parcel-transformer-autometrics",
+  "version": "0.3.0",
+  "description": "Parcel transformer plugin for Autometrics",
+  "author": "Fiberplane<info@fiberplane.com>",
+  "contributors": [
+    "Laurynas Keturakis",
+    "Evan Schwartz",
+    "Jacco Flenter",
+    "Oscar van Zijverden",
+    "Stephan Lagerwaard"
+  ],
+  "repository": {
+    "url": "https://github.com/autometrics-dev/autometrics-ts.git"
+  },
+  "license": "MIT OR Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [],
+  "main": "dist/index",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "clean": "rm -rf dist/"
+  },
+  "devDependencies": {
+    "@types/babel__generator": "^7.4.4",
+    "@types/babel__traverse": "^7.18.3",
+    "typescript": ">=4.9.4"
+  },
+  "dependencies": {
+    "@babel/generator": "^7.21.4",
+    "@babel/parser": "^7.21.4",
+    "@babel/traverse": "^7.21.4",
+    "@parcel/plugin": "^2.8.3"
+  }
+}

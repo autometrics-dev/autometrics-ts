@@ -224,7 +224,7 @@ function getModulePath(): string | undefined {
 
   let rootDir: string;
 
-  if (typeof process === "object") {
+  if (typeof process === "object" && "cwd" in process) {
     // HACK: this assumes the entire app was run from the root directory of the project
     rootDir = process.cwd();
     //@ts-ignore

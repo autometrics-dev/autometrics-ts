@@ -3,9 +3,10 @@
   "type": "module",
   "name": "autometrics-monorepo",
   "workspaces": [
-    "packages/autometrics-typescript-plugin",
+    "packages/autometrics",
     "packages/autometrics-lib",
-    "packages/autometrics"
+    "packages/autometrics-typescript-plugin",
+    "packages/parcel-transformer-autometrics"
   ],
   "main": "index.js",
   "scripts": {
