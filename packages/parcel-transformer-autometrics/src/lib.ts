@@ -51,13 +51,13 @@ export function addAutometricsOptions(code: string, filePath: string): string {
 function appendOptionsProperties(
   options: ObjectExpression,
   functionName: string,
-  moduleName: string
+  moduleName: string,
 ) {
   const hasFunctionNameProperty = options.properties.some(
     (n) =>
       n.type === "ObjectProperty" &&
       n.key.type === "Identifier" &&
-      n.key.name === "functionName"
+      n.key.name === "functionName",
   );
 
   if (!hasFunctionNameProperty) {
@@ -74,7 +74,7 @@ function appendOptionsProperties(
     (n) =>
       n.type === "ObjectProperty" &&
       n.key.type === "Identifier" &&
-      n.key.name === "moduleName"
+      n.key.name === "moduleName",
   );
 
   if (!hasModuleNameProperty) {
