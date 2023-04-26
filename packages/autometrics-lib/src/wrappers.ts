@@ -62,19 +62,18 @@ type AnyFunction<T extends FunctionSig> = (
  */
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
-export type AutometricsOptions =
-  | {
-      /**
-       * Name of your function
-       */
-      functionName: string;
-      /**
-       * Name of the module (usually filename)
-       */
-      moduleName?: string;
-      objective?: Objective;
-    }
-  | { objective: Objective };
+export type AutometricsOptions = {
+  /**
+   * Name of your function
+   */
+  functionName?: string;
+  /**
+   * Name of the module (usually filename)
+   */
+  moduleName?: string;
+  objective?: Objective;
+  trackConcurrency?: boolean;
+};
 
 /**
  * Autometrics wrapper for **functions** that automatically instruments the
@@ -95,6 +94,7 @@ export function autometrics<F extends FunctionSig>(
   let moduleName: string;
   let fn: F;
   let objective: Objective | undefined;
+  let trackConcurrency = false;
 
   if (typeof functionOrOptions === "function") {
     fn = functionOrOptions;
@@ -114,6 +114,10 @@ export function autometrics<F extends FunctionSig>(
 
     if ("objective" in functionOrOptions) {
       objective = functionOrOptions.objective;
+    }
+
+    if ("trackConcurrency" in functionOrOptions) {
+      trackConcurrency = functionOrOptions.trackConcurrency;
     }
   }
 
@@ -148,6 +152,14 @@ export function autometrics<F extends FunctionSig>(
     const autometricsStart = performance.now();
     const counter = meter.createCounter("function.calls.count");
     const histogram = meter.createHistogram("function.calls.duration");
+    const gauge = meter.createUpDownCounter("function.calls.concurrent");
+
+    if (trackConcurrency) {
+      gauge.add(1, {
+        function: functionName,
+        module: moduleName,
+      });
+    }
 
     const onSuccess = () => {
       const autometricsDuration = performance.now() - autometricsStart;
@@ -164,6 +176,13 @@ export function autometrics<F extends FunctionSig>(
         module: moduleName,
         ...histogramObjectiveAttributes,
       });
+
+      if (trackConcurrency) {
+        gauge.add(-1, {
+          function: functionName,
+          module: moduleName,
+        });
+      }
     };
 
     const onError = () => {
@@ -181,6 +200,13 @@ export function autometrics<F extends FunctionSig>(
         module: moduleName,
         ...histogramObjectiveAttributes,
       });
+
+      if (trackConcurrency) {
+        gauge.add(-1, {
+          function: functionName,
+          module: moduleName,
+        });
+      }
     };
 
     try {
