@@ -60,7 +60,7 @@ type AnyFunction<T extends FunctionSig> = (
  * This type signals to the language service plugin that it should show extra
  * documentation along with the queries.
  */
-interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
+type AutometricsWrapper<T extends AnyFunction<T>> = AnyFunction<T>;
 
 export type AutometricsOptions =
   | {
