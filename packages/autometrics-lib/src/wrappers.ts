@@ -64,19 +64,28 @@ type AnyFunction<T extends FunctionSig> = (
 // rome-ignore lint/suspicious/noEmptyInterface: Converting this to a type breaks the language server plugin
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
-export type AutometricsOptions =
-  | {
-      /**
-       * Name of your function
-       */
-      functionName: string;
-      /**
-       * Name of the module (usually filename)
-       */
-      moduleName?: string;
-      objective?: Objective;
-    }
-  | { objective: Objective };
+export type AutometricsOptions = {
+  /**
+   * Name of your function
+   */
+  functionName?: string;
+  /**
+   * Name of the module (usually filename)
+   */
+  moduleName?: string;
+  /**
+   * Include this function's metrics in the specified objective or SLO.
+   *
+   * See the docs for {@link Objective} for details on how to create objectives.
+   */
+  objective?: Objective;
+  /**
+   * Pass this argument to track the number of concurrent calls to the function (using a gauge).
+   * This may be most useful for top-level functions such as the main HTTP handler that
+   * passes requests off to other functions. (default: `false`)
+   */
+  trackConcurrency?: boolean;
+};
 
 /**
  * Autometrics wrapper for **functions** that automatically instruments the
@@ -97,6 +106,7 @@ export function autometrics<F extends FunctionSig>(
   let moduleName: string;
   let fn: F;
   let objective: Objective | undefined;
+  let trackConcurrency = false;
 
   if (typeof functionOrOptions === "function") {
     fn = functionOrOptions;
@@ -116,6 +126,10 @@ export function autometrics<F extends FunctionSig>(
 
     if ("objective" in functionOrOptions) {
       objective = functionOrOptions.objective;
+    }
+
+    if ("trackConcurrency" in functionOrOptions) {
+      trackConcurrency = functionOrOptions.trackConcurrency;
     }
   }
 
@@ -150,6 +164,14 @@ export function autometrics<F extends FunctionSig>(
     const autometricsStart = performance.now();
     const counter = meter.createCounter("function.calls.count");
     const histogram = meter.createHistogram("function.calls.duration");
+    const gauge = meter.createUpDownCounter("function.calls.concurrent");
+
+    if (trackConcurrency) {
+      gauge.add(1, {
+        function: functionName,
+        module: moduleName,
+      });
+    }
 
     const onSuccess = () => {
       const autometricsDuration = performance.now() - autometricsStart;
@@ -166,6 +188,13 @@ export function autometrics<F extends FunctionSig>(
         module: moduleName,
         ...histogramObjectiveAttributes,
       });
+
+      if (trackConcurrency) {
+        gauge.add(-1, {
+          function: functionName,
+          module: moduleName,
+        });
+      }
     };
 
     const onError = () => {
@@ -183,6 +212,13 @@ export function autometrics<F extends FunctionSig>(
         module: moduleName,
         ...histogramObjectiveAttributes,
       });
+
+      if (trackConcurrency) {
+        gauge.add(-1, {
+          function: functionName,
+          module: moduleName,
+        });
+      }
     };
 
     try {
