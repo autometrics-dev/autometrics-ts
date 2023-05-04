@@ -1,5 +1,7 @@
 import ts from "typescript/lib/tsserverlibrary";
 
+import type { NodeType } from "./types";
+
 /**
  * Checks if the node is wrapped or decorated by Autometrics (but not the
  * wrapper or decorator itself!)
@@ -52,13 +54,12 @@ export function isAutometricsWrappedOrDecorated(
 /**
  * Gets the node identifier
  * @param node {ts.Node} - the node itself
- * @param nodeType {"function" | "method"} - so we know what kind of check to
- * run
+ * @param nodeType {NodeType} - so we know what kind of check to run
  * @param typechecker {ts.TypeChecker} - helper util
  */
 export function getNodeIdentifier(
   node: ts.Node,
-  nodeType: "function" | "method",
+  nodeType: NodeType,
   typechecker: ts.TypeChecker,
 ): string {
   if (nodeType === "method" && ts.isIdentifier(node)) {
@@ -101,12 +102,12 @@ export function getNodeIdentifier(
  * Gets the type of the node (we care only about functions or methods)
  * @param node The node itself
  * @param typechecker The helper utility
+ * @returns {NodeType}
  */
 export function getNodeType(node: ts.Node, typechecker: ts.TypeChecker) {
   const declaration = typechecker.getSymbolAtLocation(node);
 
-  // rome-ignore lint/complexity/useSimplifiedLogicExpression: simplify if statement ignoring Rome's suggestion
-  if (!declaration.valueDeclaration || !node.parent) {
+  if (!(declaration.valueDeclaration && node.parent)) {
     return;
   }
 
@@ -156,5 +157,6 @@ export function getNodeAtCursor(
       return ts.forEachChild(node, find) || node;
     }
   }
+
   return find(sourceFile);
 }

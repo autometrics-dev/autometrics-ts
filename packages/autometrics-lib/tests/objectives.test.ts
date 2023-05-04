@@ -38,7 +38,7 @@ describe("Autometrics objectives test", () => {
           successRate: ObjectivePercentile.P99,
         },
       },
-      function successRate() {}
+      function successRate() {},
     );
 
     successRateFn();
@@ -60,7 +60,7 @@ describe("Autometrics objectives test", () => {
           latency: [ObjectiveLatency.Ms100, ObjectivePercentile.P99_9],
         },
       },
-      function latency() {}
+      function latency() {},
     );
 
     latencyFn();
@@ -83,7 +83,7 @@ describe("Autometrics objectives test", () => {
           latency: [ObjectiveLatency.Ms100, ObjectivePercentile.P99_9],
         },
       },
-      function combinedObjective() {}
+      function combinedObjective() {},
     );
 
     combinedObjectiveFn();

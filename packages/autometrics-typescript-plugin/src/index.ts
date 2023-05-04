@@ -1,28 +1,24 @@
+import tsserver from "typescript/lib/tsserverlibrary";
+
 import {
   getNodeAtCursor,
   getNodeType,
   getNodeIdentifier,
   isAutometricsWrappedOrDecorated,
 } from "./astHelpers";
-
-import tsserver from "typescript/lib/tsserverlibrary";
-
 import {
   createLatencyQuery,
   createRequestRateQuery,
   createErrorRatioQuery,
   makePrometheusUrl,
 } from "./queryHelpers";
-
 import { createLogger, getProxy } from "./utils";
 
 type Config = {
-  prometheusUrl: string | undefined;
+  prometheusUrl?: string;
 };
 
-function init(modules: {
-  typescript: typeof tsserver;
-}) {
+function init(modules: { typescript: typeof tsserver }) {
   let pluginConfig: Config;
   const ts = modules.typescript;
 
@@ -45,33 +41,23 @@ function init(modules: {
         position,
       );
 
-      if (prior === undefined) {
-        return prior;
+      if (!prior) {
+        return;
       }
 
-      const prometheusBase: string | undefined = pluginConfig.prometheusUrl;
+      const prometheusBase = pluginConfig.prometheusUrl;
       log(prometheusBase);
 
-      let { documentation } = prior;
-
       const sourceFile = languageService.getProgram().getSourceFile(filename);
-
       const nodeAtCursor = getNodeAtCursor(sourceFile, position);
-
       const nodeType = getNodeType(nodeAtCursor, typechecker);
-
       const autometrics = isAutometricsWrappedOrDecorated(
         nodeAtCursor,
         typechecker,
       );
 
-      // If either autometrics checker or node type is undefined
-      // return early
-      if (!autometrics) {
-        return prior;
-      }
-
-      if (!nodeType) {
+      // If either autometrics checker or node type is undefined return early
+      if (!(autometrics && nodeType)) {
         return prior;
       }
 
@@ -88,11 +74,6 @@ function init(modules: {
       const requestRateUrl = makePrometheusUrl(requestRate, prometheusBase);
       const errorRatioUrl = makePrometheusUrl(errorRatio, prometheusBase);
       const latencyUrl = makePrometheusUrl(latency, prometheusBase);
-
-      const preamble = {
-        kind: "string",
-        text: `\n\n## Autometrics\n\nView the live metrics for the \`${nodeIdentifier}\` function:\n `,
-      };
 
       const queries = <ts.SymbolDisplayPart[]>[
         {
@@ -124,11 +105,21 @@ function init(modules: {
           text: "\n",
         },
       ];
-      documentation = documentation.concat(preamble, documentation, queries);
+
+      const preamble = {
+        kind: "string",
+        text: `\n\n## Autometrics\n\nView the live metrics for the \`${nodeIdentifier}\` function:\n `,
+      };
+      const { documentation } = prior;
+      const enrichedDocumentation = documentation.concat(
+        preamble,
+        documentation,
+        queries,
+      );
 
       return <ts.QuickInfo>{
         ...prior,
-        documentation,
+        documentation: enrichedDocumentation,
       };
     };
 
