@@ -1,89 +1,148 @@
-import generate from "@babel/generator";
-import { parse } from "@babel/parser";
-import traverse from "@babel/traverse";
-import type { ObjectExpression } from "@babel/types";
 import path from "path";
+import {
+  EmitHint,
+  NewLineKind,
+  Node,
+  PropertyAssignment,
+  ScriptTarget,
+  TransformationContext,
+  TransformerFactory,
+  createPrinter,
+  createSourceFile,
+  isCallExpression,
+  isExpressionStatement,
+  isFunctionExpression,
+  isIdentifier,
+  isObjectLiteralExpression,
+  transform,
+  visitEachChild,
+  visitNode,
+} from "typescript";
 
-export function addAutometricsOptions(code: string, filePath: string): string {
-  const ast = parse(code, { sourceType: "module", plugins: ["typescript"] });
+let moduleName: string;
+const transformerFactory: TransformerFactory<Node> = (
+  context: TransformationContext,
+) => {
+  const { factory } = context;
+  return (rootNode) => {
+    function visit(node: Node): Node {
+      node = visitEachChild(node, visit, context);
 
-  traverse(ast, {
-    CallExpression(nodePath) {
       if (
-        nodePath.node.callee.type === "Identifier" &&
-        nodePath.node.callee.name === "autometrics"
+        isExpressionStatement(node) &&
+        isCallExpression(node.expression) &&
+        isIdentifier(node.expression.expression) &&
+        node.expression.expression.escapedText === "autometrics"
       ) {
-        const parsedFilePath = path.parse(filePath);
-        const moduleName = `${parsedFilePath.name}${parsedFilePath.ext}`;
+        const [functionOrOptions, maybeFunction] = node.expression.arguments;
+        if (isFunctionExpression(functionOrOptions)) {
+          const autometricsOptions = factory.createObjectLiteralExpression([
+            factory.createPropertyAssignment(
+              "functionName",
+              factory.createStringLiteral(
+                functionOrOptions.name.escapedText.toString(),
+              ),
+            ),
+            factory.createPropertyAssignment(
+              "moduleName",
+              factory.createStringLiteral(moduleName),
+            ),
+          ]);
 
-        const [functionOrOptions, maybeFunction] = nodePath.node.arguments;
-
-        // If the autometrics() function call's first argument is a function, we use unshift to inject the options object as the first argument
-        if (functionOrOptions.type === "FunctionExpression") {
-          const functionName = functionOrOptions.id.name;
-
-          const options: ObjectExpression = {
-            type: "ObjectExpression",
-            properties: [],
-          };
-
-          appendOptionsProperties(options, functionName, moduleName);
-
-          nodePath.node.arguments.unshift(options);
-
-          // If the autometrics() function call's first argument is an options object, we append properties to the object
+          return factory.createExpressionStatement(
+            factory.createCallExpression(
+              node.expression.expression,
+              node.expression.typeArguments,
+              factory.createNodeArray([
+                autometricsOptions,
+                ...node.expression.arguments,
+              ]),
+            ),
+          );
         } else if (
-          functionOrOptions.type === "ObjectExpression" &&
-          maybeFunction.type === "FunctionExpression"
+          isObjectLiteralExpression(functionOrOptions) &&
+          isFunctionExpression(maybeFunction)
         ) {
-          const functionName = maybeFunction.id.name;
+          const autometricsProperties: PropertyAssignment[] = [];
 
-          appendOptionsProperties(functionOrOptions, functionName, moduleName);
-          nodePath.node.arguments = [functionOrOptions, maybeFunction];
+          if (
+            !functionOrOptions.properties.some(
+              (objectLiteralElementLike: PropertyAssignment) => {
+                return (
+                  // TODO: Fix typing issue
+                  // @ts-expect-error
+                  objectLiteralElementLike.name.escapedText === "functionName"
+                );
+              },
+            )
+          ) {
+            autometricsProperties.push(
+              factory.createPropertyAssignment(
+                "functionName",
+                factory.createStringLiteral(
+                  maybeFunction.name.escapedText.toString(),
+                ),
+              ),
+            );
+          }
+
+          if (
+            !functionOrOptions.properties.some(
+              (objectLiteralElementLike: PropertyAssignment) => {
+                return (
+                  // TODO: Fix typing issue
+                  // @ts-expect-error
+                  objectLiteralElementLike.name.escapedText === "moduleName"
+                );
+              },
+            )
+          ) {
+            autometricsProperties.push(
+              factory.createPropertyAssignment(
+                "moduleName",
+                factory.createStringLiteral(moduleName),
+              ),
+            );
+          }
+
+          return factory.createExpressionStatement(
+            factory.createCallExpression(
+              node.expression.expression,
+              node.expression.typeArguments,
+              factory.createNodeArray([
+                factory.createObjectLiteralExpression([
+                  ...functionOrOptions.properties,
+                  ...autometricsProperties,
+                ]),
+                maybeFunction,
+              ]),
+            ),
+          );
         }
       }
-    },
-  });
 
-  return generate(ast).code;
-}
+      return node;
+    }
 
-function appendOptionsProperties(
-  options: ObjectExpression,
-  functionName: string,
-  moduleName: string,
-) {
-  const hasFunctionNameProperty = options.properties.some(
-    (n) =>
-      n.type === "ObjectProperty" &&
-      n.key.type === "Identifier" &&
-      n.key.name === "functionName",
+    return visitNode(rootNode, visit);
+  };
+};
+
+export function addAutometricsOptions(code: string, filePath: string): string {
+  const parsedFilePath = path.parse(filePath);
+  moduleName = `${parsedFilePath.name}${parsedFilePath.ext}`;
+
+  const sourceFile = createSourceFile(filePath, code, ScriptTarget.Latest);
+
+  const printer = createPrinter({ newLine: NewLineKind.LineFeed });
+
+  const transformationResult = transform(sourceFile, [transformerFactory]);
+
+  const result = printer.printNode(
+    EmitHint.Unspecified,
+    transformationResult.transformed[0],
+    sourceFile,
   );
 
-  if (!hasFunctionNameProperty) {
-    options.properties.push({
-      type: "ObjectProperty",
-      key: { type: "Identifier", name: "functionName" },
-      value: { type: "StringLiteral", value: functionName },
-      computed: false,
-      shorthand: false,
-    });
-  }
-
-  const hasModuleNameProperty = options.properties.some(
-    (n) =>
-      n.type === "ObjectProperty" &&
-      n.key.type === "Identifier" &&
-      n.key.name === "moduleName",
-  );
-
-  if (!hasModuleNameProperty) {
-    options.properties.push({
-      type: "ObjectProperty",
-      key: { type: "Identifier", name: "moduleName" },
-      value: { type: "StringLiteral", value: moduleName },
-      computed: false,
-      shorthand: false,
-    });
-  }
+  return result.trim();
 }

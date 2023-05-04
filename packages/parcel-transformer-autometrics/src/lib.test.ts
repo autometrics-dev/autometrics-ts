@@ -6,15 +6,11 @@ describe("Parcel transformer", () => {
     const filePath = "path/to/module.ts";
 
     const source = `
-autometrics(function myFunction() {});
+autometrics(function myFunction() { });
     `.trim();
 
     const transformed = `
-autometrics({
-  functionName: "myFunction",
-  moduleName: "module.ts"
-}, function myFunction() {});
-  `.trim();
+autometrics({ functionName: "myFunction", moduleName: "module.ts" }, function myFunction() { });`.trim();
 
     expect(addAutometricsOptions(source, filePath)).toEqual(transformed);
   });
@@ -23,14 +19,11 @@ autometrics({
     const filePath = "path/to/module2.ts";
 
     const source = `
-autometrics({ functionName: "renamedFunction" }, function myFunction() {});
+autometrics({ functionName: "renamedFunction" }, function myFunction() { });
   `.trim();
 
     const transformed = `
-autometrics({
-  functionName: "renamedFunction",
-  moduleName: "module2.ts"
-}, function myFunction() {});
+autometrics({ functionName: "renamedFunction", moduleName: "module2.ts" }, function myFunction() { });
   `.trim();
 
     expect(addAutometricsOptions(source, filePath)).toEqual(transformed);
@@ -40,14 +33,11 @@ autometrics({
     const filePath = "path/to/module3.ts";
 
     const source = `
-autometrics({ moduleName: "renamedModule.ts" }, function myFunction() {});
+autometrics({ moduleName: "renamedModule.ts" }, function myFunction() { });
   `.trim();
 
     const transformed = `
-autometrics({
-  moduleName: "renamedModule.ts",
-  functionName: "myFunction"
-}, function myFunction() {});
+autometrics({ moduleName: "renamedModule.ts", functionName: "myFunction" }, function myFunction() { });
   `.trim();
 
     expect(addAutometricsOptions(source, filePath)).toEqual(transformed);

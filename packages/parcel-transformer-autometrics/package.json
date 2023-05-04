@@ -25,14 +25,9 @@
     "clean": "rm -rf dist/"
   },
   "devDependencies": {
-    "@types/babel__generator": "^7.4.4",
-    "@types/babel__traverse": "^7.18.3",
     "typescript": ">=4.9.4"
   },
   "dependencies": {
-    "@babel/generator": "^7.21.4",
-    "@babel/parser": "^7.21.4",
-    "@babel/traverse": "^7.21.4",
     "@parcel/plugin": "^2.8.3"
   }
 }
