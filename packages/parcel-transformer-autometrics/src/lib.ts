@@ -17,6 +17,8 @@ import {
   transform,
   visitEachChild,
   visitNode,
+  NodeFactory,
+  ObjectLiteralExpression,
 } from "typescript";
 
 let moduleName: string;
@@ -63,59 +65,25 @@ const transformerFactory: TransformerFactory<Node> = (
           isObjectLiteralExpression(functionOrOptions) &&
           isFunctionExpression(maybeFunction)
         ) {
-          const autometricsProperties: PropertyAssignment[] = [];
+          let options = addObjectPropertyIfMissing(
+            factory,
+            functionOrOptions,
+            "functionName",
+            maybeFunction.name.escapedText.toString(),
+          );
 
-          if (
-            !functionOrOptions.properties.some(
-              (objectLiteralElementLike: PropertyAssignment) => {
-                return (
-                  // TODO: Fix typing issue
-                  // @ts-expect-error
-                  objectLiteralElementLike.name.escapedText === "functionName"
-                );
-              },
-            )
-          ) {
-            autometricsProperties.push(
-              factory.createPropertyAssignment(
-                "functionName",
-                factory.createStringLiteral(
-                  maybeFunction.name.escapedText.toString(),
-                ),
-              ),
-            );
-          }
-
-          if (
-            !functionOrOptions.properties.some(
-              (objectLiteralElementLike: PropertyAssignment) => {
-                return (
-                  // TODO: Fix typing issue
-                  // @ts-expect-error
-                  objectLiteralElementLike.name.escapedText === "moduleName"
-                );
-              },
-            )
-          ) {
-            autometricsProperties.push(
-              factory.createPropertyAssignment(
-                "moduleName",
-                factory.createStringLiteral(moduleName),
-              ),
-            );
-          }
+          options = addObjectPropertyIfMissing(
+            factory,
+            options,
+            "moduleName",
+            moduleName,
+          );
 
           return factory.createExpressionStatement(
             factory.createCallExpression(
               node.expression.expression,
               node.expression.typeArguments,
-              factory.createNodeArray([
-                factory.createObjectLiteralExpression([
-                  ...functionOrOptions.properties,
-                  ...autometricsProperties,
-                ]),
-                maybeFunction,
-              ]),
+              factory.createNodeArray([options, maybeFunction]),
             ),
           );
         }
@@ -127,6 +95,27 @@ const transformerFactory: TransformerFactory<Node> = (
     return visitNode(rootNode, visit);
   };
 };
+
+function addObjectPropertyIfMissing(
+  factory: NodeFactory,
+  options: ObjectLiteralExpression,
+  key: string,
+  value: string,
+) {
+  if (
+    !options.properties.some(
+      (node: PropertyAssignment) =>
+        "escapedText" in node.name && node.name.escapedText === key,
+    )
+  ) {
+    return factory.updateObjectLiteralExpression(options, [
+      ...options.properties,
+      factory.createPropertyAssignment(key, factory.createStringLiteral(value)),
+    ]);
+  }
+
+  return options;
+}
 
 export function addAutometricsOptions(code: string, filePath: string): string {
   const parsedFilePath = path.parse(filePath);
