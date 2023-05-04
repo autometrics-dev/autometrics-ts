@@ -45,6 +45,32 @@ export function autometricsDecorator(
       throw error;
     }
   };
+
+  return descriptor;
+}
+
+// TODO: write JSdoc
+export function autometricsClassDecorator(classConstructor: Function) {
+  const prototype = classConstructor.prototype;
+  const properties = Object.getOwnPropertyNames(prototype);
+
+  for (const key of properties) {
+    const property = prototype[key];
+
+    if (typeof property === "function" && key !== "constructor") {
+      const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
+
+      if (descriptor) {
+        const instrumentedDescriptor = autometricsDecorator(
+          {},
+          key,
+          descriptor,
+        );
+
+        Object.defineProperty(prototype, key, instrumentedDescriptor);
+      }
+    }
+  }
 }
 
 // Function Wrapper
