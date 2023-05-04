@@ -38,18 +38,22 @@ const transformerFactory: TransformerFactory<Node> = (
       ) {
         const [functionOrOptions, maybeFunction] = node.expression.arguments;
         if (isFunctionExpression(functionOrOptions)) {
+          const functionName = functionOrOptions.name.escapedText.toString();
+
           const autometricsOptions = factory.createObjectLiteralExpression([
             factory.createPropertyAssignment(
               "functionName",
-              factory.createStringLiteral(
-                functionOrOptions.name.escapedText.toString(),
-              ),
+              factory.createStringLiteral(functionName),
             ),
             factory.createPropertyAssignment(
               "moduleName",
               factory.createStringLiteral(moduleName),
             ),
           ]);
+
+          console.log(
+            `Autometrics: Adding options to ${functionName} in ${moduleName}`,
+          );
 
           return factory.createExpressionStatement(
             factory.createCallExpression(
@@ -65,11 +69,13 @@ const transformerFactory: TransformerFactory<Node> = (
           isObjectLiteralExpression(functionOrOptions) &&
           isFunctionExpression(maybeFunction)
         ) {
+          const functionName = maybeFunction.name.escapedText.toString();
+
           let options = addObjectPropertyIfMissing(
             factory,
             functionOrOptions,
             "functionName",
-            maybeFunction.name.escapedText.toString(),
+            functionName,
           );
 
           options = addObjectPropertyIfMissing(
@@ -77,6 +83,10 @@ const transformerFactory: TransformerFactory<Node> = (
             options,
             "moduleName",
             moduleName,
+          );
+
+          console.log(
+            `Autometrics: Adding options to ${functionName} in ${moduleName}`,
           );
 
           return factory.createExpressionStatement(
