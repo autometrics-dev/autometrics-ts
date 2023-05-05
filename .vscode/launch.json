@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch VSCode",
+      "type": "node",
+      "request": "launch",
+      "env": {
+        "TSS_DEBUG_BRK": "9229"
+      },
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "code",
+      "runtimeArgs": ["-n", "--disable-extensions", "${input:pickExample}"],
+      "restart": true
+    },
+    {
+      "name": "Attach to VSCode",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "restart": true,
+      "sourceMaps": true,
+    }
+  ],
+  "inputs": [
+    {
+      "id": "pickExample",
+      "type": "pickString",
+      "description": "Pick an example to run",
+      "options": [
+        "examples/express",
+        "examples/fastify",
+        "examples/nestjs",
+        "examples/react-app",
+        "examples/svelte-app",
+      ]
+    }
+  ]
+}
