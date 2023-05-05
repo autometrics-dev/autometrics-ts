@@ -36,8 +36,7 @@ more details on the ideas behind autometrics
   knowing PromQL
 - 🔗 Injects links to live Prometheus charts directly into each function's doc
   comments
-- 📊 (Coming Soon!) Grafana dashboard showing the performance of all
-  instrumented functions
+- [📊 Grafana dashboards](#dashboards) work out of the box to visualize the performance of instrumented functions & SLOs
 - 🚨 Generates Prometheus alerting rules using SLO best practices
   from simple annotations in your code
 - ⚡ Minimal runtime overhead
@@ -120,6 +119,11 @@ Add the language service plugin to the `tsconfig.json` file:
   }
 }
 ```
+
+## Dashboards
+
+Autometrics provides [Grafana dashboards](https://github.com/autometrics-dev/autometrics-shared#dashboards) that will work for any project instrumented with the library.
+
 
 ## Alerts / SLOs
 
