@@ -47,6 +47,19 @@ export function isAutometricsWrappedOrDecorated(
     return hasAutometricsDecorator;
   }
 
+  // WIP (Oscar): check if the decorator is added to the class itself
+  if (
+    ts.isClassDeclaration(node.parent.parent) &&
+    ts.getDecorators(node.parent.parent)
+  ) {
+    const decorators = ts.getDecorators(node.parent.parent);
+    const hasAutometricsDecorator = decorators.some((decorator) =>
+      decorator.getText().startsWith("@autometrics"),
+    );
+
+    return hasAutometricsDecorator;
+  }
+
   // Otherwise just return false
   return false;
 }
