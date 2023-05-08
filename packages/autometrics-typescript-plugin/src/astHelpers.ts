@@ -36,55 +36,40 @@ export function isAutometricsWrappedOrDecorated(
     return true;
   }
 
-  // TODO (Oscar): refactor logic that determines if a class or method is
-  // decorated
-
-  // If none of the function checkers return, we continue investigating if it
-  // has the right decorators for class methods
-  if (ts.canHaveDecorators(node.parent) && ts.getDecorators(node.parent)) {
-    const decorators = ts.getDecorators(node.parent);
-    const hasAutometricsDecorator = decorators.some((decorator) =>
-      decorator.getText().startsWith("@autometrics"),
-    );
-
-    return hasAutometricsDecorator;
-  }
-
-  // WIP (Oscar): check if the autometrics decorator is added to the class
-  // itself
-  if (
-    ts.isClassDeclaration(node.parent.parent) &&
-    ts.canHaveDecorators(node.parent.parent) &&
-    ts.getDecorators(node.parent.parent)
-  ) {
-    const decorators = ts.getDecorators(node.parent.parent);
-    const hasAutometricsDecorator = decorators.some((decorator) =>
-      decorator.getText().startsWith("@autometrics"),
-    );
-
-    return hasAutometricsDecorator;
-  }
-
-  // WIP (Oscar): check if the called method is part of a class that has the
-  // autometrics decorator applied
+  // If none of the function checkers return, we continue investigating if a
+  // decorator is applied to either a class method or class itself
   const method = typechecker
     .getSymbolAtLocation(node)
-    .declarations.find((d) => ts.isMethodDeclaration(d));
-  if (
-    ts.isClassDeclaration(method.parent) &&
-    ts.canHaveDecorators(method.parent) &&
-    ts.getDecorators(method.parent)
-  ) {
-    const decorators = ts.getDecorators(method.parent);
-    const hasAutometricsDecorator = decorators.some((decorator) =>
-      decorator.getText().startsWith("@autometrics"),
-    );
+    .declarations.find((declaration) => ts.isMethodDeclaration(declaration));
 
-    return hasAutometricsDecorator;
+  // Class method
+  if (ts.canHaveDecorators(method) && ts.getDecorators(method)) {
+    const isDecorated = hasAutometricsDecorator(method);
+    return isDecorated;
+  }
+
+  // Class
+  if (ts.isClassDeclaration(method.parent) && ts.getDecorators(method.parent)) {
+    const isDecorated = hasAutometricsDecorator(method.parent);
+    return isDecorated;
   }
 
   // Otherwise just return false
   return false;
+}
+
+// TODO (Oscar): write JSDoc
+function hasAutometricsDecorator(node: ts.Node) {
+  if (!ts.canHaveDecorators(node)) {
+    return false;
+  }
+
+  const decorators = ts.getDecorators(node);
+  const hasAutometricsDecorator = decorators.some((decorator) =>
+    decorator.getText().startsWith("@autometrics"),
+  );
+
+  return hasAutometricsDecorator;
 }
 
 /**
