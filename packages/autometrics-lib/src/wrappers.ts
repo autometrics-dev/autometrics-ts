@@ -24,27 +24,29 @@ export function autometricsDecorator(autometricsOptions?: AutometricsOptions) {
 }
 
 // TODO: write JSdoc
-export function autometricsClassDecorator(classConstructor: Function) {
-  const prototype = classConstructor.prototype;
-  const properties = Object.getOwnPropertyNames(prototype);
+export function autometricsClassDecorator(
+  autometricsOptions?: Omit<AutometricsOptions, "functionName">,
+) {
+  return function (classConstructor: Function) {
+    const prototype = classConstructor.prototype;
+    const properties = Object.getOwnPropertyNames(prototype);
 
-  for (const key of properties) {
-    const property = prototype[key];
+    for (const key of properties) {
+      const property = prototype[key];
 
-    if (typeof property === "function" && key !== "constructor") {
-      const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
+      if (typeof property === "function" && key !== "constructor") {
+        const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
 
-      if (descriptor) {
-        const instrumentedDescriptor = autometricsDecorator()(
-          {},
-          key,
-          descriptor,
-        );
+        if (descriptor) {
+          const instrumentedDescriptor = autometricsDecorator(
+            autometricsOptions,
+          )({}, key, descriptor);
 
-        Object.defineProperty(prototype, key, instrumentedDescriptor);
+          Object.defineProperty(prototype, key, instrumentedDescriptor);
+        }
       }
     }
-  }
+  };
 }
 
 // Function Wrapper
