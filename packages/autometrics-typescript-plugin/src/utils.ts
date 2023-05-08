@@ -1,4 +1,4 @@
-import type ts from "typescript/lib/tsserverlibrary";
+import ts from "typescript/lib/tsserverlibrary";
 
 const PLUGIN_NAME = "Autometrics TypeScript Plugin";
 
@@ -19,4 +19,20 @@ export function createLogger(project: ts.server.Project) {
   return (msg: string) => {
     project.projectService.logger.info(`${PLUGIN_NAME}: ${msg}`);
   };
+}
+
+/**
+ * Helper function that checks if a node has an autometrics decorator
+ */
+export function hasAutometricsDecorator(node: ts.Node) {
+  const decorators = ts.canHaveDecorators(node) && ts.getDecorators(node);
+  if (!decorators) {
+    return false;
+  }
+
+  const hasAutometricsDecorator = decorators.some((decorator) =>
+    decorator.getText().startsWith("@autometrics"),
+  );
+
+  return hasAutometricsDecorator;
 }

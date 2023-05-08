@@ -1,6 +1,7 @@
 import ts from "typescript/lib/tsserverlibrary";
 
 import type { NodeType } from "./types";
+import { hasAutometricsDecorator } from "./utils";
 
 /**
  * Checks if the node is wrapped or decorated by Autometrics (but not the
@@ -45,20 +46,6 @@ export function isAutometricsWrappedOrDecorated(
   const isDecorated =
     hasAutometricsDecorator(method) || hasAutometricsDecorator(method.parent);
   return isDecorated;
-}
-
-// TODO (Oscar): write JSDoc
-function hasAutometricsDecorator(node: ts.Node) {
-  const decorators = ts.canHaveDecorators(node) && ts.getDecorators(node);
-  if (!decorators) {
-    return false;
-  }
-
-  const hasAutometricsDecorator = decorators.some((decorator) =>
-    decorator.getText().startsWith("@autometrics"),
-  );
-
-  return hasAutometricsDecorator;
 }
 
 /**
