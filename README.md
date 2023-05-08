@@ -186,15 +186,15 @@ const user = createUser();
 
 ### Decorating class methods
 
-When using a decorator fora class method, it is wrapped in additional
-code that instruments the method with OpenTelemetry metrics.
+When using a decorator for a class method, it is wrapped in additional code that
+instruments the method with OpenTelemetry metrics.
 
 Here's a snippet from the example code:
 
 ```typescript
 import { Controller, Get } from "@nestjs/common";
 import { AppService } from "./app.service";
-import { autometricsDecorator as autometrics } from "autometrics";
+import { autometricsMethodDecorator as autometrics } from "autometrics";
 
 @Controller()
 export class AppController {

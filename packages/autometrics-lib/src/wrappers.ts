@@ -10,7 +10,9 @@ import { getMeter } from "./instrumentation";
  * Hover over the method to get the links for generated queries (if you have the
  * language service plugin installed)
  */
-export function autometricsDecorator(autometricsOptions?: AutometricsOptions) {
+export function autometricsMethodDecorator(
+  autometricsOptions?: AutometricsOptions,
+) {
   return function (
     _target: Object,
     _propertyKey: string,
@@ -23,7 +25,15 @@ export function autometricsDecorator(autometricsOptions?: AutometricsOptions) {
   };
 }
 
-// TODO: write JSdoc
+/**
+ * Autometrics decorator for **classes** that automatically instruments all
+ * methods with OpenTelemetry-compatible metrics.
+ *
+ * Hover over the method to get the links for generated queries (if you have the
+ * language service plugin installed)
+ * @param autometricsOptions
+ * @returns
+ */
 export function autometricsClassDecorator(
   autometricsOptions?: Omit<AutometricsOptions, "functionName">,
 ) {
@@ -38,9 +48,9 @@ export function autometricsClassDecorator(
         const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
 
         if (descriptor) {
-          const instrumentedDescriptor = autometricsDecorator(
-            autometricsOptions,
-          )({}, key, descriptor);
+          const methodDecorator =
+            autometricsMethodDecorator(autometricsOptions);
+          const instrumentedDescriptor = methodDecorator({}, key, descriptor);
 
           Object.defineProperty(prototype, key, instrumentedDescriptor);
         }
@@ -62,8 +72,8 @@ type AnyFunction<T extends FunctionSig> = (
  * This type signals to the language service plugin that it should show extra
  * documentation along with the queries.
  */
-
-// rome-ignore lint/suspicious/noEmptyInterface: Converting this to a type breaks the language server plugin
+/* rome-ignore lint/suspicious/noEmptyInterface: Converting this to a type
+breaks the language server plugin */
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
 export type AutometricsOptions = {
@@ -82,9 +92,10 @@ export type AutometricsOptions = {
    */
   objective?: Objective;
   /**
-   * Pass this argument to track the number of concurrent calls to the function (using a gauge).
-   * This may be most useful for top-level functions such as the main HTTP handler that
-   * passes requests off to other functions. (default: `false`)
+   * Pass this argument to track the number of concurrent calls to the function
+   * (using a gauge).
+   * This may be most useful for top-level functions such as the main HTTP
+   * handler that passes requests off to other functions. (default: `false`)
    */
   trackConcurrency?: boolean;
 };
@@ -96,8 +107,8 @@ export type AutometricsOptions = {
  * Hover over the wrapped function to get the links for generated queries (if
  * you have the language service plugin installed)
  *
- * @param functionOrOptions {(F|AutometricsOptions)} - the function that will be wrapped and instrumented
- * (requests handler or database method)
+ * @param functionOrOptions {(F|AutometricsOptions)} - the function that will be
+ * wrapped and instrumented (requests handler or database method)
  * @param fnInput {F}
  */
 export function autometrics<F extends FunctionSig>(
@@ -265,7 +276,8 @@ function getModulePath(): string | undefined {
   let rootDir: string;
 
   if (typeof process === "object") {
-    // HACK: this assumes the entire app was run from the root directory of the project
+    // HACK: this assumes the entire app was run from the root directory of the
+    // project
     rootDir = process.cwd();
     //@ts-ignore
   } else if (typeof Deno === "object") {
