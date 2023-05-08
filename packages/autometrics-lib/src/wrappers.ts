@@ -10,43 +10,17 @@ import { getMeter } from "./instrumentation";
  * Hover over the method to get the links for generated queries (if you have the
  * language service plugin installed)
  */
-export function autometricsDecorator(
-  _target: Object,
-  propertyKey: string,
-  descriptor: PropertyDescriptor,
-) {
-  const originalFunction = descriptor.value;
+export function autometricsDecorator(autometricsOptions?: AutometricsOptions) {
+  return function (
+    _target: Object,
+    _propertyKey: string,
+    descriptor: PropertyDescriptor,
+  ) {
+    const originalFunction = descriptor.value;
+    descriptor.value = autometrics(autometricsOptions, originalFunction);
 
-  descriptor.value = function (...args: unknown[]) {
-    const meter = getMeter();
-    let result: ReturnType<typeof originalFunction>;
-    const autometricsStart = performance.now();
-    const counter = meter.createCounter("method.calls.count");
-    const histogram = meter.createHistogram("method.calls.duration");
-
-    const onSuccess = () => {
-      counter.add(1, { method: propertyKey, result: "ok" });
-      const autometricsDuration = performance.now() - autometricsStart;
-      histogram.record(autometricsDuration, { method: propertyKey });
-    };
-
-    const onError = () => {
-      const autometricsDuration = performance.now() - autometricsStart;
-      counter.add(1, { method: propertyKey, result: "error" });
-      histogram.record(autometricsDuration, { method: propertyKey });
-    };
-
-    try {
-      originalFunction.apply(this, args);
-      onSuccess();
-      return result;
-    } catch (error) {
-      onError();
-      throw error;
-    }
+    return descriptor;
   };
-
-  return descriptor;
 }
 
 // TODO: write JSdoc
@@ -61,7 +35,7 @@ export function autometricsClassDecorator(classConstructor: Function) {
       const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
 
       if (descriptor) {
-        const instrumentedDescriptor = autometricsDecorator(
+        const instrumentedDescriptor = autometricsDecorator()(
           {},
           key,
           descriptor,
