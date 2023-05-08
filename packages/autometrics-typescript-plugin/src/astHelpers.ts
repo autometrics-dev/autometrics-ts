@@ -42,29 +42,18 @@ export function isAutometricsWrappedOrDecorated(
     .getSymbolAtLocation(node)
     .declarations.find((declaration) => ts.isMethodDeclaration(declaration));
 
-  // Class method
-  if (ts.canHaveDecorators(method) && ts.getDecorators(method)) {
-    const isDecorated = hasAutometricsDecorator(method);
-    return isDecorated;
-  }
-
-  // Class
-  if (ts.isClassDeclaration(method.parent) && ts.getDecorators(method.parent)) {
-    const isDecorated = hasAutometricsDecorator(method.parent);
-    return isDecorated;
-  }
-
-  // Otherwise just return false
-  return false;
+  const isDecorated =
+    hasAutometricsDecorator(method) || hasAutometricsDecorator(method.parent);
+  return isDecorated;
 }
 
 // TODO (Oscar): write JSDoc
 function hasAutometricsDecorator(node: ts.Node) {
-  if (!ts.canHaveDecorators(node)) {
+  const decorators = ts.canHaveDecorators(node) && ts.getDecorators(node);
+  if (!decorators) {
     return false;
   }
 
-  const decorators = ts.getDecorators(node);
   const hasAutometricsDecorator = decorators.some((decorator) =>
     decorator.getText().startsWith("@autometrics"),
   );
