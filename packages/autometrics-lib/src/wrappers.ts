@@ -3,16 +3,34 @@ import { Attributes } from "@opentelemetry/api";
 import type { Objective } from "./objectives";
 import { getMeter } from "./instrumentation";
 
+// WIP (Oscar)
+export function Autometrics(autometricsOptions?: AutometricsOptions) {
+  return function (
+    target: Function | Object,
+    propertyKey?: string,
+    descriptor?: PropertyDescriptor,
+  ) {
+    if (typeof target === "function") {
+      autometricsClassDecorator(autometricsOptions)(target);
+    }
+
+    autometricsMethodDecorator(autometricsOptions)(
+      target,
+      propertyKey,
+      descriptor,
+    );
+  };
+}
+
 /**
  * Autometrics decorator for **class methods** that automatically instruments
  * the decorated method with OpenTelemetry-compatible metrics.
  *
  * Hover over the method to get the links for generated queries (if you have the
  * language service plugin installed)
+ * @param autometricsOptions
  */
-export function autometricsMethodDecorator(
-  autometricsOptions?: AutometricsOptions,
-) {
+function autometricsMethodDecorator(autometricsOptions?: AutometricsOptions) {
   return function (
     _target: Object,
     _propertyKey: string,
@@ -32,9 +50,8 @@ export function autometricsMethodDecorator(
  * Hover over the method to get the links for generated queries (if you have the
  * language service plugin installed)
  * @param autometricsOptions
- * @returns
  */
-export function autometricsClassDecorator(
+function autometricsClassDecorator(
   autometricsOptions?: Omit<AutometricsOptions, "functionName">,
 ) {
   return function (classConstructor: Function) {

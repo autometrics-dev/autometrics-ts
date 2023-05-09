@@ -1,4 +1,4 @@
-import { autometricsDecorator as autometrics } from '@autometrics/autometrics';
+import { autometricsMethodDecorator as autometrics } from '@autometrics/autometrics';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

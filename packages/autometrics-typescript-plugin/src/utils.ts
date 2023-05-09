@@ -31,7 +31,7 @@ export function hasAutometricsDecorator(node: ts.Node) {
   }
 
   const hasAutometricsDecorator = decorators.some((decorator) =>
-    decorator.getText().startsWith("@autometrics"),
+    decorator.getText().startsWith("@Autometrics"),
   );
 
   return hasAutometricsDecorator;
