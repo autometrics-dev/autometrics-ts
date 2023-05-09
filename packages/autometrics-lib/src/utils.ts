@@ -20,22 +20,31 @@ export function getAutometricsClassDecorator(
 ) {
   return function (classConstructor: Function) {
     const prototype = classConstructor.prototype;
-    const properties = Object.getOwnPropertyNames(prototype);
+    const propertyNames = Object.getOwnPropertyNames(prototype);
 
-    for (const key of properties) {
-      const property = prototype[key];
+    for (const propertyName of propertyNames) {
+      const property = prototype[propertyName];
 
-      if (typeof property === "function" && key !== "constructor") {
-        const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
-
-        if (descriptor) {
-          const methodDecorator =
-            getAutometricsMethodDecorator(autometricsOptions);
-          const instrumentedDescriptor = methodDecorator({}, key, descriptor);
-
-          Object.defineProperty(prototype, key, instrumentedDescriptor);
-        }
+      if (typeof property !== "function" || propertyName === "constructor") {
+        continue;
       }
+
+      const descriptor = Object.getOwnPropertyDescriptor(
+        prototype,
+        propertyName,
+      );
+      if (!descriptor) {
+        continue;
+      }
+
+      const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
+      const instrumentedDescriptor = methodDecorator(
+        {},
+        propertyName,
+        descriptor,
+      );
+
+      Object.defineProperty(prototype, propertyName, instrumentedDescriptor);
     }
   };
 }
