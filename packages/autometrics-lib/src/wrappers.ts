@@ -1,9 +1,20 @@
-import "./instrumentation";
 import { Attributes } from "@opentelemetry/api";
+
 import type { Objective } from "./objectives";
 import { getMeter } from "./instrumentation";
+import {
+  getAutometricsClassDecorator,
+  getAutometricsMethodDecorator,
+  getModulePath,
+} from "./utils";
 
-// WIP (Oscar)
+/**
+ * Autometrics decorator that can be applied to either a class or class method
+ * that automatically instruments methods with OpenTelemetry-compatible metrics.
+ * Hover over the method to get the links for generated queries (if you have the
+ * language service plugin installed)
+ * @param autometricsOptions
+ */
 export function Autometrics(autometricsOptions?: AutometricsOptions) {
   return function (
     target: Function | Object,
@@ -11,68 +22,14 @@ export function Autometrics(autometricsOptions?: AutometricsOptions) {
     descriptor?: PropertyDescriptor,
   ) {
     if (typeof target === "function") {
-      autometricsClassDecorator(autometricsOptions)(target);
+      const classDecorator = getAutometricsClassDecorator(autometricsOptions);
+      classDecorator(target);
+
+      return;
     }
 
-    autometricsMethodDecorator(autometricsOptions)(
-      target,
-      propertyKey,
-      descriptor,
-    );
-  };
-}
-
-/**
- * Autometrics decorator for **class methods** that automatically instruments
- * the decorated method with OpenTelemetry-compatible metrics.
- *
- * Hover over the method to get the links for generated queries (if you have the
- * language service plugin installed)
- * @param autometricsOptions
- */
-function autometricsMethodDecorator(autometricsOptions?: AutometricsOptions) {
-  return function (
-    _target: Object,
-    _propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) {
-    const originalFunction = descriptor.value;
-    descriptor.value = autometrics(autometricsOptions, originalFunction);
-
-    return descriptor;
-  };
-}
-
-/**
- * Autometrics decorator for **classes** that automatically instruments all
- * methods with OpenTelemetry-compatible metrics.
- *
- * Hover over the method to get the links for generated queries (if you have the
- * language service plugin installed)
- * @param autometricsOptions
- */
-function autometricsClassDecorator(
-  autometricsOptions?: Omit<AutometricsOptions, "functionName">,
-) {
-  return function (classConstructor: Function) {
-    const prototype = classConstructor.prototype;
-    const properties = Object.getOwnPropertyNames(prototype);
-
-    for (const key of properties) {
-      const property = prototype[key];
-
-      if (typeof property === "function" && key !== "constructor") {
-        const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
-
-        if (descriptor) {
-          const methodDecorator =
-            autometricsMethodDecorator(autometricsOptions);
-          const instrumentedDescriptor = methodDecorator({}, key, descriptor);
-
-          Object.defineProperty(prototype, key, instrumentedDescriptor);
-        }
-      }
-    }
+    const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
+    methodDecorator(target, propertyKey, descriptor);
   };
 }
 
@@ -282,49 +239,4 @@ function isPromise<T extends Promise<void>>(val: unknown): val is T {
     "catch" in val &&
     typeof val.catch === "function"
   );
-}
-
-// HACK: this entire function is a hacky way to acquire the module name
-// for a given function e.g.: dist/index.js
-function getModulePath(): string | undefined {
-  Error.stackTraceLimit = 5;
-  const stack = new Error()?.stack?.split("\n");
-
-  let rootDir: string;
-
-  if (typeof process === "object") {
-    // HACK: this assumes the entire app was run from the root directory of the
-    // project
-    rootDir = process.cwd();
-    //@ts-ignore
-  } else if (typeof Deno === "object") {
-    //@ts-ignore
-    rootDir = Deno.cwd();
-  } else {
-    rootDir = "";
-  }
-
-  if (!stack) {
-    return;
-  }
-
-  /**
-   *
-   * 0: Error
-   * 1: at getModulePath() ...
-   * 2: at autometrics() ...
-   * 3: at ... -> 4th line is always the original caller
-   */
-  const originalCaller = 3 as const;
-
-  // The last element in this array will have the full path
-  const fullPath = stack[originalCaller].split(" ").pop();
-
-  // We split away everything up to the root directory of the project
-  let modulePath = fullPath.replace(rootDir, "");
-
-  // We split away the line and column numbers index.js:14:6
-  modulePath = modulePath.substring(0, modulePath.indexOf(":"));
-
-  return modulePath;
 }
