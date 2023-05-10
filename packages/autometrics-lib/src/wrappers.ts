@@ -2,6 +2,13 @@ import "./instrumentation";
 import { Attributes } from "@opentelemetry/api";
 import type { Objective } from "./objectives";
 import { getMeter } from "./instrumentation";
+import { AsyncLocalStorage } from "async_hooks";
+
+type ALSContext = {
+  caller?: string;
+}
+
+const context = new AsyncLocalStorage<ALSContext>();
 
 /**
  * Autometrics decorator for **class methods** that automatically instruments
@@ -159,12 +166,14 @@ export function autometrics<F extends FunctionSig>(
     }
   }
 
-  return function (...params) {
+  return function(...params) {
     const meter = getMeter();
     const autometricsStart = performance.now();
     const counter = meter.createCounter("function.calls.count");
     const histogram = meter.createHistogram("function.calls.duration");
     const gauge = meter.createUpDownCounter("function.calls.concurrent");
+    const store = context.getStore();
+    const caller = store?.caller;
 
     if (trackConcurrency) {
       gauge.add(1, {
@@ -180,12 +189,14 @@ export function autometrics<F extends FunctionSig>(
         function: functionName,
         module: moduleName,
         result: "ok",
+        caller,
         ...counterObjectiveAttributes,
       });
 
       histogram.record(autometricsDuration, {
         function: functionName,
         module: moduleName,
+        caller,
         ...histogramObjectiveAttributes,
       });
 
@@ -204,12 +215,14 @@ export function autometrics<F extends FunctionSig>(
         function: functionName,
         module: moduleName,
         result: "error",
+        caller,
         ...counterObjectiveAttributes,
       });
 
       histogram.record(autometricsDuration, {
         function: functionName,
         module: moduleName,
+        caller,
         ...histogramObjectiveAttributes,
       });
 
@@ -217,30 +230,34 @@ export function autometrics<F extends FunctionSig>(
         gauge.add(-1, {
           function: functionName,
           module: moduleName,
+          caller,
         });
       }
     };
 
-    try {
-      const result = fn(...params);
-      if (isPromise<ReturnType<F>>(result)) {
-        return result
-          .then((res: Awaited<ReturnType<typeof result>>) => {
-            onSuccess();
-            return res;
-          })
-          .catch((err: unknown) => {
-            onError();
-            throw err;
-          });
-      }
+    return context.run({ caller: functionName }, () => {
+      try {
+        const result = fn(...params);
+        if (isPromise<ReturnType<F>>(result)) {
+          return result
+            .then((res: Awaited<ReturnType<typeof result>>) => {
+              onSuccess();
+              return res;
+            })
+            .catch((err: unknown) => {
+              onError();
+              throw err;
+            });
+        }
 
-      onSuccess();
-      return result;
-    } catch (error) {
-      onError();
-      throw error;
-    }
+        onSuccess();
+        return result;
+      } catch (error) {
+        onError();
+        throw error;
+      }
+    });
+
   };
 }
 
