@@ -141,9 +141,7 @@ export function autometrics<F extends FunctionSig>(
   }
 
   if (!functionName) {
-    throw new Error(
-      "Autometrics decorated function must have a name to successfully create a metric",
-    );
+    console.trace("Autometrics decorated function must have a name to successfully create metrics. This function will not be instrumented.")
   }
 
   const counterObjectiveAttributes: Attributes = {};
