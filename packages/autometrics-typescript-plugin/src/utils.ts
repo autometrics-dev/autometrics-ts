@@ -1,4 +1,4 @@
-import ts from "typescript/lib/tsserverlibrary";
+import type ts from "typescript/lib/tsserverlibrary";
 
 const PLUGIN_NAME = "Autometrics TypeScript Plugin";
 
@@ -20,4 +20,3 @@ export function createLogger(project: ts.server.Project) {
     project.projectService.logger.info(`${PLUGIN_NAME}: ${msg}`);
   };
 }
-
