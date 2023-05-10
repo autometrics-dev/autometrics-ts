@@ -6,7 +6,7 @@ import { AsyncLocalStorage } from "async_hooks";
 
 type ALSContext = {
   caller?: string;
-}
+};
 
 const context = new AsyncLocalStorage<ALSContext>();
 
@@ -141,7 +141,9 @@ export function autometrics<F extends FunctionSig>(
   }
 
   if (!functionName) {
-    console.trace("Autometrics decorated function must have a name to successfully create metrics. This function will not be instrumented.")
+    console.trace(
+      "Autometrics decorated function must have a name to successfully create metrics. This function will not be instrumented.",
+    );
   }
 
   const counterObjectiveAttributes: Attributes = {};
@@ -164,7 +166,7 @@ export function autometrics<F extends FunctionSig>(
     }
   }
 
-  return function(...params) {
+  return function (...params) {
     const meter = getMeter();
     const autometricsStart = performance.now();
     const counter = meter.createCounter("function.calls.count");
@@ -255,7 +257,6 @@ export function autometrics<F extends FunctionSig>(
         throw error;
       }
     });
-
   };
 }
 
