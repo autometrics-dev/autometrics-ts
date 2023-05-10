@@ -21,9 +21,6 @@ export function createLogger(project: ts.server.Project) {
   };
 }
 
-/**
- * Helper function that checks if a node has an autometrics decorator
- */
 export function hasAutometricsDecorator(node: ts.Node) {
   const decorators = ts.canHaveDecorators(node) && ts.getDecorators(node);
   if (!decorators) {

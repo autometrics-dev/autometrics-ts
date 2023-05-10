@@ -1,5 +1,10 @@
 import { autometrics, AutometricsOptions } from "./wrappers";
 
+/**
+ * Decorator factory that returns a method decorator. Optionally accepts
+ * an autometrics options object.
+ * @param autometricsOptions
+ */
 export function getAutometricsMethodDecorator(
   autometricsOptions?: AutometricsOptions,
 ) {
@@ -15,6 +20,12 @@ export function getAutometricsMethodDecorator(
   };
 }
 
+/**
+ * Decorator factory that returns a class decorator that instruments all methods
+ * of a class with autometrics. Optionally accepts an autometrics options
+ * object.
+ * @param autometricsOptions
+ */
 export function getAutometricsClassDecorator(
   autometricsOptions?: AutometricsOptions,
 ) {
@@ -92,4 +103,14 @@ export function getModulePath(): string | undefined {
   modulePath = modulePath.substring(0, modulePath.indexOf(":"));
 
   return modulePath;
+}
+
+export function isPromise<T extends Promise<void>>(val: unknown): val is T {
+  return (
+    typeof val === "object" &&
+    "then" in val &&
+    typeof val.then === "function" &&
+    "catch" in val &&
+    typeof val.catch === "function"
+  );
 }

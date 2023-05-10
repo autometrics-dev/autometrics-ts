@@ -38,7 +38,7 @@ export function isAutometricsWrappedOrDecorated(
   }
 
   // If none of the function checkers return, we continue investigating if a
-  // decorator is applied to either a class method or class itself
+  // decorator is applied to either a class method or its parent class
   const method = typechecker
     .getSymbolAtLocation(node)
     .declarations.find((declaration) => ts.isMethodDeclaration(declaration));

@@ -194,14 +194,29 @@ Here's a snippet from the example code:
 ```typescript
 import { Controller, Get } from "@nestjs/common";
 import { AppService } from "./app.service";
-import { autometricsMethodDecorator as autometrics } from "autometrics";
+import { Autometrics } from "autometrics";
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @autometrics
+  @Autometrics()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+}
+```
+
+Alternatively, you can apply the same decorator to a class to instrument all of
+its methods:
+
+```typescript
+// ...
+@Autometrics()
+export class AppController {
+  // ...
+  @Get()
   getHello(): string {
     return this.appService.getHello();
   }

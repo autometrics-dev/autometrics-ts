@@ -6,32 +6,8 @@ import {
   getAutometricsClassDecorator,
   getAutometricsMethodDecorator,
   getModulePath,
+  isPromise,
 } from "./utils";
-
-/**
- * Autometrics decorator that can be applied to either a class or class method
- * that automatically instruments methods with OpenTelemetry-compatible metrics.
- * Hover over the method to get the links for generated queries (if you have the
- * language service plugin installed)
- * @param autometricsOptions
- */
-export function Autometrics(autometricsOptions?: AutometricsOptions) {
-  return function (
-    target: Function | Object,
-    propertyKey?: string,
-    descriptor?: PropertyDescriptor,
-  ) {
-    if (typeof target === "function") {
-      const classDecorator = getAutometricsClassDecorator(autometricsOptions);
-      classDecorator(target);
-
-      return;
-    }
-
-    const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
-    methodDecorator(target, propertyKey, descriptor);
-  };
-}
 
 // Function Wrapper
 // This seems to be the preferred way for defining functions in TypeScript
@@ -231,12 +207,60 @@ export function autometrics<F extends FunctionSig>(
   };
 }
 
-function isPromise<T extends Promise<void>>(val: unknown): val is T {
-  return (
-    typeof val === "object" &&
-    "then" in val &&
-    typeof val.then === "function" &&
-    "catch" in val &&
-    typeof val.catch === "function"
-  );
+/**
+ * Autometrics decorator that can be applied to either a class or class method
+ * that automatically instruments methods with OpenTelemetry-compatible metrics.
+ * Hover over the method to get the links for generated queries (if you have the
+ * language service plugin installed).
+ *
+ * Optionally, you can pass in an {@link AutometricsOptions} object to configure
+ * the decorator.
+ * @param autometricsOptions
+ * @example
+ * ```typescript
+ * import {
+ *   Autometrics,
+ *   AutometricsOptions,
+ *   Objective,
+ *   ObjectivePercentile,
+ *   ObjectiveLatency,
+ * } from "autometrics";
+ *
+ * const objective: Objective = {
+ *   successRate: ObjectivePercentile.P99_9,
+ *   latency: [ObjectiveLatency.Ms250, ObjectivePercentile.P99],
+ *   name: "foo",
+ * };
+ *
+ * const autometricsOptions: AutometricsOptions = {
+ *   functionName: "FooBar",
+ *   moduleName: "FooModule",
+ *   objective,
+ *   trackConcurrency: true,
+ * };
+ *
+ * class Foo {
+ *   \@Autometrics(autometricsOptions)
+ *   bar() {
+ *     console.log("bar");
+ *   }
+ * }
+ * ```
+ */
+export function Autometrics(autometricsOptions?: AutometricsOptions) {
+  return function (
+    target: Function | Object,
+    propertyKey?: string,
+    descriptor?: PropertyDescriptor,
+  ) {
+    if (typeof target === "function") {
+      const classDecorator = getAutometricsClassDecorator(autometricsOptions);
+      classDecorator(target);
+
+      return;
+    }
+
+    const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
+    methodDecorator(target, propertyKey, descriptor);
+  };
 }
