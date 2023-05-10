@@ -36,19 +36,31 @@ export function isAutometricsWrappedOrDecorated(
     return true;
   }
 
-  // If none of the function checkers return, we continue investigating if it
-  // has the right decorators for class methods
-  if (ts.canHaveDecorators(node.parent) && ts.getDecorators(node.parent)) {
-    const decorators = ts.getDecorators(node.parent);
-    const hasAutometricsDecorator = decorators.some((decorator) =>
-      decorator.getText().startsWith("@autometrics"),
-    );
-
-    return hasAutometricsDecorator;
+  // If none of the function checkers return, we continue investigating if a
+  // decorator is applied to either a class method or its parent class
+  const method = typechecker
+    .getSymbolAtLocation(node)
+    .declarations.find((declaration) => ts.isMethodDeclaration(declaration));
+  if (!method) {
+    return false;
   }
 
-  // Otherwise just return false
-  return false;
+  const isDecorated =
+    hasAutometricsDecorator(method) || hasAutometricsDecorator(method.parent);
+  return isDecorated;
+}
+
+export function hasAutometricsDecorator(node: ts.Node) {
+  const decorators = ts.canHaveDecorators(node) && ts.getDecorators(node);
+  if (!decorators) {
+    return false;
+  }
+
+  const hasAutometricsDecorator = decorators.some((decorator) =>
+    decorator.getText().startsWith("@Autometrics"),
+  );
+
+  return hasAutometricsDecorator;
 }
 
 /**

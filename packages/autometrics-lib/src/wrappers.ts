@@ -1,51 +1,13 @@
-import "./instrumentation";
 import { Attributes } from "@opentelemetry/api";
+
 import type { Objective } from "./objectives";
 import { getMeter } from "./instrumentation";
-
-/**
- * Autometrics decorator for **class methods** that automatically instruments
- * the decorated method with OpenTelemetry-compatible metrics.
- *
- * Hover over the method to get the links for generated queries (if you have the
- * language service plugin installed)
- */
-export function autometricsDecorator(
-  _target: Object,
-  propertyKey: string,
-  descriptor: PropertyDescriptor,
-) {
-  const originalFunction = descriptor.value;
-
-  descriptor.value = function (...args: unknown[]) {
-    const meter = getMeter();
-    let result: ReturnType<typeof originalFunction>;
-    const autometricsStart = performance.now();
-    const counter = meter.createCounter("method.calls.count");
-    const histogram = meter.createHistogram("method.calls.duration");
-
-    const onSuccess = () => {
-      counter.add(1, { method: propertyKey, result: "ok" });
-      const autometricsDuration = performance.now() - autometricsStart;
-      histogram.record(autometricsDuration, { method: propertyKey });
-    };
-
-    const onError = () => {
-      const autometricsDuration = performance.now() - autometricsStart;
-      counter.add(1, { method: propertyKey, result: "error" });
-      histogram.record(autometricsDuration, { method: propertyKey });
-    };
-
-    try {
-      originalFunction.apply(this, args);
-      onSuccess();
-      return result;
-    } catch (error) {
-      onError();
-      throw error;
-    }
-  };
-}
+import {
+  getAutometricsClassDecorator,
+  getAutometricsMethodDecorator,
+  getModulePath,
+  isPromise,
+} from "./utils";
 
 // Function Wrapper
 // This seems to be the preferred way for defining functions in TypeScript
@@ -60,8 +22,8 @@ type AnyFunction<T extends FunctionSig> = (
  * This type signals to the language service plugin that it should show extra
  * documentation along with the queries.
  */
-
-// rome-ignore lint/suspicious/noEmptyInterface: Converting this to a type breaks the language server plugin
+/* rome-ignore lint/suspicious/noEmptyInterface: Converting this to a type
+breaks the language server plugin */
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
 export type AutometricsOptions = {
@@ -80,9 +42,10 @@ export type AutometricsOptions = {
    */
   objective?: Objective;
   /**
-   * Pass this argument to track the number of concurrent calls to the function (using a gauge).
-   * This may be most useful for top-level functions such as the main HTTP handler that
-   * passes requests off to other functions. (default: `false`)
+   * Pass this argument to track the number of concurrent calls to the function
+   * (using a gauge).
+   * This may be most useful for top-level functions such as the main HTTP
+   * handler that passes requests off to other functions. (default: `false`)
    */
   trackConcurrency?: boolean;
 };
@@ -94,8 +57,8 @@ export type AutometricsOptions = {
  * Hover over the wrapped function to get the links for generated queries (if
  * you have the language service plugin installed)
  *
- * @param functionOrOptions {(F|AutometricsOptions)} - the function that will be wrapped and instrumented
- * (requests handler or database method)
+ * @param functionOrOptions {(F|AutometricsOptions)} - the function that will be
+ * wrapped and instrumented (requests handler or database method)
  * @param fnInput {F}
  */
 export function autometrics<F extends FunctionSig>(
@@ -244,56 +207,74 @@ export function autometrics<F extends FunctionSig>(
   };
 }
 
-function isPromise<T extends Promise<void>>(val: unknown): val is T {
-  return (
-    typeof val === "object" &&
-    "then" in val &&
-    typeof val.then === "function" &&
-    "catch" in val &&
-    typeof val.catch === "function"
-  );
-}
+/**
+ * Autometrics decorator that can be applied to either a class or class method
+ * that automatically instruments methods with OpenTelemetry-compatible metrics.
+ * Hover over the method to get the links for generated queries (if you have the
+ * language service plugin installed).
+ *
+ * Optionally, you can pass in an {@link AutometricsOptions} object to configure
+ * the decorator.
+ * @param autometricsOptions
+ * @example
+ * <caption>Basic class decorator implementation</caption>
+ * ```
+ *  \@Autometrics()
+ *  class Foo {
+ *   // Don't add a backslash in front of the decorator, this is only here to
+ *   // prevent the example from rendering incorrectly
+ *   bar() {
+ *     console.log("bar");
+ *   }
+ * }
+ * ```
+ * @example
+ * <caption>Method decorator that passes in an autometrics options object including SLO</caption>
+ * ```typescript
+ * import {
+ *   Autometrics,
+ *   AutometricsOptions,
+ *   Objective,
+ *   ObjectivePercentile,
+ *   ObjectiveLatency,
+ * } from "autometrics";
+ *
+ * const objective: Objective = {
+ *   successRate: ObjectivePercentile.P99_9,
+ *   latency: [ObjectiveLatency.Ms250, ObjectivePercentile.P99],
+ *   name: "foo",
+ * };
+ *
+ * const autometricsOptions: AutometricsOptions = {
+ *   functionName: "FooBar",
+ *   objective,
+ *   trackConcurrency: true,
+ * };
+ *
+ * class Foo {
+ *   // Don't add a backslash in front of the decorator, this is only here to
+ *   // prevent the example from rendering incorrectly
+ *   \@Autometrics(autometricsOptions)
+ *   bar() {
+ *     console.log("bar");
+ *   }
+ * }
+ * ```
+ */
+export function Autometrics(autometricsOptions?: AutometricsOptions) {
+  return function (
+    target: Function | Object,
+    propertyKey?: string,
+    descriptor?: PropertyDescriptor,
+  ) {
+    if (typeof target === "function") {
+      const classDecorator = getAutometricsClassDecorator(autometricsOptions);
+      classDecorator(target);
 
-// HACK: this entire function is a hacky way to acquire the module name
-// for a given function e.g.: dist/index.js
-function getModulePath(): string | undefined {
-  Error.stackTraceLimit = 5;
-  const stack = new Error()?.stack?.split("\n");
+      return;
+    }
 
-  let rootDir: string;
-
-  if (typeof process === "object") {
-    // HACK: this assumes the entire app was run from the root directory of the project
-    rootDir = process.cwd();
-    //@ts-ignore
-  } else if (typeof Deno === "object") {
-    //@ts-ignore
-    rootDir = Deno.cwd();
-  } else {
-    rootDir = "";
-  }
-
-  if (!stack) {
-    return;
-  }
-
-  /**
-   *
-   * 0: Error
-   * 1: at getModulePath() ...
-   * 2: at autometrics() ...
-   * 3: at ... -> 4th line is always the original caller
-   */
-  const originalCaller = 3 as const;
-
-  // The last element in this array will have the full path
-  const fullPath = stack[originalCaller].split(" ").pop();
-
-  // We split away everything up to the root directory of the project
-  let modulePath = fullPath.replace(rootDir, "");
-
-  // We split away the line and column numbers index.js:14:6
-  modulePath = modulePath.substring(0, modulePath.indexOf(":"));
-
-  return modulePath;
+    const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
+    methodDecorator(target, propertyKey, descriptor);
+  };
 }
