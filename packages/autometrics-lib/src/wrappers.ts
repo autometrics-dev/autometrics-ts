@@ -217,6 +217,19 @@ export function autometrics<F extends FunctionSig>(
  * the decorator.
  * @param autometricsOptions
  * @example
+ * <caption>Basic class decorator implementation</caption>
+ * ```
+ *  \@Autometrics()
+ *  class Foo {
+ *   // Don't add a backslash in front of the decorator, this is only here to
+ *   // prevent the example from rendering incorrectly
+ *   bar() {
+ *     console.log("bar");
+ *   }
+ * }
+ * ```
+ * @example
+ * <caption>Method decorator that passes in an autometrics options object including SLO</caption>
  * ```typescript
  * import {
  *   Autometrics,
@@ -234,12 +247,13 @@ export function autometrics<F extends FunctionSig>(
  *
  * const autometricsOptions: AutometricsOptions = {
  *   functionName: "FooBar",
- *   moduleName: "FooModule",
  *   objective,
  *   trackConcurrency: true,
  * };
  *
  * class Foo {
+ *   // Don't add a backslash in front of the decorator, this is only here to
+ *   // prevent the example from rendering incorrectly
  *   \@Autometrics(autometricsOptions)
  *   bar() {
  *     console.log("bar");

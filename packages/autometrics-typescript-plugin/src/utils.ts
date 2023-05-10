@@ -21,15 +21,3 @@ export function createLogger(project: ts.server.Project) {
   };
 }
 
-export function hasAutometricsDecorator(node: ts.Node) {
-  const decorators = ts.canHaveDecorators(node) && ts.getDecorators(node);
-  if (!decorators) {
-    return false;
-  }
-
-  const hasAutometricsDecorator = decorators.some((decorator) =>
-    decorator.getText().startsWith("@Autometrics"),
-  );
-
-  return hasAutometricsDecorator;
-}
