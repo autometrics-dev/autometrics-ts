@@ -42,6 +42,9 @@ export function isAutometricsWrappedOrDecorated(
   const method = typechecker
     .getSymbolAtLocation(node)
     .declarations.find((declaration) => ts.isMethodDeclaration(declaration));
+  if (!method) {
+    return false;
+  }
 
   const isDecorated =
     hasAutometricsDecorator(method) || hasAutometricsDecorator(method.parent);
