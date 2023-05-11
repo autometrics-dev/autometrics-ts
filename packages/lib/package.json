@@ -13,7 +13,7 @@
   "repository": {
     "url": "https://github.com/autometrics-dev/autometrics-ts.git"
   },
-  "license": "MIT OR Apache-2.0",
+  "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
