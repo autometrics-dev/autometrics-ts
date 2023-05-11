@@ -5,7 +5,7 @@ const BUILD_INFO_LABELS =
 
 export function createLatencyQuery(nodeIdentifier: string) {
   const latency = `sum by (le, function, module, commit, version) (rate(function_calls_duration_bucket{function="${nodeIdentifier}"}[5m]) ${BUILD_INFO_LABELS})`;
-  return `histogram_quantile(0.99, ${latency}) or histogram_quantile(0.95, ${latency})`;
+  return `histogram_quantile(0.99, ${latency}, \"percentile_latency\", \"99\", \"\",\"\") or histogram_quantile(0.95, ${latency}), \"percentile_latency\", \"95\", \"\", \"\")`;
 }
 
 export function createRequestRateQuery(nodeIdentifier: string) {
