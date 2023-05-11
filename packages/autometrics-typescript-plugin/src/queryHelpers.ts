@@ -1,25 +1,25 @@
 /* Functions below template creation of relevant queries and encode them in URL */
 
 import type { NodeType } from "./types";
+const BUILD_INFO_LABELS =
+  "* on (instance, job) group_left(version, commit) (last_over_time(build_info[1s]) or on (instance, job) up)";
 
-export function createLatencyQuery(nodeIdentifier: string, nodeType: string) {
-  const latency = `sum by (le, function, module) (rate(${nodeType}_calls_duration_bucket{${nodeType}="${nodeIdentifier}"}[5m]))`;
+export function createLatencyQuery(nodeIdentifier: string) {
+  const latency = `sum by (le, function, module, commit, version) (rate(function_calls_duration_bucket{function="${nodeIdentifier}"}[5m]) ${BUILD_INFO_LABELS})`;
   return `histogram_quantile(0.99, ${latency}) or histogram_quantile(0.95, ${latency})`;
 }
 
 export function createRequestRateQuery(
   nodeIdentifier: string,
-  nodeType: NodeType,
 ) {
-  return `sum by (function, module) (rate(${nodeType}_calls_count_total{${nodeType}="${nodeIdentifier}"}[5m]))`;
+  return `sum by (function, module, commit, version) (rate(function_calls_count_total{function="${nodeIdentifier}"}[5m]) ${BUILD_INFO_LABELS})`;
 }
 
 export function createErrorRatioQuery(
   nodeIdentifier: string,
-  nodeType: NodeType,
 ) {
-  const requestQuery = createRequestRateQuery(nodeIdentifier, nodeType);
-  return `sum by (function, module) (rate(${nodeType}_calls_count_total{${nodeType}="${nodeIdentifier}",result="error"}[5m])) / ${requestQuery}`;
+  const requestQuery = createRequestRateQuery(nodeIdentifier);
+  return `sum by (function, module, commit, version) (rate(function_calls_count_total{function="${nodeIdentifier}",result="error"}[5m]) ${BUILD_INFO_LABELS}) / ${requestQuery}`;
 }
 
 const DEFAULT_URL = "http://localhost:9090/";
