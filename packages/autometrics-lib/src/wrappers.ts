@@ -207,7 +207,7 @@ export function autometrics<F extends FunctionSig>(
   };
 }
 
-type AutometricsClassDecoratorOptions = Omit<
+export type AutometricsClassDecoratorOptions = Omit<
   AutometricsOptions,
   "functionName"
 >;
