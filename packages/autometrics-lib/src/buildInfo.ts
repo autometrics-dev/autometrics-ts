@@ -27,14 +27,14 @@ function getVersion() {
   if (process.env.npm_package_version) {
     return process.env.npm_package_version;
   } else {
-    return process.env.PACKAGE_VERSION;
+    return process.env.PACKAGE_VERSION || process.env.AUTOMETRICS_VERSION;
   }
 }
 
 function getCommit() {
-  return process.env.COMMIT_SHA;
+  return process.env.COMMIT_SHA || process.env.AUTOMETRICS_COMMIT;
 }
 
 function getBranch() {
-  return process.env.BRANCH_NAME;
+  return process.env.BRANCH_NAME || process.env.AUTOMETRICS_BRANCH;
 }
