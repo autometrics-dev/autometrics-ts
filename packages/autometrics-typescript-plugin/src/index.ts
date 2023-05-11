@@ -67,9 +67,9 @@ function init(modules: { typescript: typeof tsserver }) {
         typechecker,
       );
 
-      const requestRate = createRequestRateQuery(nodeIdentifier, nodeType);
-      const errorRatio = createErrorRatioQuery(nodeIdentifier, nodeType);
-      const latency = createLatencyQuery(nodeIdentifier, nodeType);
+      const requestRate = createRequestRateQuery(nodeIdentifier);
+      const errorRatio = createErrorRatioQuery(nodeIdentifier);
+      const latency = createLatencyQuery(nodeIdentifier);
 
       const requestRateUrl = makePrometheusUrl(requestRate, prometheusBase);
       const errorRatioUrl = makePrometheusUrl(errorRatio, prometheusBase);

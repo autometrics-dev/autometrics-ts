@@ -1,6 +1,5 @@
 /* Functions below template creation of relevant queries and encode them in URL */
 
-import type { NodeType } from "./types";
 const BUILD_INFO_LABELS =
   "* on (instance, job) group_left(version, commit) (last_over_time(build_info[1s]) or on (instance, job) up)";
 
