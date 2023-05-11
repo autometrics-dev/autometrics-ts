@@ -105,8 +105,8 @@ export function autometrics<F extends FunctionSig>(
   }
 
   if (!functionName) {
-    console.trace(
-      "Autometrics decorated function must have a name to successfully create metrics. This function will not be instrumented.",
+    throw new Error(
+      "Autometrics decorated function must have a name to successfully create a metric",
     );
   }
 
