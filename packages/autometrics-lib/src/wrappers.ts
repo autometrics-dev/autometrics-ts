@@ -207,6 +207,15 @@ export function autometrics<F extends FunctionSig>(
   };
 }
 
+type AutometricsClassDecoratorOptions = Omit<
+  AutometricsOptions,
+  "functionName"
+>;
+
+type AutometricsDecoratorOptions<T> = T extends Function
+  ? AutometricsClassDecoratorOptions
+  : AutometricsOptions;
+
 /**
  * Autometrics decorator that can be applied to either a class or class method
  * that automatically instruments methods with OpenTelemetry-compatible metrics.
@@ -261,9 +270,17 @@ export function autometrics<F extends FunctionSig>(
  * }
  * ```
  */
-export function Autometrics(autometricsOptions?: AutometricsOptions) {
-  return function (
-    target: Function | Object,
+export function Autometrics<T extends Function | Object>(
+  autometricsOptions?: AutometricsDecoratorOptions<T>,
+) {
+  function decorator<T extends Function>(target: T): void;
+  function decorator<T extends Object>(
+    target: T,
+    propertyKey: string,
+    descriptor: PropertyDescriptor,
+  ): void;
+  function decorator<T>(
+    target: T,
     propertyKey?: string,
     descriptor?: PropertyDescriptor,
   ) {
@@ -276,5 +293,7 @@ export function Autometrics(autometricsOptions?: AutometricsOptions) {
 
     const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
     methodDecorator(target, propertyKey, descriptor);
-  };
+  }
+
+  return decorator;
 }
