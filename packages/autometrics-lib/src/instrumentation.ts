@@ -3,6 +3,7 @@ import {
   PrometheusSerializer,
 } from "@opentelemetry/exporter-prometheus";
 import {
+  AggregationTemporality,
   InMemoryMetricExporter,
   MeterProvider,
   MetricReader,
@@ -43,7 +44,7 @@ export function init(options: initOptions) {
     exporter = new PeriodicExportingMetricReader({
       // 0 - using delta aggregation temporality setting
       // to ensure data submitted to the gateway is accurate
-      exporter: new InMemoryMetricExporter(0),
+      exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
     });
     // Make sure the provider is initialized and exporter is registered
     getMetricsProvider();

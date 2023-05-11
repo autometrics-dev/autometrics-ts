@@ -1,6 +1,7 @@
 import { autometrics, init } from "../src";
 import { describe, test, expect, beforeAll, afterEach } from "vitest";
 import {
+  AggregationTemporality,
   InMemoryMetricExporter,
   PeriodicExportingMetricReader,
 } from "@opentelemetry/sdk-metrics";
@@ -14,7 +15,7 @@ describe("Autometrics integration test", () => {
     exporter = new PeriodicExportingMetricReader({
       // 0 - using delta aggregation temporality setting
       // to ensure data submitted to the gateway is accurate
-      exporter: new InMemoryMetricExporter(0),
+      exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
     });
 
     init({ exporter });
