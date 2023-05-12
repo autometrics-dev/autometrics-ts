@@ -1,6 +1,6 @@
 {
   "name": "autometrics",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "description": "Easily add metrics to your system -- and actually understand them using automatically customized Prometheus queries",
   "author": "Fiberplane<info@fiberplane.com>",
@@ -30,7 +30,7 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@autometrics/autometrics": "^0.3.0",
+    "@autometrics/autometrics": "^0.4.0",
     "@opentelemetry/api": "^1.4.1",
     "@opentelemetry/exporter-prometheus": "^0.35.1",
     "@opentelemetry/sdk-metrics": "^1.9.0"
