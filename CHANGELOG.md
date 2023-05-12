@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [v0.4] - 2023-05-12
 
 ### Added
 - added support for tracking concurrent requests on each function
