@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🤔 Support
+    url: https://discord.gg/MJr7pYzZQ4
+    about: "This issue tracker is not for support questions. Post your questions to our Discussions board or our community Discord #autometrics channel!"
+  - name: 🗣️ Chat
+    url: https://discord.gg/MJr7pYzZQ4
+    about: "Our Discord server is active and is used for real-time discussions including contribution collaboration, questions, and more!"
+  - name: 🆘 Code of Conduct Reports
+    url: https://github.com/fiberplane/fiberplane/blob/main/CODE_OF_CONDUCT.md
+    about: "Please use the contact information in our Code of Conduct instead in order to maintain confidentiality."
