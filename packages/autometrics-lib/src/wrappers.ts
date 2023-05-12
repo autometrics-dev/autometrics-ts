@@ -8,6 +8,7 @@ import {
   getModulePath,
   isPromise,
 } from "./utils";
+import { registerBuildInfo } from "./buildInfo";
 
 // Function Wrapper
 // This seems to be the preferred way for defining functions in TypeScript
@@ -97,9 +98,10 @@ export function autometrics<F extends FunctionSig>(
   }
 
   if (!functionName) {
-    throw new Error(
-      "Autometrics decorated function must have a name to successfully create a metric",
+    console.trace(
+      "Autometrics decorated function must have a name to successfully create a metric. Function will not be instrumented.",
     );
+    return fn;
   }
 
   const counterObjectiveAttributes: Attributes = {};
@@ -124,6 +126,7 @@ export function autometrics<F extends FunctionSig>(
 
   return function (...params) {
     const meter = getMeter();
+    registerBuildInfo();
     const autometricsStart = performance.now();
     const counter = meter.createCounter("function.calls.count");
     const histogram = meter.createHistogram("function.calls.duration");
