@@ -8,6 +8,7 @@ import {
   getModulePath,
   isPromise,
 } from "./utils";
+import { registerBuildInfo } from "./buildInfo";
 
 // Function Wrapper
 // This seems to be the preferred way for defining functions in TypeScript
@@ -97,9 +98,10 @@ export function autometrics<F extends FunctionSig>(
   }
 
   if (!functionName) {
-    throw new Error(
-      "Autometrics decorated function must have a name to successfully create a metric",
+    console.trace(
+      "Autometrics decorated function must have a name to successfully create a metric. Function will not be instrumented.",
     );
+    return fn;
   }
 
   const counterObjectiveAttributes: Attributes = {};
@@ -124,6 +126,7 @@ export function autometrics<F extends FunctionSig>(
 
   return function (...params) {
     const meter = getMeter();
+    registerBuildInfo();
     const autometricsStart = performance.now();
     const counter = meter.createCounter("function.calls.count");
     const histogram = meter.createHistogram("function.calls.duration");
@@ -207,6 +210,15 @@ export function autometrics<F extends FunctionSig>(
   };
 }
 
+export type AutometricsClassDecoratorOptions = Omit<
+  AutometricsOptions,
+  "functionName"
+>;
+
+type AutometricsDecoratorOptions<T> = T extends Function
+  ? AutometricsClassDecoratorOptions
+  : AutometricsOptions;
+
 /**
  * Autometrics decorator that can be applied to either a class or class method
  * that automatically instruments methods with OpenTelemetry-compatible metrics.
@@ -261,9 +273,17 @@ export function autometrics<F extends FunctionSig>(
  * }
  * ```
  */
-export function Autometrics(autometricsOptions?: AutometricsOptions) {
-  return function (
-    target: Function | Object,
+export function Autometrics<T extends Function | Object>(
+  autometricsOptions?: AutometricsDecoratorOptions<T>,
+) {
+  function decorator<T extends Function>(target: T): void;
+  function decorator<T extends Object>(
+    target: T,
+    propertyKey: string,
+    descriptor: PropertyDescriptor,
+  ): void;
+  function decorator<T>(
+    target: T,
     propertyKey?: string,
     descriptor?: PropertyDescriptor,
   ) {
@@ -276,5 +296,7 @@ export function Autometrics(autometricsOptions?: AutometricsOptions) {
 
     const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
     methodDecorator(target, propertyKey, descriptor);
-  };
+  }
+
+  return decorator;
 }
