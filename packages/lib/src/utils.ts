@@ -1,4 +1,8 @@
-import { autometrics, AutometricsOptions } from "./wrappers";
+import {
+  autometrics,
+  AutometricsClassDecoratorOptions,
+  AutometricsOptions,
+} from "./wrappers";
 
 /**
  * Decorator factory that returns a method decorator. Optionally accepts
@@ -27,7 +31,7 @@ export function getAutometricsMethodDecorator(
  * @param autometricsOptions
  */
 export function getAutometricsClassDecorator(
-  autometricsOptions?: AutometricsOptions,
+  autometricsOptions?: AutometricsClassDecoratorOptions,
 ) {
   return function (classConstructor: Function) {
     const prototype = classConstructor.prototype;

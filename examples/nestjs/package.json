@@ -13,7 +13,7 @@
     "start:prod": "node dist/main"
   },
   "dependencies": {
-    "@autometrics/autometrics": "file:../../packages/autometrics-lib",
+    "@autometrics/autometrics": "^0.4.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
@@ -21,7 +21,7 @@
     "rxjs": "^7.2.0"
   },
   "devDependencies": {
-    "@autometrics/typescript-plugin": "file:../../packages/autometrics-typescript-plugin",
+    "@autometrics/typescript-plugin": "^0.4.0",
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",

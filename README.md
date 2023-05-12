@@ -49,28 +49,12 @@ The Autometrics library:
 - Uses a Prometheus Exporter to write metrics to a `/metrics` endpoint (by
   default on port `:9464`) or pushes them to a specified gateway (if used in
   browser)
-- Uses a TypeScript plugin to automatically add useful Prometheus queries in the doc comments for instrumented functions
+- Uses a TypeScript plugin / VSCode extension to automatically add useful Prometheus queries in the doc comments for instrumented functions
 
 ## Quickstart
 
 ```shell
 npm install --save autometrics
-npm install --save-dev @autometrics/typescript-plugin
-```
-
-Enable the TypeScript plugin by adding it to `tsconfig.json`:
-
-```json
-{
-  "compilerOptions": {
-    "plugins": [
-      {
-        "name": "@autometrics/typescript-plugin",
-        "prometheusUrl": ""
-      }
-    ]
-  }
-}
 ```
 
 Use the library in your code:
@@ -98,10 +82,27 @@ The default `autometrics` package bundles `@opentelemetry/sdk-metrics` and
 these in your codebase or want to use other custom metrics, use the following
 installation option.
 
-Install the wrappers and the language service plugin:
+Install the wrappers:
 
 ```shell
 npm install --save @autometrics/autometrics
+```
+
+Import and use the library in your code:
+
+```typescript
+import { autometrics } from "@autometrics/autometrics"
+```
+
+## Getting PromQL queries
+
+In order to get PromQL query links in your IDE download the [Autometrics VSCode
+extension](https://marketplace.visualstudio.com/items?itemName=Fiberplane.autometrics).
+
+If you're on any other IDE you can install and add the TypeScript plugin
+directly:
+
+```bash
 npm install --save-dev @autometrics/typescript-plugin
 ```
 
@@ -124,6 +125,15 @@ Add the language service plugin to the `tsconfig.json` file:
 
 Autometrics provides [Grafana dashboards](https://github.com/autometrics-dev/autometrics-shared#dashboards) that will work for any project instrumented with the library.
 
+## Identifying commits that introduce errors
+
+Autometrics makes it easy to [spot versions and commits that introduce errors or latency](https://fiberplane.com/blog/autometrics-rs-0-4-spot-commits-that-introduce-errors-or-slow-down-your-application).
+
+| Label | Run-Time Environment Variables | Default value |
+|---|---|---|
+| `version` | `AUTOMETRICS_VERSION` or `PACKAGE_VERSION` | `npm_package_version` (set by npm/yarn/pnpm by default) |
+| `commit` | `AUTOMETRICS_COMMIT` or `COMMIT_SHA` | `""` |
+| `branch` | `AUTOMETRICS_BRANCH` or `BRANCH_NAME` | `""` |
 
 ## Alerts / SLOs
 

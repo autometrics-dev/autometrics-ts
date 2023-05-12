@@ -1,0 +1,44 @@
+name: 🐛 Report issue
+description: Report a possible bug or other issue
+title: "🐛 <TITLE>"
+labels: ["needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for submitting an issue! We'll try to triage it ASAP!
+  - type: markdown
+    attributes:
+      value: |
+        Issue reports that don't follow this template will be closed.
+        Please provide a clear and concise description of what the bug is.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment information
+      description: |
+        Which programming language(s) are you using Autometrics with? What's
+        your Prometheus version? What Operating System do you use? Please
+        describe your setup here.
+      render: plain text
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: What happened?
+      description: |
+        Please provide a detailed list of steps that reproduce the issue.
+        The more information and included steps, the quicker we can address your report.
+      placeholder: |
+        1.
+        2.
+    validations:
+      required: true
+  - type: textarea
+    id: expected-result
+    attributes:
+      label: Expected result
+      description: Describe what you expected to happen.
+      placeholder: It should not throw an error.
+    validations:
+      required: true

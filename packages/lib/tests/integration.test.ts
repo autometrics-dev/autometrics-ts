@@ -1,6 +1,7 @@
 import { autometrics, init } from "../src";
 import { describe, test, expect, beforeAll, afterEach } from "vitest";
 import {
+  AggregationTemporality,
   InMemoryMetricExporter,
   PeriodicExportingMetricReader,
 } from "@opentelemetry/sdk-metrics";
@@ -14,7 +15,7 @@ describe("Autometrics integration test", () => {
     exporter = new PeriodicExportingMetricReader({
       // 0 - using delta aggregation temporality setting
       // to ensure data submitted to the gateway is accurate
-      exporter: new InMemoryMetricExporter(0),
+      exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
     });
 
     init({ exporter });
@@ -27,9 +28,9 @@ describe("Autometrics integration test", () => {
 
   test("single function", async () => {
     const callCountMetric =
-      /function_calls_count_total\{\S*function="helloWorld"\S*module="\/packages\/autometrics-lib\/tests\/integration.test.ts"\S*\} 2/gm;
+      /function_calls_count_total\{\S*function="helloWorld"\S*module="\/packages\/lib\/tests\/integration.test.ts"\S*\} 2/gm;
     const durationMetric =
-      /function_calls_duration_bucket\{\S*function="helloWorld"\S*module="\/packages\/autometrics-lib\/tests\/integration.test.ts"\S*\}/gm;
+      /function_calls_duration_bucket\{\S*function="helloWorld"\S*module="\/packages\/lib\/tests\/integration.test.ts"\S*\}/gm;
 
     const helloWorldFn = autometrics(function helloWorld() {});
 
