@@ -32,27 +32,27 @@ export function getAutometricsMethodDecorator(
  */
 export function getAutometricsClassDecorator(
   autometricsOptions?: AutometricsClassDecoratorOptions,
-) {
+): ClassDecorator {
   return function (classConstructor: Function) {
     const prototype = classConstructor.prototype;
     const propertyNames = Object.getOwnPropertyNames(prototype);
+    const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
 
     for (const propertyName of propertyNames) {
       const property = prototype[propertyName];
-
-      if (typeof property !== "function" || propertyName === "constructor") {
-        continue;
-      }
-
       const descriptor = Object.getOwnPropertyDescriptor(
         prototype,
         propertyName,
       );
-      if (!descriptor) {
+
+      if (
+        typeof property !== "function" ||
+        propertyName === "constructor" ||
+        !descriptor
+      ) {
         continue;
       }
 
-      const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
       const instrumentedDescriptor = methodDecorator(
         {},
         propertyName,
@@ -117,4 +117,12 @@ export function isPromise<T extends Promise<void>>(val: unknown): val is T {
     "catch" in val &&
     typeof val.catch === "function"
   );
+}
+
+export function isFunction(value: unknown): value is Function {
+  return typeof value === "function";
+}
+
+export function isObject(value: unknown): value is Object {
+  return typeof value === "object";
 }
