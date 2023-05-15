@@ -6,7 +6,7 @@ import { getMeter } from "./instrumentation";
 import {
   ALSInstance,
   getALSCaller,
-  getALSContext,
+  getALSInstance,
   getAutometricsClassDecorator,
   getAutometricsMethodDecorator,
   getModulePath,
@@ -19,7 +19,7 @@ import { registerBuildInfo } from "./buildInfo";
 let asyncLocalStorage: ALSInstance | undefined;
 if (typeof window === "undefined") {
   async () => {
-    asyncLocalStorage = await getALSContext();
+    asyncLocalStorage = await getALSInstance();
   };
 }
 

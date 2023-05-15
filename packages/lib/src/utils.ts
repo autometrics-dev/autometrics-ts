@@ -112,9 +112,9 @@ export function getModulePath(): string | undefined {
 type ALSContext = {
   caller?: string;
 };
-export type ALSInstance = Awaited<ReturnType<typeof getALSContext>>;
+export type ALSInstance = Awaited<ReturnType<typeof getALSInstance>>;
 
-export async function getALSContext() {
+export async function getALSInstance() {
   const { AsyncLocalStorage } = await import("node:async_hooks");
   return new AsyncLocalStorage<ALSContext>();
 }
