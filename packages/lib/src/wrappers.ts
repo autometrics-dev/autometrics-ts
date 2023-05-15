@@ -1,4 +1,5 @@
 import { Attributes } from "@opentelemetry/api";
+import { AsyncLocalStorage } from "async_hooks";
 
 import type { Objective } from "./objectives";
 import { getMeter } from "./instrumentation";
@@ -9,8 +10,6 @@ import {
   isPromise,
 } from "./utils";
 import { registerBuildInfo } from "./buildInfo";
-
-import { AsyncLocalStorage } from "async_hooks";
 
 type ALSContext = {
   caller?: string;
