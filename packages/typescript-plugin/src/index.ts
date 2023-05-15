@@ -70,19 +70,26 @@ function init(modules: { typescript: typeof tsserver }) {
       const requestRate = createRequestRateQuery("function", nodeIdentifier);
       const requestRateUrl = makePrometheusUrl(requestRate, prometheusBase);
 
-      const calleeRequestRate = createRequestRateQuery("caller", nodeIdentifier);
-      const calleeRequestRateUrl = makePrometheusUrl(calleeRequestRate, prometheusBase);
+      const calleeRequestRate = createRequestRateQuery(
+        "caller",
+        nodeIdentifier,
+      );
+      const calleeRequestRateUrl = makePrometheusUrl(
+        calleeRequestRate,
+        prometheusBase,
+      );
 
       const errorRatio = createErrorRatioQuery("caller", nodeIdentifier);
       const errorRatioUrl = makePrometheusUrl(errorRatio, prometheusBase);
 
       const calleeErrorRatio = createErrorRatioQuery("caller", nodeIdentifier);
-      const calleeErrorRatioUrl = makePrometheusUrl(calleeErrorRatio, prometheusBase);
+      const calleeErrorRatioUrl = makePrometheusUrl(
+        calleeErrorRatio,
+        prometheusBase,
+      );
 
       const latency = createLatencyQuery(nodeIdentifier);
       const latencyUrl = makePrometheusUrl(latency, prometheusBase);
-
-
 
       const queries = <ts.SymbolDisplayPart[]>[
         {
