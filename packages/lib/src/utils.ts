@@ -109,6 +109,23 @@ export function getModulePath(): string | undefined {
   return modulePath;
 }
 
+type ALSContext = {
+  caller?: string;
+};
+export type ALSInstance = Awaited<ReturnType<typeof getALSContext>>;
+
+export async function getALSContext() {
+  const { AsyncLocalStorage } = await import("node:async_hooks");
+  return new AsyncLocalStorage<ALSContext>();
+}
+
+export function getALSCaller(context?: ALSInstance) {
+  if (context) {
+    const contextValue = context.getStore();
+    return contextValue?.caller;
+  }
+}
+
 export function isPromise<T extends Promise<void>>(val: unknown): val is T {
   return (
     typeof val === "object" &&

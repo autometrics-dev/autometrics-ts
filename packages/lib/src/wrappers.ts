@@ -4,6 +4,9 @@ import { AsyncLocalStorage } from "async_hooks";
 import type { Objective } from "./objectives";
 import { getMeter } from "./instrumentation";
 import {
+  ALSInstance,
+  getALSCaller,
+  getALSContext,
   getAutometricsClassDecorator,
   getAutometricsMethodDecorator,
   getModulePath,
@@ -13,11 +16,12 @@ import {
 } from "./utils";
 import { registerBuildInfo } from "./buildInfo";
 
-type ALSContext = {
-  caller?: string;
-};
-
-const context = new AsyncLocalStorage<ALSContext>();
+let asyncLocalStorage: ALSInstance | undefined;
+if (typeof window === "undefined") {
+  async () => {
+    asyncLocalStorage = await getALSContext();
+  };
+}
 
 // Function Wrapper
 // This seems to be the preferred way for defining functions in TypeScript
@@ -140,8 +144,7 @@ export function autometrics<F extends FunctionSig>(
     const counter = meter.createCounter("function.calls.count");
     const histogram = meter.createHistogram("function.calls.duration");
     const gauge = meter.createUpDownCounter("function.calls.concurrent");
-    const store = context.getStore();
-    const caller = store?.caller;
+    const caller = getALSCaller(asyncLocalStorage);
 
     if (trackConcurrency) {
       gauge.add(1, {
@@ -203,7 +206,7 @@ export function autometrics<F extends FunctionSig>(
       }
     };
 
-    return context.run({ caller: functionName }, () => {
+    function instrumentedFunction() {
       try {
         const result = fn(...params);
         if (isPromise<ReturnType<F>>(result)) {
@@ -224,7 +227,16 @@ export function autometrics<F extends FunctionSig>(
         onError();
         throw error;
       }
-    });
+    }
+
+    if (asyncLocalStorage) {
+      return asyncLocalStorage.run(
+        { caller: functionName },
+        instrumentedFunction,
+      );
+    }
+
+    return instrumentedFunction();
   };
 }
 
