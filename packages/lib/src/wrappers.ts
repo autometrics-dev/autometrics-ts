@@ -6,6 +6,8 @@ import {
   getAutometricsClassDecorator,
   getAutometricsMethodDecorator,
   getModulePath,
+  isFunction,
+  isObject,
   isPromise,
 } from "./utils";
 import { registerBuildInfo } from "./buildInfo";
@@ -282,20 +284,22 @@ export function Autometrics<T extends Function | Object>(
     propertyKey: string,
     descriptor: PropertyDescriptor,
   ): void;
-  function decorator<T>(
+  function decorator<T extends Function | Object>(
     target: T,
     propertyKey?: string,
     descriptor?: PropertyDescriptor,
   ) {
-    if (typeof target === "function") {
+    if (isFunction(target)) {
       const classDecorator = getAutometricsClassDecorator(autometricsOptions);
       classDecorator(target);
 
       return;
     }
 
-    const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
-    methodDecorator(target, propertyKey, descriptor);
+    if (isObject(target) && propertyKey && descriptor) {
+      const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
+      methodDecorator(target, propertyKey, descriptor);
+    }
   }
 
   return decorator;
