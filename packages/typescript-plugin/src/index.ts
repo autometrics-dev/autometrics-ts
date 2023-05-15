@@ -67,12 +67,28 @@ function init(modules: { typescript: typeof tsserver }) {
         typechecker,
       );
 
-      const requestRate = createRequestRateQuery(nodeIdentifier);
-      const errorRatio = createErrorRatioQuery(nodeIdentifier);
-      const latency = createLatencyQuery(nodeIdentifier);
-
+      const requestRate = createRequestRateQuery("function", nodeIdentifier);
       const requestRateUrl = makePrometheusUrl(requestRate, prometheusBase);
+
+      const calleeRequestRate = createRequestRateQuery(
+        "caller",
+        nodeIdentifier,
+      );
+      const calleeRequestRateUrl = makePrometheusUrl(
+        calleeRequestRate,
+        prometheusBase,
+      );
+
+      const errorRatio = createErrorRatioQuery("caller", nodeIdentifier);
       const errorRatioUrl = makePrometheusUrl(errorRatio, prometheusBase);
+
+      const calleeErrorRatio = createErrorRatioQuery("caller", nodeIdentifier);
+      const calleeErrorRatioUrl = makePrometheusUrl(
+        calleeErrorRatio,
+        prometheusBase,
+      );
+
+      const latency = createLatencyQuery(nodeIdentifier);
       const latencyUrl = makePrometheusUrl(latency, prometheusBase);
 
       const queries = <ts.SymbolDisplayPart[]>[
@@ -99,6 +115,34 @@ function init(modules: { typescript: typeof tsserver }) {
         {
           kind: "string",
           text: `- [Latency (95th and 99th percentiles)](${latencyUrl})`,
+        },
+        {
+          kind: "space",
+          text: "\n",
+        },
+        {
+          kind: "space",
+          text: "\n",
+        },
+        {
+          kind: "string",
+          text: `Or, dig into the metrics of *functions called by* \`${nodeIdentifier}\``,
+        },
+        {
+          kind: "space",
+          text: "\n",
+        },
+        {
+          kind: "string",
+          text: `- [Request rate](${calleeRequestRateUrl})`,
+        },
+        {
+          kind: "space",
+          text: "\n",
+        },
+        {
+          kind: "string",
+          text: `- [Error ratio](${calleeErrorRatioUrl})`,
         },
         {
           kind: "space",
