@@ -18,9 +18,9 @@ import { registerBuildInfo } from "./buildInfo";
 
 let asyncLocalStorage: ALSInstance | undefined;
 if (typeof window === "undefined") {
-  async () => {
+  (async () => {
     asyncLocalStorage = await getALSInstance();
-  };
+  })();
 }
 
 // Function Wrapper
