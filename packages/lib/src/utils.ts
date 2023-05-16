@@ -18,7 +18,10 @@ export function getAutometricsMethodDecorator(
     descriptor: PropertyDescriptor,
   ) {
     const originalFunction = descriptor.value;
-    descriptor.value = autometrics(autometricsOptions, originalFunction);
+    const functionOrOptions = autometricsOptions ?? originalFunction;
+    const functionInput = autometricsOptions ? originalFunction : undefined;
+
+    descriptor.value = autometrics(functionOrOptions, functionInput);
 
     return descriptor;
   };
