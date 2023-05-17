@@ -347,7 +347,7 @@ type AutometricsDecoratorOptions<T> = T extends Function
  * class Foo {
  *   // Don't add a backslash in front of the decorator, this is only here to
  *   // prevent the example from rendering incorrectly
- *   @Autometrics(autometricsOptions)
+ *   \@Autometrics(autometricsOptions)
  *   bar() {
  *     console.log("bar");
  *   }
