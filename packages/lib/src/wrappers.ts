@@ -42,7 +42,8 @@ interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
 export type AutometricsOptions = {
   /**
-   * Name of your function
+   * Name of your function. Only necessary if using the decorator/wrapper on the
+   * client side where builds get minified.
    */
   functionName?: string;
   /**
@@ -65,15 +66,60 @@ export type AutometricsOptions = {
 };
 
 /**
- * Autometrics wrapper for **functions** that automatically instruments the
- * wrapped function with OpenTelemetry-compatible metrics.
+ * Autometrics wrapper for **functions** (requests handlers or database methods)
+ * that automatically instruments the wrapped function with OpenTelemetry metrics.
  *
  * Hover over the wrapped function to get the links for generated queries (if
  * you have the language service plugin installed)
  *
  * @param functionOrOptions {(F|AutometricsOptions)} - the function that will be
- * wrapped and instrumented (requests handler or database method)
- * @param fnInput {F}
+ * wrapped and instrumented with metrics, or an options object
+ * @param fnInput {F} - the function that will be wrapped and instrumented with
+ * metrics (only necessary if the first argument is an options object)
+ *
+ * @example
+ *
+ * <caption>Basic usage</caption>
+ *
+ * ```typescript
+ * import { autometrics } from "autometrics";
+ *
+ * const createUser = autometrics(async function createUser(payload: User) {
+ *   // ...
+ * });
+ *
+ * const user = createUser();
+ * ```
+ *
+ * <caption>Usage with options</caption>
+ *
+ * ```typescript
+ * import {
+ *   autometrics,
+ *   AutometricsOptions,
+ *   Objective,
+ *   ObjectiveLatency,
+ *   ObjectivePercentile,
+ * } from "autometrics";
+ *
+ * const objective: Objective = {
+ *   successRate: ObjectivePercentile.P99_9,
+ *   latency: [ObjectiveLatency.Ms250, ObjectivePercentile.P99],
+ *   name: "foo",
+ * };
+ *
+ * const autometricsOptions: AutometricsOptions = {
+ *   objective,
+ *   trackConcurrency: true,
+ * };
+ *
+ * const createUser = autometrics(autometricsOptions, async function createUser(payload: User) {
+ *  // ...
+ * });
+ *
+ * const user = createUser();
+ * ```
+ *
  */
 export function autometrics<F extends FunctionSig>(
   functionOrOptions: F | AutometricsOptions,
@@ -258,8 +304,11 @@ type AutometricsDecoratorOptions<T> = T extends Function
  * Optionally, you can pass in an {@link AutometricsOptions} object to configure
  * the decorator.
  * @param autometricsOptions
+ *
  * @example
+ *
  * <caption>Basic class decorator implementation</caption>
+ *
  * ```
  *  \@Autometrics()
  *  class Foo {
@@ -271,7 +320,9 @@ type AutometricsDecoratorOptions<T> = T extends Function
  * }
  * ```
  * @example
+ *
  * <caption>Method decorator that passes in an autometrics options object including SLO</caption>
+ *
  * ```typescript
  * import {
  *   Autometrics,

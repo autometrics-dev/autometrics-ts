@@ -32,7 +32,7 @@ export type initOptions = {
 
 /**
  * Optional initialization function to set a custom exporter or push gateway for client-side applications.
- * Required if using autometrics in a client-side application.
+ * Required if using autometrics in a client-side application. See {@link initOptions} for details.
  *
  * @param {initOptions} options
  */

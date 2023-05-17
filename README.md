@@ -178,7 +178,7 @@ pieces of important business logic that you want to measure.
 Example:
 
 ```typescript
-import { autometrics, Objective } from "autometrics";
+import { autometrics } from "autometrics";
 
 const createUser = autometrics(async function createUser(payload: User) {
   // ...
