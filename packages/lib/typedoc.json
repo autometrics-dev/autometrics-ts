@@ -1,0 +1,9 @@
+{
+  "readme": "none",
+  "entryPoints": ["src/index.ts"],
+  "cleanOutputDir": true,
+  "out": "./reference",
+  "plugin": ["typedoc-plugin-markdown"],
+  "hideInPageTOC": true,
+  "hideBreadcrumbs": true
+}
