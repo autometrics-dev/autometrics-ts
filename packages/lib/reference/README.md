@@ -13,7 +13,7 @@
 
 #### Defined in
 
-[wrappers.ts:289](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/wrappers.ts#L289)
+[wrappers.ts:289](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/wrappers.ts#L289)
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 #### Defined in
 
-[wrappers.ts:43](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/wrappers.ts#L43)
+[wrappers.ts:43](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/wrappers.ts#L43)
 
 ___
 
@@ -85,7 +85,7 @@ However, they are enabled when the special labels are present on certain metrics
 
 #### Defined in
 
-[objectives.ts:36](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L36)
+[objectives.ts:36](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L36)
 
 ___
 
@@ -103,7 +103,7 @@ ___
 
 #### Defined in
 
-[instrumentation.ts:18](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/instrumentation.ts#L18)
+[instrumentation.ts:18](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/instrumentation.ts#L18)
 
 ## Functions
 
@@ -162,7 +162,7 @@ const autometricsOptions: AutometricsOptions = {
 class Foo {
   // Don't add a backslash in front of the decorator, this is only here to
   // prevent the example from rendering incorrectly
-  @Autometrics(autometricsOptions)
+  \@Autometrics(autometricsOptions)
   bar() {
     console.log("bar");
   }
@@ -225,7 +225,7 @@ class Foo {
 
 #### Defined in
 
-[wrappers.ts:357](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/wrappers.ts#L357)
+[wrappers.ts:357](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/wrappers.ts#L357)
 
 ___
 
@@ -301,7 +301,7 @@ const user = createUser();
 
 #### Defined in
 
-[wrappers.ts:124](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/wrappers.ts#L124)
+[wrappers.ts:124](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/wrappers.ts#L124)
 
 ___
 
@@ -324,4 +324,4 @@ Required if using autometrics in a client-side application. See [initOptions](RE
 
 #### Defined in
 
-[instrumentation.ts:39](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/instrumentation.ts#L39)
+[instrumentation.ts:39](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/instrumentation.ts#L39)

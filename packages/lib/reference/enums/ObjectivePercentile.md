@@ -12,7 +12,7 @@ The percentage of requests that must meet the given criteria (success rate or la
 
 #### Defined in
 
-[objectives.ts:49](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L49)
+[objectives.ts:49](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L49)
 
 ___
 
@@ -24,7 +24,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:53](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L53)
+[objectives.ts:53](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L53)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:57](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L57)
+[objectives.ts:57](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L57)
 
 ___
 
@@ -48,4 +48,4 @@ ___
 
 #### Defined in
 
-[objectives.ts:61](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L61)
+[objectives.ts:61](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L61)

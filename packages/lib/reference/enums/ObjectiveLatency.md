@@ -12,7 +12,7 @@ The latency threshold, in milliseconds, for a given objective.
 
 #### Defined in
 
-[objectives.ts:75](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L75)
+[objectives.ts:75](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L75)
 
 ___
 
@@ -24,7 +24,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:91](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L91)
+[objectives.ts:91](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L91)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:107](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L107)
+[objectives.ts:107](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L107)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:123](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L123)
+[objectives.ts:123](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L123)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:79](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L79)
+[objectives.ts:79](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L79)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:95](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L95)
+[objectives.ts:95](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L95)
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:111](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L111)
+[objectives.ts:111](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L111)
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:71](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L71)
+[objectives.ts:71](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L71)
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:83](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L83)
+[objectives.ts:83](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L83)
 
 ___
 
@@ -120,7 +120,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:99](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L99)
+[objectives.ts:99](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L99)
 
 ___
 
@@ -132,7 +132,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:115](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L115)
+[objectives.ts:115](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L115)
 
 ___
 
@@ -144,7 +144,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:87](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L87)
+[objectives.ts:87](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L87)
 
 ___
 
@@ -156,7 +156,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:103](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L103)
+[objectives.ts:103](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L103)
 
 ___
 
@@ -168,4 +168,4 @@ ___
 
 #### Defined in
 
-[objectives.ts:119](https://github.com/autometrics-dev/autometrics-ts/blob/d24c439/packages/lib/src/objectives.ts#L119)
+[objectives.ts:119](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L119)
