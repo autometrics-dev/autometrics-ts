@@ -18,7 +18,7 @@
  * ));
  * ```
  *
- * ## How this works
+ * #### How this works
  *
  * When an objective is added to a function, the metrics for that function will
  * have additional labels attached to specify the SLO details.

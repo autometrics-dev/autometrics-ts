@@ -76,6 +76,18 @@ work and feel like.
 
 #### Debugging TypeScript plugin
 
+0. Run `Launch VSCode` and `Attach VSCode` in debugger
+
+The repo includes two launch configurations, one to launch a VSCode instance for
+debugging (with no extensions running to prevent conflicts), and another to
+attach the "host" VSCode debugger. They are both separated as you might need to
+reattach the host debugger multiple times during the workflow.
+
+To run either of the commands simply select any of the launch configurations in 
+the debugger section of your main VSCode window. The "Launch VSCode" command
+will prompt you to select an example project that you'd want to use for testing
+(make sure your local development version TypeScript plugin is installed there).
+
 1. Console.log
 
 You can use `console.log` to debug like in any application. To see the logs in

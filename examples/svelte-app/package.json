@@ -19,6 +19,6 @@
     "vite": "^4.1.0"
   },
   "dependencies": {
-    "autometrics": "file:../../packages/autometrics"
+    "autometrics": "^0.4.0"
   }
 }

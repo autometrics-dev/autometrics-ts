@@ -1,9 +1,9 @@
-import { autometricsDecorator as autometrics } from '@autometrics/autometrics';
+import { Autometrics } from '@autometrics/autometrics';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
+@Autometrics()
 export class AppService {
-  @autometrics
   getHello(): string {
     return 'Hello World!';
   }

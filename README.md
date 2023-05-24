@@ -36,8 +36,7 @@ more details on the ideas behind autometrics
   knowing PromQL
 - 🔗 Injects links to live Prometheus charts directly into each function's doc
   comments
-- 📊 (Coming Soon!) Grafana dashboard showing the performance of all
-  instrumented functions
+- [📊 Grafana dashboards](#dashboards) work out of the box to visualize the performance of instrumented functions & SLOs
 - 🚨 Generates Prometheus alerting rules using SLO best practices
   from simple annotations in your code
 - ⚡ Minimal runtime overhead
@@ -50,28 +49,12 @@ The Autometrics library:
 - Uses a Prometheus Exporter to write metrics to a `/metrics` endpoint (by
   default on port `:9464`) or pushes them to a specified gateway (if used in
   browser)
-- Uses a TypeScript plugin to automatically add useful Prometheus queries in the doc comments for instrumented functions
+- Uses a TypeScript plugin / VSCode extension to automatically add useful Prometheus queries in the doc comments for instrumented functions
 
 ## Quickstart
 
 ```shell
 npm install --save autometrics
-npm install --save-dev @autometrics/typescript-plugin
-```
-
-Enable the TypeScript plugin by adding it to `tsconfig.json`:
-
-```json
-{
-  "compilerOptions": {
-    "plugins": [
-      {
-        "name": "@autometrics/typescript-plugin",
-        "prometheusUrl": ""
-      }
-    ]
-  }
-}
 ```
 
 Use the library in your code:
@@ -99,10 +82,27 @@ The default `autometrics` package bundles `@opentelemetry/sdk-metrics` and
 these in your codebase or want to use other custom metrics, use the following
 installation option.
 
-Install the wrappers and the language service plugin:
+Install the wrappers:
 
 ```shell
 npm install --save @autometrics/autometrics
+```
+
+Import and use the library in your code:
+
+```typescript
+import { autometrics } from "@autometrics/autometrics"
+```
+
+## Getting PromQL queries
+
+In order to get PromQL query links in your IDE download the [Autometrics VSCode
+extension](https://marketplace.visualstudio.com/items?itemName=Fiberplane.autometrics).
+
+If you're on any other IDE you can install and add the TypeScript plugin
+directly:
+
+```bash
 npm install --save-dev @autometrics/typescript-plugin
 ```
 
@@ -120,6 +120,20 @@ Add the language service plugin to the `tsconfig.json` file:
   }
 }
 ```
+
+## Dashboards
+
+Autometrics provides [Grafana dashboards](https://github.com/autometrics-dev/autometrics-shared#dashboards) that will work for any project instrumented with the library.
+
+## Identifying commits that introduce errors
+
+Autometrics makes it easy to [spot versions and commits that introduce errors or latency](https://fiberplane.com/blog/autometrics-rs-0-4-spot-commits-that-introduce-errors-or-slow-down-your-application).
+
+| Label | Run-Time Environment Variables | Default value |
+|---|---|---|
+| `version` | `AUTOMETRICS_VERSION` or `PACKAGE_VERSION` | `npm_package_version` (set by npm/yarn/pnpm by default) |
+| `commit` | `AUTOMETRICS_COMMIT` or `COMMIT_SHA` | `""` |
+| `branch` | `AUTOMETRICS_BRANCH` or `BRANCH_NAME` | `""` |
 
 ## Alerts / SLOs
 
@@ -164,7 +178,7 @@ pieces of important business logic that you want to measure.
 Example:
 
 ```typescript
-import { autometrics, Objective } from "autometrics";
+import { autometrics } from "autometrics";
 
 const createUser = autometrics(async function createUser(payload: User) {
   // ...
@@ -182,22 +196,37 @@ const user = createUser();
 
 ### Decorating class methods
 
-When using a decorator fora class method, it is wrapped in additional
-code that instruments the method with OpenTelemetry metrics.
+When using a decorator for a class method, it is wrapped in additional code that
+instruments the method with OpenTelemetry metrics.
 
 Here's a snippet from the example code:
 
 ```typescript
 import { Controller, Get } from "@nestjs/common";
 import { AppService } from "./app.service";
-import { autometricsDecorator as autometrics } from "autometrics";
+import { Autometrics } from "autometrics";
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @autometrics
+  @Autometrics()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+}
+```
+
+Alternatively, you can apply the same decorator to a class to instrument all of
+its methods:
+
+```typescript
+// ...
+@Autometrics()
+export class AppController {
+  // ...
+  @Get()
   getHello(): string {
     return this.appService.getHello();
   }
