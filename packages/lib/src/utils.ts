@@ -67,6 +67,21 @@ export function getAutometricsClassDecorator(
   };
 }
 
+export type Runtime = "node" | "deno" | "browser" | "unknown";
+
+export function getRuntime(): Runtime {
+  if (typeof process === "object") {
+    return "node";
+    //@ts-ignore
+  } else if (typeof Deno === "object") {
+    return "deno";
+  } else if (typeof window === "object") {
+    return "browser";
+  } else {
+    return "unknown";
+  }
+}
+
 // HACK: this entire function is a hacky way to acquire the module name for a
 // given function e.g.: dist/index.js
 export function getModulePath(): string | undefined {
@@ -75,14 +90,17 @@ export function getModulePath(): string | undefined {
 
   let rootDir: string;
 
-  if (typeof process === "object") {
+  const runtime = getRuntime();
+
+  if (runtime === "browser") {
+    rootDir = "";
+  } else if (runtime === "deno") {
+    //@ts-ignore
+    rootDir = Deno.cwd();
+  } else if (runtime === "node") {
     // HACK: this assumes the entire app was run from the root directory of the
     // project
     rootDir = process.cwd();
-    //@ts-ignore
-  } else if (typeof Deno === "object") {
-    //@ts-ignore
-    rootDir = Deno.cwd();
   } else {
     rootDir = "";
   }
