@@ -1,16 +1,21 @@
 import { getMeter } from "./instrumentation";
 
-type BuildInfo = {
+/**
+ * BuildInfo is used to create the `build_info` metric that
+ * helps to identify the version, commit, and branch of the
+ * application, the metrics of which are being collected.
+ */
+export type BuildInfo = {
   version?: string;
   commit?: string;
   branch?: string;
 };
 
-let buildInfo: BuildInfo | undefined;
+export let buildInfo: BuildInfo = {};
 
 export function registerBuildInfo() {
   if (buildInfo) {
-    return;
+    return buildInfo;
   }
 
   buildInfo = {
@@ -22,7 +27,7 @@ export function registerBuildInfo() {
   const gauge = getMeter().createUpDownCounter("build_info");
   gauge.add(1, buildInfo);
 
-	return buildInfo;
+  return buildInfo;
 }
 
 function getVersion(): string | undefined {
