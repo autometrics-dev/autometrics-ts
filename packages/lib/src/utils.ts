@@ -72,14 +72,18 @@ export type Runtime = "node" | "deno" | "browser" | "unknown";
 export function getRuntime(): Runtime {
   if (typeof process === "object" && "cwd" in process) {
     return "node";
-    //@ts-ignore
-  } else if (typeof Deno === "object") {
-    return "deno";
-  } else if (typeof window === "object") {
-    return "browser";
-  } else {
-    return "unknown";
   }
+
+  //@ts-ignore
+  if (typeof Deno === "object") {
+    return "deno";
+  }
+
+  if (typeof window === "object") {
+    return "browser";
+  }
+
+  return "unknown";
 }
 
 // HACK: this entire function is a hacky way to acquire the module name for a
