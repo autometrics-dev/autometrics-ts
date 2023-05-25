@@ -1,4 +1,5 @@
 import { getMeter } from "./instrumentation";
+import { getRuntime, Runtime } from "./utils";
 
 /**
  * BuildInfo is used to create the `build_info` metric that
@@ -18,10 +19,12 @@ export function registerBuildInfo() {
     return buildInfo;
   }
 
+  const runtime = getRuntime();
+
   buildInfo = {
-    version: getVersion(),
-    commit: getCommit(),
-    branch: getBranch(),
+    version: getVersion(runtime),
+    commit: getCommit(runtime),
+    branch: getBranch(runtime),
   };
 
   const gauge = getMeter().createUpDownCounter("build_info");
@@ -30,14 +33,14 @@ export function registerBuildInfo() {
   return buildInfo;
 }
 
-function getVersion(): string | undefined {
-  if (process) {
+function getVersion(runtime: Runtime): string | undefined {
+  if (runtime === "node") {
     if (process.env.npm_package_version) {
       return process.env.npm_package_version;
     }
     return process.env.PACKAGE_VERSION || process.env.AUTOMETRICS_VERSION;
     //@ts-ignore
-  } else if (Deno) {
+  } else if (runtime === "deno") {
     return (
       //@ts-ignore
       Deno.env.get("AUTOMETRICS_VERSION") || Deno.env.get("PACKAGE_VERSION")
@@ -47,11 +50,11 @@ function getVersion(): string | undefined {
   }
 }
 
-function getCommit() {
-  if (process) {
+function getCommit(runtime: Runtime) {
+  if (runtime === "node") {
     return process.env.COMMIT_SHA || process.env.AUTOMETRICS_COMMIT;
     //@ts-ignore
-  } else if (Deno) {
+  } else if (runtime === "deno") {
     //@ts-ignore
     return Deno.env.get("AUTOMETRICS_COMMIT");
   } else {
@@ -59,11 +62,11 @@ function getCommit() {
   }
 }
 
-function getBranch() {
-  if (process) {
+function getBranch(runtime: Runtime) {
+  if (runtime === "node") {
     return process.env.BRANCH_NAME || process.env.AUTOMETRICS_BRANCH;
     //@ts-ignore
-  } else if (Deno) {
+  } else if (runtime === "deno") {
     //@ts-ignore
     return Deno.env.get("AUTOMETRICS_BRANCH");
   } else {
