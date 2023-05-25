@@ -70,7 +70,7 @@ export function getAutometricsClassDecorator(
 export type Runtime = "node" | "deno" | "browser" | "unknown";
 
 export function getRuntime(): Runtime {
-  if (typeof process === "object") {
+  if (typeof process === "object" && "cwd" in process) {
     return "node";
     //@ts-ignore
   } else if (typeof Deno === "object") {
