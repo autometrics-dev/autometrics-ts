@@ -9,6 +9,7 @@ import {
   MetricReader,
   PeriodicExportingMetricReader,
 } from "@opentelemetry/sdk-metrics";
+import { buildInfo, BuildInfo } from "./buildInfo";
 
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
@@ -28,6 +29,12 @@ export type initOptions = {
    * Set a custom push interval in ms (default: 5000ms)
    */
   pushInterval?: number;
+  /**
+   * Optional build info to be added to the build_info metric (necessary for client-side applications).
+   *
+   * See {@link BuildInfo}
+   */
+  buildInfo?: BuildInfo;
 };
 
 /**
@@ -37,6 +44,13 @@ export type initOptions = {
  * @param {initOptions} options
  */
 export function init(options: initOptions) {
+  if (options.buildInfo) {
+    logger("Registering build info");
+    buildInfo.version = options.buildInfo?.version;
+    buildInfo.commit = options.buildInfo?.commit;
+    buildInfo.branch = options.buildInfo?.branch;
+  }
+
   logger("Using the user's Exporter configuration");
   exporter = options.exporter;
   // if a pushGateway is added we overwrite the exporter

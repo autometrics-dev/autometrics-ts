@@ -37,7 +37,7 @@
     "typescript": "^4.9.4"
   },
   "peerDependencies": {
-    "@opentelemetry/exporter-prometheus": "^0.35.1",
-    "@opentelemetry/sdk-metrics": "^1.9.0"
+    "@opentelemetry/exporter-prometheus": ">=0.35.1",
+    "@opentelemetry/sdk-metrics": ">=1.9.0"
   }
 }
