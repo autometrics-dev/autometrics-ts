@@ -84,16 +84,16 @@ const transformerFactory: TransformerFactory<Node> = (
         ) {
           const functionName = maybeFunction.name.escapedText.toString();
 
-          let autoMetricsOptions = addObjectPropertyIfMissing(
+          let autometricsOptions = addObjectPropertyIfMissing(
             factory,
             functionOrOptions,
             "functionName",
             functionName,
           );
 
-          autoMetricsOptions = addObjectPropertyIfMissing(
+          autometricsOptions = addObjectPropertyIfMissing(
             factory,
-            autoMetricsOptions,
+            autometricsOptions,
             "moduleName",
             moduleName,
           );
@@ -110,7 +110,7 @@ const transformerFactory: TransformerFactory<Node> = (
               factory.createIdentifier("autometrics"),
               undefined,
               [
-                autoMetricsOptions,
+                autometricsOptions,
                 factory.createFunctionExpression(
                   undefined,
                   undefined,
