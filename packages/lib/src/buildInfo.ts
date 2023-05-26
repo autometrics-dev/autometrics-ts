@@ -14,8 +14,13 @@ export type BuildInfo = {
 
 export let buildInfo: BuildInfo = {};
 
-export function registerBuildInfo() {
-  if (buildInfo) {
+export function recordBuildInfo(buildInfo: BuildInfo) {
+  const gauge = getMeter().createUpDownCounter("build_info");
+  gauge.add(1, buildInfo);
+}
+
+export function setBuildInfo() {
+  if (Object.keys(buildInfo).length > 0) {
     return buildInfo;
   }
 
@@ -27,8 +32,7 @@ export function registerBuildInfo() {
     branch: getBranch(runtime),
   };
 
-  const gauge = getMeter().createUpDownCounter("build_info");
-  gauge.add(1, buildInfo);
+  recordBuildInfo(buildInfo);
 
   return buildInfo;
 }

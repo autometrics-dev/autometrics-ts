@@ -9,7 +9,7 @@ import {
   MetricReader,
   PeriodicExportingMetricReader,
 } from "@opentelemetry/sdk-metrics";
-import { buildInfo, BuildInfo } from "./buildInfo";
+import { buildInfo, BuildInfo, recordBuildInfo } from "./buildInfo";
 
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
@@ -49,6 +49,7 @@ export function init(options: initOptions) {
     buildInfo.version = options.buildInfo?.version;
     buildInfo.commit = options.buildInfo?.commit;
     buildInfo.branch = options.buildInfo?.branch;
+    recordBuildInfo(buildInfo);
   }
 
   logger("Using the user's Exporter configuration");
