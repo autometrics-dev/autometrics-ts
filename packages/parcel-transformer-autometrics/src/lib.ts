@@ -19,6 +19,7 @@ import {
   visitNode,
   NodeFactory,
   ObjectLiteralExpression,
+  isVariableDeclaration,
 } from "typescript";
 
 let moduleName: string;
@@ -31,6 +32,99 @@ const transformerFactory: TransformerFactory<Node> = (
       node = visitEachChild(node, visit, context);
 
       if (
+        isVariableDeclaration(node) &&
+        isIdentifier(node.name) &&
+        isCallExpression(node.initializer) &&
+        isIdentifier(node.initializer.expression) &&
+        node.initializer.expression.escapedText === "autometrics"
+      ) {
+        const [functionOrOptions, maybeFunction] = node.initializer.arguments;
+        if (isFunctionExpression(functionOrOptions)) {
+          const functionName = functionOrOptions.name.escapedText.toString();
+
+          const autometricsOptions = factory.createObjectLiteralExpression([
+            factory.createPropertyAssignment(
+              "functionName",
+              factory.createStringLiteral(functionName),
+            ),
+            factory.createPropertyAssignment(
+              "moduleName",
+              factory.createStringLiteral(moduleName),
+            ),
+          ]);
+
+          console.log(
+            `Autometrics: Adding options to ${functionName} in ${moduleName}`,
+          );
+
+          return factory.createVariableDeclaration(
+            factory.createIdentifier(node.name.escapedText.toString()),
+            undefined,
+            undefined,
+            factory.createCallExpression(
+              factory.createIdentifier("autometrics"),
+              undefined,
+              [
+                autometricsOptions,
+                factory.createFunctionExpression(
+                  undefined,
+                  undefined,
+                  factory.createIdentifier(functionName),
+                  undefined,
+                  [],
+                  undefined,
+                  factory.createBlock([], false),
+                ),
+              ],
+            ),
+          );
+        } else if (
+          isObjectLiteralExpression(functionOrOptions) &&
+          isFunctionExpression(maybeFunction)
+        ) {
+          const functionName = maybeFunction.name.escapedText.toString();
+
+          let autoMetricsOptions = addObjectPropertyIfMissing(
+            factory,
+            functionOrOptions,
+            "functionName",
+            functionName,
+          );
+
+          autoMetricsOptions = addObjectPropertyIfMissing(
+            factory,
+            autoMetricsOptions,
+            "moduleName",
+            moduleName,
+          );
+
+          console.log(
+            `Autometrics: Adding options to ${functionName} in ${moduleName}`,
+          );
+
+          return factory.createVariableDeclaration(
+            factory.createIdentifier(node.name.escapedText.toString()),
+            undefined,
+            undefined,
+            factory.createCallExpression(
+              factory.createIdentifier("autometrics"),
+              undefined,
+              [
+                autoMetricsOptions,
+                factory.createFunctionExpression(
+                  undefined,
+                  undefined,
+                  factory.createIdentifier(functionName),
+                  undefined,
+                  [],
+                  undefined,
+                  factory.createBlock([], false),
+                ),
+              ],
+            ),
+          );
+        }
+      } else if (
         isExpressionStatement(node) &&
         isCallExpression(node.expression) &&
         isIdentifier(node.expression.expression) &&
@@ -71,16 +165,16 @@ const transformerFactory: TransformerFactory<Node> = (
         ) {
           const functionName = maybeFunction.name.escapedText.toString();
 
-          let options = addObjectPropertyIfMissing(
+          let autometricsOptions = addObjectPropertyIfMissing(
             factory,
             functionOrOptions,
             "functionName",
             functionName,
           );
 
-          options = addObjectPropertyIfMissing(
+          autometricsOptions = addObjectPropertyIfMissing(
             factory,
-            options,
+            autometricsOptions,
             "moduleName",
             moduleName,
           );
@@ -93,7 +187,7 @@ const transformerFactory: TransformerFactory<Node> = (
             factory.createCallExpression(
               node.expression.expression,
               node.expression.typeArguments,
-              factory.createNodeArray([options, maybeFunction]),
+              factory.createNodeArray([autometricsOptions, maybeFunction]),
             ),
           );
         }

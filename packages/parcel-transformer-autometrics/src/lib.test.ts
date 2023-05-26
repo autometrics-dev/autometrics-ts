@@ -32,12 +32,33 @@ describe("Parcel transformer", () => {
     expect(addAutometricsOptions(source, filePath)).toEqual(transformed);
   });
 
-  test("Adds autometrics options to a wrapped function in a variable assignment", () => {
+  test("Adds options to a variable assignment", () => {
     const filePath = "path/to/module4.ts";
 
-    const source = "const myFunction = autometrics(function myFunction() { });";
+    const source =
+      "const renamedFunction = autometrics(function myFunction() { });";
 
-    const transformed = `const myFunction = autometrics({ moduleName: "module4.ts", functionName: "myFunction" }, function myFunction() { });`;
+    const transformed = `const renamedFunction = autometrics({ functionName: "myFunction", moduleName: "module4.ts" }, function myFunction() { });`;
+
+    expect(addAutometricsOptions(source, filePath)).toEqual(transformed);
+  });
+
+  test("Adds moduleName to the options in a variable assignment", () => {
+    const filePath = "path/to/module5.ts";
+
+    const source = `const myFunction = autometrics({ functionName: "renamedFunction" }, function myFunction() { });`;
+
+    const transformed = `const myFunction = autometrics({ functionName: "renamedFunction", moduleName: "module5.ts" }, function myFunction() { });`;
+
+    expect(addAutometricsOptions(source, filePath)).toEqual(transformed);
+  });
+
+  test("Adds functionName to the options in a variable assignment", () => {
+    const filePath = "path/to/module5.ts";
+
+    const source = `const myFunction = autometrics({ moduleName: "renamedModule.ts" }, function myFunction() { });`;
+
+    const transformed = `const myFunction = autometrics({ moduleName: "renamedModule.ts", functionName: "myFunction" }, function myFunction() { });`;
 
     expect(addAutometricsOptions(source, filePath)).toEqual(transformed);
   });
