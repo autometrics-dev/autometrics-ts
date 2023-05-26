@@ -10,7 +10,7 @@ import {
   isObject,
   isPromise,
 } from "./utils";
-import { registerBuildInfo } from "./buildInfo";
+import { setBuildInfo } from "./buildInfo";
 
 let asyncLocalStorage: ALSInstance | undefined;
 if (typeof window === "undefined") {
@@ -181,7 +181,7 @@ export function autometrics<F extends FunctionSig>(
 
   return function (...params) {
     const meter = getMeter();
-    registerBuildInfo();
+    setBuildInfo();
     const autometricsStart = performance.now();
     const counter = meter.createCounter("function.calls.count");
     const histogram = meter.createHistogram("function.calls.duration");
