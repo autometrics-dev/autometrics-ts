@@ -6,7 +6,7 @@ export default new Transformer({
     const { filePath } = asset;
     const code = await asset.getCode();
 
-    if (/\.(js|ts)x?$/.test(filePath) && code.includes("autometrics(")) {
+    if (/\.(js|ts)x?$/.test(filePath) && code.includes("autometrics")) {
       const transformedCode = addAutometricsOptions(code, filePath);
       asset.setCode(transformedCode);
     }
