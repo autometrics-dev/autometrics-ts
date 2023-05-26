@@ -24,9 +24,8 @@
     "build": "tsc",
     "clean": "rm -rf dist/"
   },
-  "devDependencies": {},
   "dependencies": {
-    "@parcel/plugin": "^2.8.3",
+    "@parcel/plugin": "^2.9.0",
     "typescript": ">=4.9.4"
   }
 }
