@@ -10,10 +10,11 @@ jobs:
         # Setup .npmrc file to publish to npm
       - uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "18.x"
+          registry-url: "https://registry.npmjs.org"
           scope: "@autometrics"
       - run: npm ci
+      - run: npm install @rometools/cli-linux-x64
       - run: npm run build --workspaces
       - run: npm publish --workspaces
         env:
