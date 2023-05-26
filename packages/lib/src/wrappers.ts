@@ -1,20 +1,16 @@
 import { Attributes } from "@opentelemetry/api";
-import { AsyncLocalStorage } from "async_hooks";
-
 import type { Objective } from "./objectives";
 import { getMeter } from "./instrumentation";
 import {
   ALSInstance,
   getALSCaller,
   getALSInstance,
-  getAutometricsClassDecorator,
-  getAutometricsMethodDecorator,
   getModulePath,
   isFunction,
   isObject,
   isPromise,
 } from "./utils";
-import { registerBuildInfo } from "./buildInfo";
+import { setBuildInfo } from "./buildInfo";
 
 let asyncLocalStorage: ALSInstance | undefined;
 if (typeof window === "undefined") {
@@ -185,7 +181,7 @@ export function autometrics<F extends FunctionSig>(
 
   return function (...params) {
     const meter = getMeter();
-    registerBuildInfo();
+    setBuildInfo();
     const autometricsStart = performance.now();
     const counter = meter.createCounter("function.calls.count");
     const histogram = meter.createHistogram("function.calls.duration");
@@ -382,4 +378,67 @@ export function Autometrics<T extends Function | Object>(
   }
 
   return decorator;
+}
+
+/**
+ * Decorator factory that returns a method decorator. Optionally accepts
+ * an autometrics options object.
+ * @param autometricsOptions
+ */
+export function getAutometricsMethodDecorator(
+  autometricsOptions?: AutometricsOptions,
+) {
+  return function (
+    _target: Object,
+    _propertyKey: string,
+    descriptor: PropertyDescriptor,
+  ) {
+    const originalFunction = descriptor.value;
+    const functionOrOptions = autometricsOptions ?? originalFunction;
+    const functionInput = autometricsOptions ? originalFunction : undefined;
+
+    descriptor.value = autometrics(functionOrOptions, functionInput);
+
+    return descriptor;
+  };
+}
+
+/**
+ * Decorator factory that returns a class decorator that instruments all methods
+ * of a class with autometrics. Optionally accepts an autometrics options
+ * object.
+ * @param autometricsOptions
+ */
+export function getAutometricsClassDecorator(
+  autometricsOptions?: AutometricsClassDecoratorOptions,
+): ClassDecorator {
+  return function (classConstructor: Function) {
+    const prototype = classConstructor.prototype;
+    const propertyNames = Object.getOwnPropertyNames(prototype);
+    const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
+
+    for (const propertyName of propertyNames) {
+      const property = prototype[propertyName];
+      const descriptor = Object.getOwnPropertyDescriptor(
+        prototype,
+        propertyName,
+      );
+
+      if (
+        typeof property !== "function" ||
+        propertyName === "constructor" ||
+        !descriptor
+      ) {
+        continue;
+      }
+
+      const instrumentedDescriptor = methodDecorator(
+        {},
+        propertyName,
+        descriptor,
+      );
+
+      Object.defineProperty(prototype, propertyName, instrumentedDescriptor);
+    }
+  };
 }

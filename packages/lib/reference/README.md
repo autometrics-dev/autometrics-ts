@@ -13,7 +13,7 @@
 
 #### Defined in
 
-[wrappers.ts:289](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/wrappers.ts#L289)
+[wrappers.ts:289](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/wrappers.ts#L289)
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 #### Defined in
 
-[wrappers.ts:43](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/wrappers.ts#L43)
+[wrappers.ts:43](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/wrappers.ts#L43)
 
 ___
 
@@ -85,7 +85,7 @@ However, they are enabled when the special labels are present on certain metrics
 
 #### Defined in
 
-[objectives.ts:36](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/objectives.ts#L36)
+[objectives.ts:36](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/objectives.ts#L36)
 
 ___
 
@@ -97,13 +97,14 @@ ___
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `buildInfo?` | `BuildInfo` | Optional build info to be added to the build_info metric (necessary for client-side applications). See BuildInfo |
 | `exporter?` | `Exporter` | A custom exporter to be used instead of the bundled Prometheus Exporter on port 9464 |
 | `pushGateway?` | `string` | The full URL (including http://) of the aggregating push gateway for metrics to be submitted to. |
 | `pushInterval?` | `number` | Set a custom push interval in ms (default: 5000ms) |
 
 #### Defined in
 
-[instrumentation.ts:18](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/instrumentation.ts#L18)
+[instrumentation.ts:19](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/instrumentation.ts#L19)
 
 ## Functions
 
@@ -225,7 +226,7 @@ class Foo {
 
 #### Defined in
 
-[wrappers.ts:357](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/wrappers.ts#L357)
+[wrappers.ts:357](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/wrappers.ts#L357)
 
 ___
 
@@ -301,7 +302,7 @@ const user = createUser();
 
 #### Defined in
 
-[wrappers.ts:124](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/wrappers.ts#L124)
+[wrappers.ts:124](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/wrappers.ts#L124)
 
 ___
 
@@ -324,4 +325,4 @@ Required if using autometrics in a client-side application. See [initOptions](RE
 
 #### Defined in
 
-[instrumentation.ts:39](https://github.com/autometrics-dev/autometrics-ts/blob/97db82d/packages/lib/src/instrumentation.ts#L39)
+[instrumentation.ts:46](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/instrumentation.ts#L46)

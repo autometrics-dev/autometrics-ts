@@ -1,70 +1,20 @@
-import {
-  autometrics,
-  AutometricsClassDecoratorOptions,
-  AutometricsOptions,
-} from "./wrappers";
+export type Runtime = "node" | "deno" | "browser" | "unknown";
 
-/**
- * Decorator factory that returns a method decorator. Optionally accepts
- * an autometrics options object.
- * @param autometricsOptions
- */
-export function getAutometricsMethodDecorator(
-  autometricsOptions?: AutometricsOptions,
-) {
-  return function (
-    _target: Object,
-    _propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) {
-    const originalFunction = descriptor.value;
-    const functionOrOptions = autometricsOptions ?? originalFunction;
-    const functionInput = autometricsOptions ? originalFunction : undefined;
+export function getRuntime(): Runtime {
+  if (typeof process === "object" && "cwd" in process) {
+    return "node";
+  }
 
-    descriptor.value = autometrics(functionOrOptions, functionInput);
+  //@ts-ignore
+  if (typeof Deno === "object") {
+    return "deno";
+  }
 
-    return descriptor;
-  };
-}
+  if (typeof window === "object") {
+    return "browser";
+  }
 
-/**
- * Decorator factory that returns a class decorator that instruments all methods
- * of a class with autometrics. Optionally accepts an autometrics options
- * object.
- * @param autometricsOptions
- */
-export function getAutometricsClassDecorator(
-  autometricsOptions?: AutometricsClassDecoratorOptions,
-): ClassDecorator {
-  return function (classConstructor: Function) {
-    const prototype = classConstructor.prototype;
-    const propertyNames = Object.getOwnPropertyNames(prototype);
-    const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
-
-    for (const propertyName of propertyNames) {
-      const property = prototype[propertyName];
-      const descriptor = Object.getOwnPropertyDescriptor(
-        prototype,
-        propertyName,
-      );
-
-      if (
-        typeof property !== "function" ||
-        propertyName === "constructor" ||
-        !descriptor
-      ) {
-        continue;
-      }
-
-      const instrumentedDescriptor = methodDecorator(
-        {},
-        propertyName,
-        descriptor,
-      );
-
-      Object.defineProperty(prototype, propertyName, instrumentedDescriptor);
-    }
-  };
+  return "unknown";
 }
 
 // HACK: this entire function is a hacky way to acquire the module name for a
@@ -75,14 +25,17 @@ export function getModulePath(): string | undefined {
 
   let rootDir: string;
 
-  if (typeof process === "object") {
+  const runtime = getRuntime();
+
+  if (runtime === "browser") {
+    rootDir = "";
+  } else if (runtime === "deno") {
+    //@ts-ignore
+    rootDir = Deno.cwd();
+  } else if (runtime === "node") {
     // HACK: this assumes the entire app was run from the root directory of the
     // project
     rootDir = process.cwd();
-    //@ts-ignore
-  } else if (typeof Deno === "object") {
-    //@ts-ignore
-    rootDir = Deno.cwd();
   } else {
     rootDir = "";
   }
