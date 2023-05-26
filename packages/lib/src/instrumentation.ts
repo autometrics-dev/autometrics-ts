@@ -56,20 +56,20 @@ export function init(options: initOptions) {
     // Make sure the provider is initialized and exporter is registered
     getMetricsProvider();
 
-    // buildInfo is added to init function only for client-side applications
-    // if it is provided - we register it
-    if (options.buildInfo) {
-      logger("Registering build info");
-      buildInfo.version = options.buildInfo?.version;
-      buildInfo.commit = options.buildInfo?.commit;
-      buildInfo.branch = options.buildInfo?.branch;
-      recordBuildInfo(buildInfo); // record build info only after the exporter is initialized
-    }
-
     setInterval(
       () => pushToGateway(options.pushGateway),
       options.pushInterval ?? 5000,
     );
+  }
+
+  // buildInfo is added to init function only for client-side applications
+  // if it is provided - we register it
+  if (options.buildInfo) {
+    logger("Registering build info");
+    buildInfo.version = options.buildInfo?.version;
+    buildInfo.commit = options.buildInfo?.commit;
+    buildInfo.branch = options.buildInfo?.branch;
+    recordBuildInfo(buildInfo); // record build info only after the exporter is initialized
   }
 }
 
