@@ -5,12 +5,9 @@ describe("Parcel transformer", () => {
   test("Injects options", () => {
     const filePath = "path/to/module.ts";
 
-    const source = `
-autometrics(function myFunction() { });
-    `.trim();
+    const source = "autometrics(function myFunction() { });";
 
-    const transformed = `
-autometrics({ functionName: "myFunction", moduleName: "module.ts" }, function myFunction() { });`.trim();
+    const transformed = `autometrics({ functionName: "myFunction", moduleName: "module.ts" }, function myFunction() { });`;
 
     expect(addAutometricsOptions(source, filePath)).toEqual(transformed);
   });
@@ -38,7 +35,7 @@ autometrics({ functionName: "myFunction", moduleName: "module.ts" }, function my
   test("Adds autometrics options to a wrapped function in a variable assignment", () => {
     const filePath = "path/to/module4.ts";
 
-    const source = `const myFunction = autometrics(function myFunction() { });`;
+    const source = "const myFunction = autometrics(function myFunction() { });";
 
     const transformed = `const myFunction = autometrics({ moduleName: "module4.ts", functionName: "myFunction" }, function myFunction() { });`;
 
