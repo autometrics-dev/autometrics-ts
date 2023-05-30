@@ -1,8 +1,20 @@
 # Changelog
 
+## [v0.5] - 2023-05-26
+
+### Added
+
+- added support for tracking function caller requests (a.k.a. "Tracing Lite")
+- added API reference documentation
+
+### Changed
+
+- improves `build_info` to ensure it doesn't crash in the browser
+
 ## [v0.4] - 2023-05-12
 
 ### Added
+
 - added support for tracking concurrent requests on each function
 - added support for applying `@Autometrics()` to entire classes
 - updated the decorator to support latest features (SLOs)

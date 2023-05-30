@@ -5,6 +5,14 @@ import {
 } from "@opentelemetry/sdk-metrics";
 import { afterEach, beforeAll, describe, expect, test } from "vitest";
 import { init } from "../src";
+import { getMetricsProvider } from "../src/instrumentation";
+import { collectAndSerialize } from "./util";
+
+const buildInfo = {
+  version: "1.0.0",
+  commit: "123456789",
+  branch: "main",
+};
 
 let exporter: PeriodicExportingMetricReader;
 
@@ -13,7 +21,10 @@ describe("Autometrics build info tests", () => {
     exporter = new PeriodicExportingMetricReader({
       exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
     });
-    init({ exporter });
+
+    init({ buildInfo, exporter });
+
+    getMetricsProvider();
   });
 
   afterEach(async () => {
@@ -21,18 +32,11 @@ describe("Autometrics build info tests", () => {
   });
 
   test("build info is recorded", async () => {
-    const buildInfo = {
-      version: "1.0.0",
-      commit: "123456789",
-      branch: "main",
-    };
-    init({ buildInfo });
+    const buildInfoMetric =
+      /build_info{version="1.0.0",commit="123456789",branch="main"}/gm;
 
-    const buildInfoGauge = await exporter.collect();
-    const buildInfoGaugeData =
-      buildInfoGauge.resourceMetrics.scopeMetrics[0].metrics[0].dataPoints[0]
-        .attributes;
+    const serialized = await collectAndSerialize(exporter);
 
-    expect(buildInfoGaugeData).toEqual(buildInfo);
+    expect(serialized).toMatch(buildInfoMetric);
   });
 });

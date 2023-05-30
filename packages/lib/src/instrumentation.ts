@@ -44,14 +44,6 @@ export type initOptions = {
  * @param {initOptions} options
  */
 export function init(options: initOptions) {
-  if (options.buildInfo) {
-    logger("Registering build info");
-    buildInfo.version = options.buildInfo?.version;
-    buildInfo.commit = options.buildInfo?.commit;
-    buildInfo.branch = options.buildInfo?.branch;
-    recordBuildInfo(buildInfo);
-  }
-
   logger("Using the user's Exporter configuration");
   exporter = options.exporter;
   // if a pushGateway is added we overwrite the exporter
@@ -63,10 +55,21 @@ export function init(options: initOptions) {
     });
     // Make sure the provider is initialized and exporter is registered
     getMetricsProvider();
+
     setInterval(
       () => pushToGateway(options.pushGateway),
       options.pushInterval ?? 5000,
     );
+  }
+
+  // buildInfo is added to init function only for client-side applications
+  // if it is provided - we register it
+  if (options.buildInfo) {
+    logger("Registering build info");
+    buildInfo.version = options.buildInfo?.version;
+    buildInfo.commit = options.buildInfo?.commit;
+    buildInfo.branch = options.buildInfo?.branch;
+    recordBuildInfo(buildInfo); // record build info only after the exporter is initialized
   }
 }
 
