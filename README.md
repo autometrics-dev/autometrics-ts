@@ -9,36 +9,30 @@
 
 <hr />
 
-> A TypeScript port of the Rust
-> [autometrics-rs](https://github.com/fiberplane/autometrics-rs) library
+Autometrics is an observability micro-framework built for developers.
 
-**A library that makes it easy to understand the error rate, response time, and
-production usage of any function in your code.** Jump straight from your IDE to
-live Prometheus charts for each HTTP/RPC handler, database method, or other
-piece of application logic.
+The TypeScript/JavaScript library provides a wrapper for functions and decorator
+for classes and methods to instrument your function with the most useful
+metrics: request rate, error rate, and latency. Autometrics uses instrumented
+function names to generate Prometheus queries so you don’t need to hand-write
+complicated PromQL.
 
-Autometrics for TypeScript provides a wrapper function and a decorator that can
-create Prometheus or OpenTelemetry metrics for your functions and class methods
-throughout your code base, as well as a language service plugin that will write
-corresponding Prometheus queries for you.
-
-See [Why Autometrics?](https://github.com/autometrics-dev#why-autometrics) for
-more details on the ideas behind autometrics
+[Learn more about Autometrics here](https://autometrics.dev/) or watch the demo below.
 
 ![AutometricsTS demo](./assets/autometrics-ts-demo.gif)
 
 ## Features
 
-- ✨ `autometrics` wrapper instruments any function or class method to track its
+- ✨ `autometrics()` wrapper / `@Autometrics()` instruments any function or class method to track its
   most useful metrics
-- 🌳 Works in NodeJS and browser environments (Deno and serverless support coming soon)
+- 🌳 Works in NodeJS, experimental support for browser and Deno environments
 - 💡 Writes Prometheus queries so you can understand the data generated without
   knowing PromQL
 - 🔗 Injects links to live Prometheus charts directly into each function's doc
+- 🔍 Identify commits that introduced errors or increased latency
+- 🚨 Define alerts using SLO best practices directly in your source code
   comments
-- [📊 Grafana dashboards](#dashboards) work out of the box to visualize the performance of instrumented functions & SLOs
-- 🚨 Generates Prometheus alerting rules using SLO best practices
-  from simple annotations in your code
+- [📊 Grafana dashboards](/packages/lib/reference) work out of the box to visualize the performance of instrumented functions & SLOs
 - ⚡ Minimal runtime overhead
 
 ## How it works
