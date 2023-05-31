@@ -34,6 +34,7 @@ const transformerFactory: TransformerFactory<Node> = (
       if (
         isVariableDeclaration(node) &&
         isIdentifier(node.name) &&
+        node.initializer &&
         isCallExpression(node.initializer) &&
         isIdentifier(node.initializer.expression) &&
         node.initializer.expression.escapedText === "autometrics"
@@ -64,18 +65,7 @@ const transformerFactory: TransformerFactory<Node> = (
             factory.createCallExpression(
               factory.createIdentifier("autometrics"),
               undefined,
-              [
-                autometricsOptions,
-                factory.createFunctionExpression(
-                  undefined,
-                  undefined,
-                  factory.createIdentifier(functionName),
-                  undefined,
-                  [],
-                  undefined,
-                  factory.createBlock([], false),
-                ),
-              ],
+              [autometricsOptions, functionOrOptions],
             ),
           );
         } else if (
@@ -109,18 +99,7 @@ const transformerFactory: TransformerFactory<Node> = (
             factory.createCallExpression(
               factory.createIdentifier("autometrics"),
               undefined,
-              [
-                autometricsOptions,
-                factory.createFunctionExpression(
-                  undefined,
-                  undefined,
-                  factory.createIdentifier(functionName),
-                  undefined,
-                  [],
-                  undefined,
-                  factory.createBlock([], false),
-                ),
-              ],
+              [autometricsOptions, maybeFunction],
             ),
           );
         }
