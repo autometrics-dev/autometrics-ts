@@ -26,6 +26,10 @@ export function isAutometricsWrappedOrDecorated(
   // AutometricsWrapper or is wrapped by a function that has a type
   // AutometricsWrapper
   const checkWrapperType = (node: ts.Node) => {
+    if (ts.isSourceFile(node)) {
+      return;
+    }
+
     return typechecker.getTypeAtLocation(node)?.symbol?.getEscapedName();
   };
 
