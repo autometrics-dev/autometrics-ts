@@ -44,7 +44,7 @@ export function isAutometricsWrappedOrDecorated(
   // decorator is applied to either a class method or its parent class
   const method = typechecker
     .getSymbolAtLocation(node)
-    .declarations.find((declaration) => ts.isMethodDeclaration(declaration));
+    ?.declarations.find((declaration) => ts.isMethodDeclaration(declaration));
   if (!method) {
     return false;
   }
@@ -123,7 +123,7 @@ export function getNodeIdentifier(
 export function getNodeType(node: ts.Node, typechecker: ts.TypeChecker) {
   const declaration = typechecker.getSymbolAtLocation(node);
 
-  if (!(declaration.valueDeclaration && node.parent)) {
+  if (!declaration?.valueDeclaration || !node?.parent) {
     return;
   }
 
@@ -143,7 +143,7 @@ export function getNodeType(node: ts.Node, typechecker: ts.TypeChecker) {
   // const originalFunc = () => {}
   if (
     ts.isVariableDeclaration(valueDeclaration) &&
-    ts.isFunctionLike(valueDeclaration.initializer)
+    ts.isFunctionLike(valueDeclaration?.initializer)
   ) {
     return "function";
   }
@@ -152,8 +152,8 @@ export function getNodeType(node: ts.Node, typechecker: ts.TypeChecker) {
   // autometrics
   // const funcWithMetrics = autometrics(originalFunc);
   if (
-    ts.isVariableDeclaration(declaration.valueDeclaration) &&
-    ts.isCallExpression(declaration.valueDeclaration.initializer)
+    ts.isVariableDeclaration(declaration?.valueDeclaration) &&
+    ts.isCallExpression(declaration?.valueDeclaration?.initializer)
   ) {
     return "function";
   }
