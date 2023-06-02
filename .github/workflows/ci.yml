@@ -1,12 +1,12 @@
-name: Check Autometrics wrappers
-
+name: CI
 on:
   push:
     branches: [ "*" ]
   pull_request:
     branches: [ main ]
+
 jobs:
-  verify:
+  test:
     runs-on: ubuntu-latest
 
     steps:
