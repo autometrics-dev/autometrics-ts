@@ -4,12 +4,8 @@
   "description": "Easily add metrics to your system -- and actually understand them using automatically customized Prometheus queries",
   "author": "Fiberplane<info@fiberplane.com>",
   "contributors": [
-    "Brett Beutell",
-    "Evan Schwartz",
-    "Jacco Flenter",
-    "Laurynas Keturakis",
-    "Oscar van Zijverden",
-    "Stephan Lagerwaard"
+    "Brett Beutell", "Evan Schwartz", "Jacco Flenter", "Laurynas Keturakis",
+    "Oscar van Zijverden", "Stephan Lagerwaard"
   ],
   "repository": {
     "url": "https://github.com/autometrics-dev/autometrics-ts.git"
@@ -25,7 +21,8 @@
   "scripts": {
     "build": "tsup",
     "docs": "typedoc",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "publish": "npm publish"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",

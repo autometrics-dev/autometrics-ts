@@ -4,12 +4,8 @@
   "description": "Language service plugin for Autometrics",
   "author": "Fiberplane<info@fiberplane.com>",
   "contributors": [
-    "Brett Beutell",
-    "Evan Schwartz",
-    "Jacco Flenter",
-    "Laurynas Keturakis",
-    "Oscar van Zijverden",
-    "Stephan Lagerwaard"
+    "Brett Beutell", "Evan Schwartz", "Jacco Flenter", "Laurynas Keturakis",
+    "Oscar van Zijverden", "Stephan Lagerwaard"
   ],
   "repository": {
     "url": "https://github.com/autometrics-dev/autometrics-ts.git"
@@ -23,7 +19,8 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
-    "clean": "rm -rf dist/"
+    "clean": "rm -rf dist/",
+    "publish": "npm publish"
   },
   "devDependencies": {
     "typescript": ">=4.9.4"
