@@ -2,24 +2,21 @@
 
 <div align="center">
 <h1>Autometrics</h1>
-<a href="https://github.com/autometrics-dev/autometrics-ts/actions?query=branch%3Amain"><img src="https://github.com/autometrics-dev/autometrics-ts/actions/workflows/check_wrappers.yml/badge.svg?event=push&branch=main" alt="Autometrics CI status" /></a>
+<a href="https://github.com/autometrics-dev/autometrics-ts/actions?query=branch%3Amain"><img src="https://github.com/autometrics-dev/autometrics-ts/actions/workflows/ci.yml/badge.svg?event=push&branch=main" alt="Autometrics CI status" /></a>
 <a href="https://opensource.org/licenses/MIT" rel="nofollow"><img src="https://img.shields.io/npm/l/@autometrics/autometrics" alt="License"></a>
 <a href="https://discord.gg/MJr7pYzZQ4" rel="nofollow"><img src="https://img.shields.io/discord/950489382626951178?label=Discord&logo=discord&logoColor=white" alt="discord server"></a>
 </div>
 
 <hr />
 
-Autometrics is an observability micro-framework built for developers.
-
-The TypeScript/JavaScript library provides a wrapper for functions and decorator
-for classes and methods to instrument your function with the most useful
-metrics: request rate, error rate, and latency. Autometrics uses instrumented
+Autometrics library provides a wrapper for functions and decorator
+for classes and methods to instrument them with the most useful
+metrics: request rate, error rate, and latency. It then uses the instrumented
 function names to generate Prometheus queries so you don’t need to hand-write
 complicated PromQL.
 
-[Learn more about Autometrics here](https://autometrics.dev/) or watch the demo below.
+[Learn more about Autometrics here](https://autometrics.dev/).
 
-![AutometricsTS demo](./assets/autometrics-ts-demo.gif)
 
 ## Features
 
@@ -29,68 +26,57 @@ complicated PromQL.
 - 💡 Writes Prometheus queries so you can understand the data generated without
   knowing PromQL
 - 🔗 Injects links to live Prometheus charts directly into each function's doc
-- 🔍 Identify commits that introduced errors or increased latency
-- 🚨 Define alerts using SLO best practices directly in your source code
+- 🔍 Helps you to [identify commits](https://docs.autometrics.dev/typescript/adding-version-information) that introduced errors or increased latency
+- 🚨 Allows you to [define alerts](https://docs.autometrics.dev/typescript/adding-alerts-and-slos) using SLO best practices directly in your source code
   comments
-- [📊 Grafana dashboards](/packages/lib/reference) work out of the box to visualize the performance of instrumented functions & SLOs
+- 📊 [Grafana
+dashboards](https://github.com/autometrics-dev/autometrics-shared#dashboards)
+work out of the box and visualize the performance of instrumented functions &
+SLOs
 - ⚡ Minimal runtime overhead
 
-## How it works
+## Example 
 
-The Autometrics library:
+```typescript
+import { autometrics } from "autometrics";
 
-- Automatically instruments any wrapped function with OpenTelemetry metrics
-- Uses a Prometheus Exporter to write metrics to a `/metrics` endpoint (by
-  default on port `:9464`) or pushes them to a specified gateway (if used in
-  browser)
-- Uses a TypeScript plugin / VSCode extension to automatically add useful Prometheus queries in the doc comments for instrumented functions
+const createUserWithMetrics = autometrics(async function createUser(payload: User) {
+  // ...
+});
+
+createUserWithMetrics();
+```
+
+![AutometricsTS demo](./assets/autometrics-ts-demo.gif)
 
 ## Quickstart
 
-```shell
+1. Install the library:
+
+```bash
 npm install --save autometrics
+# or
+yarn add --save autometrics
+# or
+pnpm add --save autometrics
 ```
 
-Use the library in your code:
+2. Instrument your code using the `autometrics` wrapper or `Autometrics`
+   decorator
 
 ```typescript
 import { autometrics } from "autometrics";
 ```
 
-> Note for VSCode users: Make sure you set your VSCode TypeScript server
-> to be local to the project (where you have TypeScript installed in your
-> `devDependencies`).
->
-> In `.vscode/settings.json` set:
->
-> ```json
-> {
->   "typescript.tsdk": "node_modules/typescript/lib"
-> }
-> ```
+3. Configure Prometheus to scrape the data
 
-### For projects already using OpenTelemetry metrics
+By default the TypeScript library makes the metrics available on
+`<your_host>:9464/metrics`. Make sure your Prometheus is configured correctly to
+find it.
 
-The default `autometrics` package bundles `@opentelemetry/sdk-metrics` and
-`@opentelemetry/exporter-prometheus` dependencies. If you are already using
-these in your codebase or want to use other custom metrics, use the following
-installation option.
+4. Install the IDE extension
 
-Install the wrappers:
-
-```shell
-npm install --save @autometrics/autometrics
-```
-
-Import and use the library in your code:
-
-```typescript
-import { autometrics } from "@autometrics/autometrics"
-```
-
-## Getting PromQL queries
-
-In order to get PromQL query links in your IDE download the [Autometrics VSCode
+In order to get PromQL query links in your VSCode, download the [Autometrics VSCode
 extension](https://marketplace.visualstudio.com/items?itemName=Fiberplane.autometrics).
 
 If you're on any other IDE you can install and add the TypeScript plugin
@@ -115,42 +101,9 @@ Add the language service plugin to the `tsconfig.json` file:
 }
 ```
 
-## Dashboards
 
-Autometrics provides [Grafana dashboards](https://github.com/autometrics-dev/autometrics-shared#dashboards) that will work for any project instrumented with the library.
-
-## Identifying commits that introduce errors
-
-Autometrics makes it easy to [spot versions and commits that introduce errors or latency](https://fiberplane.com/blog/autometrics-rs-0-4-spot-commits-that-introduce-errors-or-slow-down-your-application).
-
-| Label | Run-Time Environment Variables | Default value |
-|---|---|---|
-| `version` | `AUTOMETRICS_VERSION` or `PACKAGE_VERSION` | `npm_package_version` (set by npm/yarn/pnpm by default) |
-| `commit` | `AUTOMETRICS_COMMIT` or `COMMIT_SHA` | `""` |
-| `branch` | `AUTOMETRICS_BRANCH` or `BRANCH_NAME` | `""` |
-
-## Alerts / SLOs
-
-Autometrics makes it easy to add Prometheus alerts using Service-Level Objectives (SLOs) to a function or group of functions.
-
-This works using pre-defined [Prometheus alerting rules](https://github.com/autometrics-dev/autometrics-shared/blob/main/autometrics.rules.yml) (read more about alerting rules in general [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)).
-By default, most of the recording rules are dormant. They are enabled by specific metric labels that can be automatically attached by autometrics.
-
-To use autometrics SLOs and alerts, create one or multiple [`Objective`s](https://github.com/autometrics-dev/autometrics-ts/blob/main/packages/autometrics-lib/src/objectives.ts) based on the function(s) success rate and/or latency, as shown below. The `Objective` can be passed as an argument to the `autometrics` wrapper function to include the given function in that objective.
-
-```ts
-import { autometrics, Objective, ObjectiveLatency, ObjectivePercentile } from "@autometrics/autometrics";
-
-const API_SLO: Objective = {
- name: 'api',
- successRate: ObjectivePercentile.P99_9,
- latency: [ObjectiveLatency.Ms250, ObjectivePercentile.P99],
-};
-
-const apiHandlerFn = autometrics({ objective: API_SLO }, function apiHandler(
- // ...
-));
-```
+[See the docs](https://docs.autometrics.dev/configuring-prometheus/local) for
+example Prometheus configuration.
 
 ## Using wrappers and decorators in NodeJS
 
@@ -174,26 +127,19 @@ Example:
 ```typescript
 import { autometrics } from "autometrics";
 
-const createUser = autometrics(async function createUser(payload: User) {
+const createUserWithMetrics = autometrics(async function createUser(payload: User) {
   // ...
 });
 
-const user = createUser();
+createUserWithMetrics();
 ```
-
-> **Note**: If you're using the `@autometrics/autometrics` package instead of
-> `autometrics`, import the helper functions from there:
->
-> ```typescript
-> import { autometrics } from "@autometrics/autometrics";
-> ```
 
 ### Decorating class methods
 
 When using a decorator for a class method, it is wrapped in additional code that
 instruments the method with OpenTelemetry metrics.
 
-Here's a snippet from the example code:
+Here's a snippet from a NestJS example project that uses Autometrics:
 
 ```typescript
 import { Controller, Get } from "@nestjs/common";
@@ -212,8 +158,8 @@ export class AppController {
 }
 ```
 
-Alternatively, you can apply the same decorator to a class to instrument all of
-its methods:
+Alternatively, you can apply the same decorator to the entire class and
+instrument all of its methods:
 
 ```typescript
 // ...
@@ -227,15 +173,12 @@ export class AppController {
 }
 ```
 
-### Getting the generated queries
 
-Hover over any Autometrics-instrumented function or class to see its augmented documentation.
-Clicking on any of the links will go directly to the Prometheus
-chart for that function.
+## Using wrappers in the browser (Experimental)
 
-![Autometrics demo](./assets/demo.png)
-
-## Using wrappers in the browser
+> **Note**
+> Support for client-side use of the Autometrics library is still early and
+> experimental.
 
 ### Set up the push gateway
 
@@ -243,9 +186,9 @@ In order for Prometheus to succesfully get your client-side app metrics, you
 will need to push them to an aggregating push gateway [like this
 one](https://github.com/zapier/prom-aggregation-gateway).
 
-Use the `init` function to configure the gateway URL that autometrics should push
-data to. You can also set the push interval with the `pushInterval` property
-(default is every 5000 miliseconds);
+Use the `init` function to configure the gateway URL that Autometrics should
+push the data to. You can also set the push interval with the `pushInterval`
+property (default is every 5000 miliseconds);
 
 ```typescript
 init({ pushGateway: "<link_to_gateway>" });
@@ -253,7 +196,9 @@ init({ pushGateway: "<link_to_gateway>" });
 
 ### Use Autometrics wrapper with options
 
-The same wrapper functions can be used in browser environments. Note that bundlers often change the names of functions and modules in production, which can impact the library.
+The same wrapper functions can be used in browser environments. Note that
+bundlers often change the names of functions and modules in production, which
+can impact the library.
 
 To get around this issue, wrappers accept an options object as
 their first argument, which explicitly assigns a function and module name.
