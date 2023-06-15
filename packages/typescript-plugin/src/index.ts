@@ -16,6 +16,7 @@ import { createLogger, getProxy } from "./utils";
 
 type Config = {
   prometheusUrl?: string;
+  quickInfoMode?: "prometheus" | "html-comment";
 };
 
 function init(modules: { typescript: typeof tsserver }) {
@@ -45,8 +46,7 @@ function init(modules: { typescript: typeof tsserver }) {
         return;
       }
 
-      const prometheusBase = pluginConfig.prometheusUrl;
-      log(prometheusBase);
+      const quickInfoMode = pluginConfig.quickInfoMode || "html-comment";
 
       const sourceFile = languageService.getProgram().getSourceFile(filename);
       const nodeAtCursor = getNodeAtCursor(sourceFile, position);
@@ -66,6 +66,26 @@ function init(modules: { typescript: typeof tsserver }) {
         nodeType,
         typechecker,
       );
+
+      if (quickInfoMode === "html-comment") {
+        const preamble = {
+          kind: "string",
+          text: `\n\n<!-- autometrics_fn: ${nodeIdentifier} -->\n`,
+        };
+        const { documentation } = prior;
+        const enrichedDocumentation = documentation.concat(
+          preamble,
+          documentation,
+        );
+
+        return <ts.QuickInfo>{
+          ...prior,
+          documentation: enrichedDocumentation,
+        };
+      }
+
+      const prometheusBase = pluginConfig.prometheusUrl;
+      log(prometheusBase);
 
       const requestRate = createRequestRateQuery("function", nodeIdentifier);
       const requestRateUrl = makePrometheusUrl(requestRate, prometheusBase);
