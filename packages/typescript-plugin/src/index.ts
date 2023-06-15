@@ -67,6 +67,10 @@ function init(modules: { typescript: typeof tsserver }) {
         typechecker,
       );
 
+      // This could also be called the 'vscode' mode since it's only
+      // really used by the vscode extension. The output of this plugin will
+      // be an html comment containing a the name of the function in a special format
+      // that the vscode extension can parse.
       if (quickInfoMode === "html-comment") {
         const preamble = {
           kind: "string",
