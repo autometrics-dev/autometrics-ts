@@ -46,7 +46,7 @@ function init(modules: { typescript: typeof tsserver }) {
         return;
       }
 
-      const quickInfoMode = pluginConfig.quickInfoMode || "html-comment";
+      const quickInfoMode = pluginConfig.quickInfoMode || "prometheus";
 
       const sourceFile = languageService.getProgram().getSourceFile(filename);
       const nodeAtCursor = getNodeAtCursor(sourceFile, position);
