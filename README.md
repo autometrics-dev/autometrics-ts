@@ -15,7 +15,7 @@ metrics: request rate, error rate, and latency. It then uses the instrumented
 function names to generate Prometheus queries so you don’t need to hand-write
 complicated PromQL.
 
-[Learn more about Autometrics here](https://autometrics.dev/).
+[Learn more about Autometrics at autometrics.dev](https://autometrics.dev/).
 
 
 ## Features
@@ -23,7 +23,7 @@ complicated PromQL.
 - ✨ `autometrics()` wrapper / `@Autometrics()` instruments any function or
 class method to track its
   most useful metrics
-- 🌳 Works in NodeJS, experimental support for browser and Deno environments
+- 🌳 Works in NodeJS and has experimental support for Deno and browser environments
 - 💡 Writes Prometheus queries so you can understand the data generated without
   knowing PromQL
 - 🔗 Injects links to live Prometheus charts directly into each function's doc
@@ -79,7 +79,7 @@ createUserWithMetrics();
 
 By default the TypeScript library makes the metrics available on
 `<your_host>:9464/metrics`. Make sure your Prometheus is configured correctly to
-find it.
+scrape it.
 
 [See the docs](https://docs.autometrics.dev/configuring-prometheus/local) for
 example Prometheus configuration.
