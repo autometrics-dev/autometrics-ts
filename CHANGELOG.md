@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- added `quickInfoMode` config parameter to the typescript plugin. This is for communicating autometrics information from typescript to the autometrics extension.
+- added `docsOutputFormat` config parameter to the typescript plugin. This is for communicating autometrics information from typescript to the autometrics extension.
 
 ## [v0.5] - 2023-05-26
 

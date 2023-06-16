@@ -16,7 +16,7 @@ import { createLogger, getProxy } from "./utils";
 
 type Config = {
   prometheusUrl?: string;
-  quickInfoMode?: "prometheus" | "html-comment";
+  docsOutputFormat?: "prometheus" | "vscode";
 };
 
 function init(modules: { typescript: typeof tsserver }) {
@@ -46,7 +46,7 @@ function init(modules: { typescript: typeof tsserver }) {
         return;
       }
 
-      const quickInfoMode = pluginConfig.quickInfoMode || "prometheus";
+      const docsOutputFormat = pluginConfig.docsOutputFormat || "prometheus";
 
       const sourceFile = languageService.getProgram().getSourceFile(filename);
       const nodeAtCursor = getNodeAtCursor(sourceFile, position);
@@ -67,11 +67,10 @@ function init(modules: { typescript: typeof tsserver }) {
         typechecker,
       );
 
-      // This could also be called the 'vscode' mode since it's only
-      // really used by the vscode extension. The output of this plugin will
+      // The output of this plugin will
       // be an html comment containing a the name of the function in a special format
       // that the vscode extension can parse.
-      if (quickInfoMode === "html-comment") {
+      if (docsOutputFormat === "vscode") {
         const preamble = {
           kind: "string",
           text: `\n\n<!-- autometrics_fn: ${nodeIdentifier} -->\n`,
