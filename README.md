@@ -9,34 +9,26 @@
 
 <hr />
 
-Autometrics library provides a wrapper for functions and decorator
-for classes and methods to instrument them with the most useful
-metrics: request rate, error rate, and latency. It then uses the instrumented
-function names to generate Prometheus queries so you don’t need to hand-write
-complicated PromQL.
+Metrics are a powerful and cost-efficient tool for understanding the health and performance of your code in production. But it's hard to decide what metrics to track and even harder to write queries to understand the data.
+
+Autometrics provides a wrapper function and decorator to instrument functions, classes, and methods with the most useful metrics: request rate, error rate, and latency. It standardizes these metrics and then generates powerful Prometheus queries based on your function details to help you quickly identify and debug issues in production.
 
 [Learn more about Autometrics at autometrics.dev](https://autometrics.dev/).
 
+## Benefits
 
-## Features
-
-- ✨ `autometrics()` wrapper / `@Autometrics()` instruments any function or
-class method to track its
-  most useful metrics
+- ✨ `autometrics()` wrapper / `@Autometrics()` decorator instruments any function or class method to track its most useful metrics
 - 🌳 Works in NodeJS and has experimental support for Deno and browser environments
-- 💡 Writes Prometheus queries so you can understand the data generated without
-  knowing PromQL
+- 💡 Writes Prometheus queries so you can understand the data generated without knowing PromQL
 - 🔗 Injects links to live Prometheus charts directly into each function's doc
 - 🔍 Helps you to [identify commits](https://docs.autometrics.dev/typescript/adding-version-information) that introduced errors or increased latency
-- 🚨 Allows you to [define alerts](https://docs.autometrics.dev/typescript/adding-alerts-and-slos) using SLO best practices directly in your source code
-  comments
-- 📊 [Grafana
-dashboards](https://github.com/autometrics-dev/autometrics-shared#dashboards)
-work out of the box and visualize the performance of instrumented functions &
-SLOs
+- 📊 [Grafana dashboards](https://github.com/autometrics-dev/autometrics-shared#dashboards) work out of the box and visualize the performance of instrumented functions & SLOs
 - ⚡ Minimal runtime overhead
 
-## Example 
+## Advanced Features
+- 🚨 Allows you to [define alerts](https://docs.autometrics.dev/typescript/adding-alerts-and-slos) using SLO best practices directly in your source code comments
+
+## Example
 
 ```typescript
 import { autometrics } from "autometrics";
@@ -52,7 +44,7 @@ createUserWithMetrics();
 
 ## Quickstart
 
-1. Install the library:
+1. **Install the library**
 
 ```bash
 npm install --save autometrics
@@ -62,8 +54,7 @@ yarn add --save autometrics
 pnpm add --save autometrics
 ```
 
-2. Instrument your code using the `autometrics` wrapper or `Autometrics`
-   decorator
+2. **Instrument your code using the `autometrics` wrapper or `Autometrics` decorator**
 
 ```typescript
 import { autometrics } from "autometrics";
@@ -75,20 +66,39 @@ const createUserWithMetrics = autometrics(async function createUser(payload: Use
 createUserWithMetrics();
 ```
 
-3. Configure Prometheus to scrape the data
+```typescript
+import { Autometrics } from "autometrics";
 
-By default the TypeScript library makes the metrics available on
-`<your_host>:9464/metrics`. Make sure your Prometheus is configured correctly to
-scrape it.
+class User {
+  @Autometrics()
+  async createUser(payload: User) {
+    // ...
+  }
+}
+```
 
-[See the docs](https://docs.autometrics.dev/configuring-prometheus/local) for
-example Prometheus configuration.
+3. **Configure Prometheus to scrape the data**
 
-4. Install the IDE extension
+By default the TypeScript library makes the metrics available on `<your_host>:9464/metrics`. Make sure your Prometheus is configured correctly to scrape it.
 
-In order to get PromQL query links in your VSCode, download the [Autometrics VSCode
-extension](https://marketplace.visualstudio.com/items?itemName=Fiberplane.autometrics).
+Here's a minimal sample Prometheus configuration you can use:
 
+```yaml
+scrape_configs:
+  - job_name: my-app
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['localhost:9464']
+    # For a real deployment, you would want the scrape interval to be
+    # longer but for testing, you want the data to show up quickly
+    scrape_interval: 200ms
+```
+
+[See the docs](https://docs.autometrics.dev/configuring-prometheus/local) for more Prometheus configurations.
+
+4. **Install the IDE extension**
+
+In order to get charts in VSCode, download the [Autometrics VSCode extension](https://marketplace.visualstudio.com/items?itemName=Fiberplane.autometrics).
 
 <details>
     <summary>
