@@ -179,15 +179,23 @@ export function autometrics<F extends FunctionSig>(
     }
   }
 
-  return function (...params) {
-    const meter = getMeter();
-    setBuildInfo();
-    const autometricsStart = performance.now();
-    const counter = meter.createCounter("function.calls.count");
-    const histogram = meter.createHistogram("function.calls.duration");
-    const gauge = meter.createUpDownCounter("function.calls.concurrent");
-    const caller = getALSCaller(asyncLocalStorage);
+  const meter = getMeter();
+  setBuildInfo();
+  const counter = meter.createCounter("function.calls.count");
+  const histogram = meter.createHistogram("function.calls.duration");
+  const gauge = meter.createUpDownCounter("function.calls.concurrent");
+  const caller = getALSCaller(asyncLocalStorage);
 
+  counter.add(0, {
+    function: functionName,
+    module: moduleName,
+    result: "ok",
+    caller,
+    ...counterObjectiveAttributes,
+  });
+
+  return function (...params) {
+    const autometricsStart = performance.now();
     if (trackConcurrency) {
       gauge.add(1, {
         function: functionName,
