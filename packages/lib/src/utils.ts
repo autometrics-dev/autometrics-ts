@@ -40,8 +40,6 @@ export function getModulePath(): string | undefined {
     rootDir = "";
   }
 
-  console.log(stack);
-
   if (!stack) {
     return;
   }
