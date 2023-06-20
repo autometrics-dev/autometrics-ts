@@ -56,8 +56,14 @@ export function getModulePath(): string | undefined {
   // The last element in this array will have the full path
   const fullPath = stack[originalCaller].split(" ").pop();
 
-  // We split away everything up to the root directory of the project
-  let modulePath = fullPath.replace(`file://${rootDir}`, "");
+  const containsFileProtocol = fullPath?.includes("file://");
+
+  // We split away everything up to the root directory of the project,
+  // if the path contains file:// we need to remove it
+  let modulePath = fullPath.replace(
+    containsFileProtocol ? `file://${rootDir}` : rootDir,
+    "",
+  );
 
   // We split away the line and column numbers index.js:14:6
   modulePath = modulePath.substring(0, modulePath.indexOf(":"));
@@ -68,6 +74,7 @@ export function getModulePath(): string | undefined {
 type ALSContext = {
   caller?: string;
 };
+
 export type ALSInstance = Awaited<ReturnType<typeof getALSInstance>>;
 
 export async function getALSInstance() {
