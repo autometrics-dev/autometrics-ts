@@ -40,6 +40,8 @@ export function getModulePath(): string | undefined {
     rootDir = "";
   }
 
+  console.log(stack);
+
   if (!stack) {
     return;
   }
@@ -57,7 +59,7 @@ export function getModulePath(): string | undefined {
   const fullPath = stack[originalCaller].split(" ").pop();
 
   // We split away everything up to the root directory of the project
-  let modulePath = fullPath.replace(rootDir, "");
+  let modulePath = fullPath.replace(`file://${rootDir}`, "");
 
   // We split away the line and column numbers index.js:14:6
   modulePath = modulePath.substring(0, modulePath.indexOf(":"));
