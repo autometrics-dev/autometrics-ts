@@ -128,3 +128,19 @@ If you're working with the AST in the TypeScript plugin it can be daunting to
 navigate the syntax tree. [This playground](https://ts-ast-viewer.com) renders
 any pasted TypeScript code in a more usable preview.
 
+## Publishing workflow
+
+Each packages in the monorepo are published using a separate GitHub workflow,
+that triggers when a specific tag is pushed. This means that for each package
+you want to publish you will need to create a separate release.
+
+### Creating a release
+
+1. Ensure that the version number in respective `package.json` is up to date
+2. Make sure that all tests have successfully passed in the latest commit on
+   `main` (the CI will run one more time before publishing it to NPM)
+3. Create a release on GitHub along with a respective tag for each package:
+    - `lib/` (main autometrics library) → tag: `lib-*` (e.g.: `lib-v0.7`)
+    - `typescript-plugin/` → tag: `typescript-plugin-*`
+    - `parcel-transformer-autometrics/` → tag: `parcel-transformer-*`
+4. When the release is published, the relevant GitHub workflow will kick off.
