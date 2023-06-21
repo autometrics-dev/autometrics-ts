@@ -16,6 +16,7 @@ import { createLogger, getProxy } from "./utils";
 
 type Config = {
   prometheusUrl?: string;
+  docsOutputFormat?: "prometheus" | "vscode";
 };
 
 function init(modules: { typescript: typeof tsserver }) {
@@ -45,8 +46,7 @@ function init(modules: { typescript: typeof tsserver }) {
         return;
       }
 
-      const prometheusBase = pluginConfig.prometheusUrl;
-      log(prometheusBase);
+      const docsOutputFormat = pluginConfig.docsOutputFormat || "prometheus";
 
       const sourceFile = languageService.getProgram().getSourceFile(filename);
       const nodeAtCursor = getNodeAtCursor(sourceFile, position);
@@ -66,6 +66,29 @@ function init(modules: { typescript: typeof tsserver }) {
         nodeType,
         typechecker,
       );
+
+      // The output of this plugin will
+      // be an html comment containing a the name of the function in a special format
+      // that the vscode extension can parse.
+      if (docsOutputFormat === "vscode") {
+        const preamble = {
+          kind: "string",
+          text: `\n\n<!-- autometrics_fn: ${nodeIdentifier} -->\n`,
+        };
+        const { documentation } = prior;
+        const enrichedDocumentation = documentation.concat(
+          preamble,
+          documentation,
+        );
+
+        return <ts.QuickInfo>{
+          ...prior,
+          documentation: enrichedDocumentation,
+        };
+      }
+
+      const prometheusBase = pluginConfig.prometheusUrl;
+      log(prometheusBase);
 
       const requestRate = createRequestRateQuery("function", nodeIdentifier);
       const requestRateUrl = makePrometheusUrl(requestRate, prometheusBase);

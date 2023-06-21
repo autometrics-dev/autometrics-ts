@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.5.2] - 2023-06-16
+
+### Added 
+
+- added `docsOutputFormat` config parameter to @autometrics/typescript-plugin. This is for communicating autometrics information from typescript to the autometrics extension.
+
 ## [v0.5] - 2023-05-26
 
 ### Added

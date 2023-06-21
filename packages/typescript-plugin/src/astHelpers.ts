@@ -153,6 +153,7 @@ export function getNodeType(node: ts.Node, typechecker: ts.TypeChecker) {
   // const funcWithMetrics = autometrics(originalFunc);
   if (
     ts.isVariableDeclaration(declaration?.valueDeclaration) &&
+    declaration?.valueDeclaration?.initializer &&
     ts.isCallExpression(declaration?.valueDeclaration?.initializer)
   ) {
     return "function";
