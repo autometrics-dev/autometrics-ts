@@ -56,7 +56,7 @@ export function getModulePath(): string | undefined {
   // The last element in this array will have the full path
   const fullPath = stack[originalCaller].split(" ").pop();
 
-  const containsFileProtocol = fullPath?.includes("file://");
+  const containsFileProtocol = fullPath.includes("file://");
 
   // We split away everything up to the root directory of the project,
   // if the path contains file:// we need to remove it
