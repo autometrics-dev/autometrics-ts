@@ -41,43 +41,32 @@ app.get("/async", autometrics(asyncRoute));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 async function generateRandomTraffic() {
-  const http = await import("http");
   console.log("Generating random traffic");
 
   while (true) {
     const type = Math.floor(Math.random() * 3);
 
-    // sleep duration is between 10 and 50 ms
     const sleepDuration = Math.floor(Math.random() * 400 + 100);
-
-    console.log(`Sleeping for ${sleepDuration}ms`);
 
     switch (type) {
       case 0: {
-        console.log("GET /");
         await fetch("http://localhost:8080");
       }
 
       case 1: {
-        console.log("GET /async");
         await fetch("http://localhost:8080/async");
       }
 
       case 2: {
-        console.log("GET /bad");
         await fetch("http://localhost:8080/bad");
-      }
-
-      default: {
-        console.log("none");
       }
     }
 
-    sleep(sleepDuration);
+    delay(sleepDuration);
   }
 }
 
-const sleep = (ms: number) => {
+const delay = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
