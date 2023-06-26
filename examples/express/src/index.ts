@@ -5,21 +5,19 @@ const app = express();
 
 const port = 8080;
 
-const rootRoute = (req: express.Request, res: express.Response) => {
+function rootRoute(req: express.Request, res: express.Response) {
   console.log("Request made");
   return res.status(200).send("did not delay - success");
-};
+}
 
 function badRoute(req: express.Request, res: express.Response) {
   console.log("Bad route request made");
   throw new Error("Bad request");
 }
 
-const badRouteMetrics = autometrics(badRoute);
-
 async function asyncRoute(req: express.Request, res: express.Response) {
   console.log("Async route request made");
-  const result = await asyncCall(); // works with async
+  const result = await asyncCall();
   return res.status(200).send(result);
 }
 
@@ -31,45 +29,46 @@ function resolveAfterHalfSecond(): Promise<string> {
   });
 }
 
-async function asyncCall() {
+const asyncCall = autometrics(async function asyncCall() {
   console.log("Calling async function");
   return await resolveAfterHalfSecond();
-}
+});
 
 app.get("/", autometrics(rootRoute));
-app.get("/bad", (req, res) => badRouteMetrics(req, res));
+app.get("/bad", autometrics(badRoute));
 app.get("/async", autometrics(asyncRoute));
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 async function generateRandomTraffic() {
-  const loopTimes = Math.floor(Math.random() * 30 + 20);
-  const http = await import("http");
+  console.log("Generating random traffic");
 
-  for (let i = 0; i < loopTimes; i++) {
+  while (true) {
     const type = Math.floor(Math.random() * 3);
+
+    const sleepDuration = Math.floor(Math.random() * 400 + 100);
 
     switch (type) {
       case 0: {
-        http.get("http://localhost:8080");
-        break;
+        await fetch("http://localhost:8080");
       }
 
       case 1: {
-        http.get("http://localhost:8080/async");
-        break;
+        await fetch("http://localhost:8080/async");
       }
 
       case 2: {
-        http.get("http://localhost:8080/bad");
-        break;
+        await fetch("http://localhost:8080/bad");
       }
-
-      default:
-        break;
     }
+
+    delay(sleepDuration);
   }
 }
+
+const delay = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 // We delay firing the sample traffic 1s to ensure
 // Prometheus can pick up the newly registered metrics

@@ -1,9 +1,9 @@
 name: CI
 on:
   push:
-    branches: [ "*" ]
+    branches: ["*"]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
@@ -18,6 +18,9 @@ jobs:
 
       - name: Setup the project
         run: npm ci
+
+      - name: Install rome cli tools
+        run: npm install @rometools/cli-linux-x64
 
       - name: Run linter and format checker
         run: npm run lint

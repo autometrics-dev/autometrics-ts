@@ -1,8 +1,8 @@
-name: Publish lib/ (and convenience package autometrics/) packages to NPMJS
+name: Publish Parcel transformer plugin package to NPMJS
 on:
   push:
     tags:
-      - "lib-*"
+      - "parcel-transformer-*"
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -41,7 +41,8 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run build --workspace=@autometrics/autometrics --workspace=autometrics
-      - run: npm publish --workspace=@autometrics/autometrics --workspace=autometrics 
+      - run: npm run build --workspace=@autometrics/parcel-transformer-autometrics
+      - run: npm run publish --workspace=@autometrics/parcel-transformer-autometrics
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+

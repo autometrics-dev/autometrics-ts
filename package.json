@@ -3,9 +3,10 @@
   "type": "module",
   "name": "autometrics-monorepo",
   "workspaces": [
-    "packages/typescript-plugin",
+    "packages/autometrics",
     "packages/lib",
-    "packages/autometrics"
+    "packages/parcel-transformer-autometrics",
+    "packages/typescript-plugin"
   ],
   "main": "index.js",
   "scripts": {
@@ -15,9 +16,12 @@
     "build:lib": "npm run build --workspace=@autometrics/autometrics",
     "dev:lib": "npm run dev --workspace=@autometrics/autometrics",
     "clean:lib": "npm run clean --workspace=@autometrics/autometrics",
-    "build:plugin": "npm run build --workspace=@autometrics/typescript-plugin",
-    "dev:plugin": "npm run dev --workspace=@autometrics/typescript-plugin",
-    "clean:plugin": "npm run clean --workspace=@autometrics/typescript-plugin",
+    "build:typescript-plugin": "npm run build --workspace=@autometrics/typescript-plugin",
+    "dev:typescript-plugin": "npm run dev --workspace=@autometrics/typescript-plugin",
+    "clean:typescript-plugin": "npm run clean --workspace=@autometrics/typescript-plugin",
+    "build:parcel-plugin": "npm run build --workspace=@autometrics/parcel-transformer-autometrics",
+    "dev:parcel-plugin": "npm dev build --workspace=@autometrics/parcel-transformer-autometrics",
+    "clean:parcel-plugin": "npm clean build --workspace=@autometrics/parcel-transformer-autometrics",
     "build": "npm run build --workspaces",
     "test": "vitest",
     "lint": "rome ci packages/**/src"

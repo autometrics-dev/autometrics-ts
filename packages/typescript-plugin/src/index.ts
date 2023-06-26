@@ -105,7 +105,7 @@ function init(modules: { typescript: Tsserver }) {
         prometheusBase,
       );
 
-      const errorRatio = createErrorRatioQuery("caller", nodeIdentifier);
+      const errorRatio = createErrorRatioQuery("function", nodeIdentifier);
       const errorRatioUrl = makePrometheusUrl(errorRatio, prometheusBase);
 
       const calleeErrorRatio = createErrorRatioQuery("caller", nodeIdentifier);
