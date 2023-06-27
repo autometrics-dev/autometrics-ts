@@ -24,7 +24,7 @@
     "clean": "rm -rf ./dist/",
     "build": "tsc",
     "dev": "tsc --watch",
-    "publish": "npm publish"
+    "release": "npm publish"
   },
   "devDependencies": {
     "@types/node": "^18.14.6",

@@ -39,7 +39,7 @@ jobs:
       - run: npm ci
 
       - run: npm run build --workspace=@autometrics/typescript-plugin
-      - run: npm run publish --workspace=@autometrics/typescript-plugin
+      - run: npm run release --workspace=@autometrics/typescript-plugin
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

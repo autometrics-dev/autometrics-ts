@@ -42,6 +42,6 @@ jobs:
       - run: npm ci
 
       - run: npm run build --workspace=@autometrics/autometrics --workspace=autometrics
-      - run: npm publish --workspace=@autometrics/autometrics --workspace=autometrics 
+      - run: npm run release --workspace=@autometrics/autometrics --workspace=autometrics 
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

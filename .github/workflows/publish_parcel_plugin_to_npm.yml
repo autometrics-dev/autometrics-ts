@@ -42,7 +42,7 @@ jobs:
       - run: npm ci
 
       - run: npm run build --workspace=@autometrics/parcel-transformer-autometrics
-      - run: npm run publish --workspace=@autometrics/parcel-transformer-autometrics
+      - run: npm run release --workspace=@autometrics/parcel-transformer-autometrics
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

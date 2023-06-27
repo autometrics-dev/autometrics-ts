@@ -20,7 +20,7 @@
     "dev": "tsc --watch",
     "build": "tsc",
     "clean": "rm -rf dist/",
-    "publish": "npm publish"
+    "release": "npm publish"
   },
   "devDependencies": {
     "typescript": ">=4.9.4"
