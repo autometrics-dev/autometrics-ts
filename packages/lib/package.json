@@ -22,7 +22,7 @@
     "build": "tsup",
     "docs": "typedoc",
     "dev": "tsup --watch",
-    "publish": "npm publish"
+    "release": "npm publish"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
