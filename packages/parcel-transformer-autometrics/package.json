@@ -1,6 +1,6 @@
 {
   "name": "@autometrics/parcel-transformer-autometrics",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Parcel transformer plugin for Autometrics",
   "author": "Fiberplane<info@fiberplane.com>",
   "contributors": [
