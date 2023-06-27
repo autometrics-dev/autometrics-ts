@@ -1,4 +1,4 @@
-import tsserver from "typescript/lib/tsserverlibrary";
+import type { QuickInfo, server } from "typescript/lib/tsserverlibrary";
 
 import {
   getNodeAtCursor,
@@ -13,13 +13,14 @@ import {
   makePrometheusUrl,
 } from "./queryHelpers";
 import { createLogger, getProxy } from "./utils";
+import { Tsserver } from "./types";
 
 type Config = {
   prometheusUrl?: string;
   docsOutputFormat?: "prometheus" | "vscode";
 };
 
-function init(modules: { typescript: typeof tsserver }) {
+function init(modules: { typescript: Tsserver }) {
   let pluginConfig: Config;
   const ts = modules.typescript;
 
@@ -27,7 +28,7 @@ function init(modules: { typescript: typeof tsserver }) {
     config,
     languageService,
     project,
-  }: ts.server.PluginCreateInfo) {
+  }: server.PluginCreateInfo) {
     const log = createLogger(project);
     log("started");
 
@@ -49,11 +50,12 @@ function init(modules: { typescript: typeof tsserver }) {
       const docsOutputFormat = pluginConfig.docsOutputFormat || "prometheus";
 
       const sourceFile = languageService.getProgram().getSourceFile(filename);
-      const nodeAtCursor = getNodeAtCursor(sourceFile, position);
-      const nodeType = getNodeType(nodeAtCursor, typechecker);
+      const nodeAtCursor = getNodeAtCursor(sourceFile, position, ts);
+      const nodeType = getNodeType(nodeAtCursor, typechecker, ts);
       const autometrics = isAutometricsWrappedOrDecorated(
         nodeAtCursor,
         typechecker,
+        ts,
       );
 
       // If either autometrics checker or node type is undefined return early
@@ -65,6 +67,7 @@ function init(modules: { typescript: typeof tsserver }) {
         nodeAtCursor,
         nodeType,
         typechecker,
+        ts,
       );
 
       // The output of this plugin will
@@ -184,7 +187,7 @@ function init(modules: { typescript: typeof tsserver }) {
         queries,
       );
 
-      return <ts.QuickInfo>{
+      return <QuickInfo>{
         ...prior,
         documentation: enrichedDocumentation,
       };

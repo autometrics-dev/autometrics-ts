@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.5.3] - 2023-06-26
+
+### Changed
+
+- Fixed issue with running the typescript plugin in combination with typescript 5 (and also fix issues when the vscode extension is bundled with a different version of typescript compared to what vscode is using)
+
 ## [v0.5.2] - 2023-06-16
 
 ### Added 

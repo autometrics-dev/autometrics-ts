@@ -1,5 +1,10 @@
-import ts from "typescript/lib/tsserverlibrary";
-
+import tsserver from "typescript/lib/tsserverlibrary";
+import type {
+  Node,
+  SourceFile,
+  TypeChecker,
+} from "typescript/lib/tsserverlibrary";
+import { Tsserver } from "./types";
 import type { NodeType } from "./types";
 
 /**
@@ -9,8 +14,9 @@ import type { NodeType } from "./types";
  * @param typechecker The helper utility typechecker
  */
 export function isAutometricsWrappedOrDecorated(
-  node: ts.Node,
-  typechecker: ts.TypeChecker,
+  node: Node,
+  typechecker: TypeChecker,
+  ts: Tsserver,
 ) {
   // Checks if the user is hovering over the autometrics wrapper itself in which
   // case we should not show the queries
@@ -25,7 +31,7 @@ export function isAutometricsWrappedOrDecorated(
   // Checks if the function the user is hovering over has a type
   // AutometricsWrapper or is wrapped by a function that has a type
   // AutometricsWrapper
-  const checkWrapperType = (node: ts.Node) => {
+  const checkWrapperType = (node: Node) => {
     if (ts.isSourceFile(node)) {
       return;
     }
@@ -50,11 +56,12 @@ export function isAutometricsWrappedOrDecorated(
   }
 
   const isDecorated =
-    hasAutometricsDecorator(method) || hasAutometricsDecorator(method.parent);
+    hasAutometricsDecorator(method, ts) ||
+    hasAutometricsDecorator(method.parent, ts);
   return isDecorated;
 }
 
-export function hasAutometricsDecorator(node: ts.Node) {
+export function hasAutometricsDecorator(node: Node, ts: Tsserver) {
   const decorators = ts.canHaveDecorators(node) && ts.getDecorators(node);
   if (!decorators) {
     return false;
@@ -69,14 +76,15 @@ export function hasAutometricsDecorator(node: ts.Node) {
 
 /**
  * Gets the node identifier
- * @param node {ts.Node} - the node itself
+ * @param node {Node} - the node itself
  * @param nodeType {NodeType} - so we know what kind of check to run
  * @param typechecker {ts.TypeChecker} - helper util
  */
 export function getNodeIdentifier(
-  node: ts.Node,
+  node: Node,
   nodeType: NodeType,
-  typechecker: ts.TypeChecker,
+  typechecker: TypeChecker,
+  ts: Tsserver,
 ): string {
   if (nodeType === "method" && ts.isIdentifier(node)) {
     return node.escapedText.toString();
@@ -118,13 +126,17 @@ export function getNodeIdentifier(
  * Gets the type of the node (we care only about functions or methods)
  * @param node The node itself
  * @param typechecker The helper utility
- * @returns {NodeType}
+ * @returns {NodeType | undefined}
  */
-export function getNodeType(node: ts.Node, typechecker: ts.TypeChecker) {
+export function getNodeType(
+  node: Node,
+  typechecker: TypeChecker,
+  ts: Tsserver,
+): "method" | "function" | undefined {
   const declaration = typechecker.getSymbolAtLocation(node);
 
-  if (!declaration?.valueDeclaration || !node?.parent) {
-    return;
+  if (!declaration?.valueDeclaration) {
+    return undefined;
   }
 
   const { valueDeclaration } = declaration;
@@ -158,6 +170,8 @@ export function getNodeType(node: ts.Node, typechecker: ts.TypeChecker) {
   ) {
     return "function";
   }
+
+  return undefined;
 }
 
 /**
@@ -166,14 +180,23 @@ export function getNodeType(node: ts.Node, typechecker: ts.TypeChecker) {
  * @param position Current cursor/mouse position
  */
 export function getNodeAtCursor(
-  sourceFile: ts.SourceFile,
+  sourceFile: SourceFile,
   position: number,
-): ts.Node | undefined {
-  function find(node: ts.Node): ts.Node | undefined {
+  ts: Tsserver,
+): Node | undefined {
+  const find = (node: Node): Node | undefined => {
     if (position >= node.getStart() && position < node.getEnd()) {
-      return ts.forEachChild(node, find) || node;
+      const children = node.getChildren();
+      for (const child of children) {
+        const result = find(child);
+        if (result) {
+          return result;
+        }
+      }
+
+      return node;
     }
-  }
+  };
 
   return find(sourceFile);
 }
