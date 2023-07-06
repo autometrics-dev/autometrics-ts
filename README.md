@@ -77,21 +77,21 @@ class User {
 }
 ```
 
-3. **Configure Prometheus to scrape the data**
+3. **Run Prometheus locally to validate and preview the data**
 
-By default the TypeScript library makes the metrics available on `<your_host>:9464/metrics`. Make sure your Prometheus is configured correctly to scrape it.
+You can use the open source Autometrics CLI to run automatically configured Prometheus locally to see the metrics that will be registered by the change. See the [Autometrics CLI docs](https://docs.autometrics.dev/local-development#getting-started-with-am) for more information.
 
-Here's a minimal sample Prometheus configuration you can use:
+or you can configure Prometheus manually:
 
 ```yaml
 scrape_configs:
   - job_name: my-app
-    metrics_path: /metrics
+    metrics_path: /metrics # The default path for the Autometrics Prometheus exporter
     static_configs:
-      - targets: ['localhost:9464']
+      - targets: ['localhost:9464'] # The default port for the Autometrics Prometheus exporter
+    scrape_interval: 200ms
     # For a real deployment, you would want the scrape interval to be
     # longer but for testing, you want the data to show up quickly
-    scrape_interval: 200ms
 ```
 
 [See the docs](https://docs.autometrics.dev/configuring-prometheus/local) for more Prometheus configurations.
