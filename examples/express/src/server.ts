@@ -16,8 +16,8 @@ app.get("/", (req, res) => {
   return res.send("Hello World!");
 });
 
-const recordErrorIf = async (res: Promise<express.Response>) => {
-  return (await res).statusCode >= 400 && (await res).statusCode <= 599;
+const recordErrorIf = (res: express.Response) => {
+  return res.statusCode >= 400 && res.statusCode <= 599;
 };
 
 app.get("/users", autometrics({ recordErrorIf }, handleGetUsers));

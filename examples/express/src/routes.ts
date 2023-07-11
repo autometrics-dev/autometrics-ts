@@ -1,16 +1,23 @@
 import express from "express";
 import { db } from "./server.js";
 
-export async function handleGetUsers(req: express.Request, res: express.Response) {
+export async function handleGetUsers(
+  req: express.Request,
+  res: express.Response,
+) {
   try {
-    const users = await db.getUsers();
+    //const users = await db.getUsers();
+    const users = { 1: "John", 2: "Doe" };
     return res.status(200).json(users);
   } catch (e) {
     return res.status(500).send(e.message);
   }
 }
 
-export async function handleGetUserById(req: express.Request, res: express.Response) {
+export async function handleGetUserById(
+  req: express.Request,
+  res: express.Response,
+) {
   const id = parseInt(req.params.id);
   try {
     const user = await db.getUser(id);
@@ -25,7 +32,10 @@ export async function handleGetUserById(req: express.Request, res: express.Respo
   }
 }
 
-export async function handleCreateUser(req: express.Request, res: express.Response) {
+export async function handleCreateUser(
+  req: express.Request,
+  res: express.Response,
+) {
   try {
     const user = await db.addUser(req.body);
     return res.status(201).json(user);
@@ -34,7 +44,10 @@ export async function handleCreateUser(req: express.Request, res: express.Respon
   }
 }
 
-export async function handleDeleteUser(req: express.Request, res: express.Response) {
+export async function handleDeleteUser(
+  req: express.Request,
+  res: express.Response,
+) {
   const id = parseInt(req.params.id);
   try {
     const user = await db.deleteUser(id);
