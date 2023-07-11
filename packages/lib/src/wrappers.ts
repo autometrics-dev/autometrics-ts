@@ -22,7 +22,7 @@ if (typeof window === "undefined") {
 // Function Wrapper
 // This seems to be the preferred way for defining functions in TypeScript
 // rome-ignore lint/suspicious/noExplicitAny:
-type FunctionSig = (...args: any[]) => any;
+export type FunctionSig = (...args: any[]) => any;
 
 type AnyFunction<T extends FunctionSig> = (
   ...params: Parameters<T>
@@ -88,11 +88,11 @@ export type AutometricsOptions<F extends FunctionSig> = {
   recordSuccessIf?: ReportSuccessCondition;
 };
 
-type ReportErrorCondition<F extends FunctionSig> = (
+export type ReportErrorCondition<F extends FunctionSig> = (
   result: Promise<ReturnType<F>> | ReturnType<F>,
 ) => Promise<boolean> | boolean;
 
-type ReportSuccessCondition = (
+export type ReportSuccessCondition = (
   result: Promise<Error> | Error,
 ) => Promise<boolean> | boolean;
 
