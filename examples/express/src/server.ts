@@ -16,9 +16,8 @@ app.get("/", (req, res) => {
   return res.send("Hello World!");
 });
 
-// rome-ignore lint/suspicious/noExplicitAny: <explanation>
-const recordErrorIf = async (res: any) => {
-  return await res.statusCode >= 400 && res.statusCode <= 599;
+const recordErrorIf = async (res: Promise<express.Response>) => {
+  return (await res).statusCode >= 400 && (await res).statusCode <= 599;
 };
 
 app.get("/users", autometrics({ recordErrorIf }, handleGetUsers));
