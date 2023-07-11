@@ -17,7 +17,9 @@ app.get("/", (req, res) => {
 });
 
 // rome-ignore lint/suspicious/noExplicitAny: <explanation>
-const  recordErrorIf = (res: any) => res.status >= 400 && res.status <= 599;
+const recordErrorIf = async (res: any) => {
+  return await res.statusCode >= 400 && res.statusCode <= 599;
+};
 
 app.get("/users", autometrics({ recordErrorIf }, handleGetUsers));
 app.get("/users/:id", autometrics({ recordErrorIf }, handleGetUserById));
@@ -29,4 +31,24 @@ app.listen(8080, () => {
 });
 
 delay(1000);
-generateRandomTraffic();
+//generateRandomTraffic();
+
+generateTraffic();
+async function generateTraffic() {
+  console.log("Generating traffic...");
+
+  let errors = 0;
+  let ok = 0;
+
+  for (let i = 0; i < 100; i++) {
+    const res = await fetch("http://localhost:8080/users");
+    if (res.status >= 400) {
+      errors++;
+    } else {
+      ok++;
+    }
+  }
+
+  console.log(`Errors: ${errors}`);
+  console.log(`OK: ${ok}`);
+}
