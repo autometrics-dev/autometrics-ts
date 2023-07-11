@@ -36,7 +36,7 @@ type AnyFunction<T extends FunctionSig> = (
 breaks the language server plugin */
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
-export type AutometricsOptions = {
+export type AutometricsOptions<F extends FunctionSig> = {
   /**
    * Name of your function. Only necessary if using the decorator/wrapper on the
    * client side where builds get minified.
@@ -59,7 +59,42 @@ export type AutometricsOptions = {
    * handler that passes requests off to other functions. (default: `false`)
    */
   trackConcurrency?: boolean;
+  /**
+   * A custom callback function that determines whether a function return should
+   * be considered an error by Autometrics. This may be most useful in
+   * top-level functions such as the HTTP handler which would catch any errors
+   * thrown called from inside the handler.
+   *
+   * @example
+   * ```typescript
+   * async function createUser(payload: User) {
+   *  // ...
+   * }
+   *
+   * // This will record an error if the handler response status is 4xx or 5xx
+   * const recordErrorIf = (res) => res.status >= 400;
+   *
+   * app.post("/users", autometrics({ recordErrorIf }, createUser)
+   * ```
+   */
+  recordErrorIf?: ReportErrorCondition<F>;
+  /**
+   * A custom callback function that determines whether a function result
+   * should be considered a success (regardless if it threw an error). This
+   * may be most useful when you want to ignore certain errors that are thrown
+   * by the function.
+   *
+   */
+  recordSuccessIf?: ReportSuccessCondition;
 };
+
+type ReportErrorCondition<F extends FunctionSig> = (
+  result: Promise<ReturnType<F>> | ReturnType<F>,
+) => Promise<boolean> | boolean;
+
+type ReportSuccessCondition = (
+  result: Promise<Error> | Error,
+) => Promise<boolean> | boolean;
 
 /**
  * Autometrics wrapper for **functions** (requests handlers or database methods)
@@ -118,7 +153,7 @@ export type AutometricsOptions = {
  *
  */
 export function autometrics<F extends FunctionSig>(
-  functionOrOptions: F | AutometricsOptions,
+  functionOrOptions: F | AutometricsOptions<F>,
   fnInput?: F,
 ): AutometricsWrapper<F> {
   let functionName: string;
@@ -126,6 +161,8 @@ export function autometrics<F extends FunctionSig>(
   let fn: F;
   let objective: Objective | undefined;
   let trackConcurrency = false;
+  let recordErrorIf: ReportErrorCondition<F> | undefined;
+  let recordSuccessIf: ReportSuccessCondition | undefined;
 
   if (typeof functionOrOptions === "function") {
     fn = functionOrOptions;
@@ -149,6 +186,14 @@ export function autometrics<F extends FunctionSig>(
 
     if ("trackConcurrency" in functionOrOptions) {
       trackConcurrency = functionOrOptions.trackConcurrency;
+    }
+
+    if ("recordErrorIf" in functionOrOptions) {
+      recordErrorIf = functionOrOptions.recordErrorIf;
+    }
+
+    if ("recordSuccessIf" in functionOrOptions) {
+      recordSuccessIf = functionOrOptions.recordSuccessIf;
     }
   }
 
@@ -256,25 +301,40 @@ export function autometrics<F extends FunctionSig>(
       }
     };
 
+    const recordSuccess = (res: ReturnType<F> | Promise<ReturnType<F>>) => {
+      if (recordErrorIf?.(res)) {
+        onError();
+      } else {
+        onSuccess();
+      }
+    };
+
+    const recordError = (err: Error) => {
+      if (recordSuccessIf?.(err)) {
+        onSuccess();
+      } else {
+        onError();
+      }
+    };
+
     function instrumentedFunction() {
       try {
         const result = fn.apply(this, params);
         if (isPromise<ReturnType<F>>(result)) {
           return result
             .then((res: Awaited<ReturnType<typeof result>>) => {
-              onSuccess();
+              recordSuccess(res);
               return res;
             })
-            .catch((err: unknown) => {
-              onError();
+            .catch((err: Error) => {
+              recordError(err);
               throw err;
             });
         }
-
-        onSuccess();
+        recordSuccess(result);
         return result;
       } catch (error) {
-        onError();
+        recordError(error);
         throw error;
       }
     }
@@ -291,13 +351,13 @@ export function autometrics<F extends FunctionSig>(
 }
 
 export type AutometricsClassDecoratorOptions = Omit<
-  AutometricsOptions,
+  AutometricsOptions<FunctionSig>,
   "functionName"
 >;
 
-type AutometricsDecoratorOptions<T> = T extends Function
+type AutometricsDecoratorOptions<F> = F extends FunctionSig
   ? AutometricsClassDecoratorOptions
-  : AutometricsOptions;
+  : AutometricsOptions<FunctionSig>;
 
 /**
  * Autometrics decorator that can be applied to either a class or class method
@@ -394,7 +454,7 @@ export function Autometrics<T extends Function | Object>(
  * @param autometricsOptions
  */
 export function getAutometricsMethodDecorator(
-  autometricsOptions?: AutometricsOptions,
+  autometricsOptions?: AutometricsOptions<FunctionSig>,
 ) {
   return function (
     _target: Object,
