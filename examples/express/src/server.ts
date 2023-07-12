@@ -10,7 +10,7 @@ import { delay, generateRandomTraffic } from "./util.js";
 
 const app = express();
 
-app.get("/", (req, res) => {
+app.get("/", (_, res) => {
   return res.send("Hello World!");
 });
 
@@ -24,7 +24,7 @@ app.post("/users", autometrics({ recordErrorIf }, handleCreateUser));
 app.delete("/users/:id", autometrics({ recordErrorIf }, handleDeleteUser));
 
 app.listen(8080, () => {
-  console.log("Example app listening on port 3000!");
+  console.log("Example app listening on port 8080!");
 });
 
 delay(1000);
