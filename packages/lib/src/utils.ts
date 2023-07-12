@@ -21,10 +21,10 @@ export function getRuntime(): Runtime {
 // given function e.g.: dist/index.js
 export function getModulePath(): string | undefined {
   const defaultPrepareStackTrace = Error.prepareStackTrace;
-  Error.prepareStackTrace = (error, stack) => stack;
-  // @ts-ignore: TS doesn't recognize that we've overwritten
-  // the default "stack" property
-  const { stack: stackConstructor }: { stack: NodeJS.CallSite[] } = new Error();
+  Error.prepareStackTrace = (_, stack) => stack;
+  const { stack: stackConstructor } = new Error() as Error & {
+    stack: NodeJS.CallSite[];
+  };
   Error.prepareStackTrace = defaultPrepareStackTrace; // we have to make sure to reset this to normal
 
   const stack = stackConstructor.map((callSite) => ({
