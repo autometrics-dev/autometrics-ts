@@ -250,7 +250,7 @@ export function autometrics<F extends FunctionSig>(
 
     function instrumentedFunction() {
       try {
-        const result = fn(...params);
+        const result = fn.apply(this, params);
         if (isPromise<ReturnType<F>>(result)) {
           return result
             .then((res: Awaited<ReturnType<typeof result>>) => {
