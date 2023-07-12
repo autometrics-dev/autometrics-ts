@@ -69,12 +69,10 @@ export function getModulePath(): string | undefined {
 
   // We split away everything up to the root directory of the project,
   // if the path contains file:// we need to remove it
-  const modulePath = wrappedFunctionPath.replace(
+  return wrappedFunctionPath.replace(
     containsFileProtocol ? `file://${rootDir}` : rootDir,
     "",
   );
-
-  return modulePath;
 }
 
 type ALSContext = {
