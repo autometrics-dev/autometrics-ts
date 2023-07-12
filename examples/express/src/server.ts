@@ -1,6 +1,5 @@
 import { autometrics } from "@autometrics/autometrics";
 import express from "express";
-import { DatabaseClient } from "./database.js";
 import {
   handleCreateUser,
   handleDeleteUser,
@@ -10,7 +9,6 @@ import {
 import { delay, generateRandomTraffic } from "./util.js";
 
 const app = express();
-export const db = new DatabaseClient();
 
 app.get("/", (req, res) => {
   return res.send("Hello World!");

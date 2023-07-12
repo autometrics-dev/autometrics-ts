@@ -1,13 +1,12 @@
 import express from "express";
-import { db } from "./server.js";
+import { db } from "./database.js";
 
 export async function handleGetUsers(
   req: express.Request,
   res: express.Response,
 ) {
   try {
-    //const users = await db.getUsers();
-    const users = { 1: "John", 2: "Doe" };
+    const users = await db.getUsers();
     return res.status(200).json(users);
   } catch (e) {
     return res.status(500).send(e.message);

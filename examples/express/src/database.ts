@@ -52,3 +52,5 @@ export class DatabaseClient {
     return user;
   }
 }
+
+export const db = new DatabaseClient();
