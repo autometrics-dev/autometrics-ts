@@ -89,12 +89,10 @@ export type AutometricsOptions<F extends FunctionSig> = {
 };
 
 export type ReportErrorCondition<F extends FunctionSig> = (
-  result: Promise<ReturnType<F>> | ReturnType<F>,
-) => Promise<boolean> | boolean;
+  result: Awaited<ReturnType<F>>,
+) => boolean;
 
-export type ReportSuccessCondition = (
-  result: Promise<Error> | Error,
-) => Promise<boolean> | boolean;
+export type ReportSuccessCondition = (result: Error) => boolean;
 
 /**
  * Autometrics wrapper for **functions** (requests handlers or database methods)
@@ -301,38 +299,48 @@ export function autometrics<F extends FunctionSig>(
       }
     };
 
-    const recordSuccess = (res: ReturnType<F> | Promise<ReturnType<F>>) => {
-      if (recordErrorIf?.(res)) {
-        onError();
-      } else {
+    const recordSuccess = (returnValue: Awaited<ReturnType<F>>) => {
+      try {
+        if (recordErrorIf?.(returnValue)) {
+          onError();
+        } else {
+          onSuccess();
+        }
+      } catch (callbackError) {
         onSuccess();
+        console.trace("Error in recordErrorIf function: ", callbackError);
       }
     };
 
-    const recordError = (err: Error) => {
-      if (recordSuccessIf?.(err)) {
-        onSuccess();
-      } else {
+    const recordError = (error: Error) => {
+      try {
+        if (recordSuccessIf?.(error)) {
+          onSuccess();
+        } else {
+          onError();
+        }
+      } catch (callbackError) {
         onError();
+        console.trace("Error in recordSuccessIf function: ", callbackError);
       }
     };
 
     function instrumentedFunction() {
       try {
-        const result = fn.apply(this, params);
-        if (isPromise<ReturnType<F>>(result)) {
-          return result
-            .then((res: Awaited<ReturnType<typeof result>>) => {
-              recordSuccess(res);
-              return res;
+        const returnValue: ReturnType<F> = fn.apply(this, params);
+        if (isPromise<ReturnType<F>>(returnValue)) {
+          return returnValue
+            .then((result: Awaited<ReturnType<typeof returnValue>>) => {
+              recordSuccess(result);
+              return result;
             })
-            .catch((err: Error) => {
-              recordError(err);
-              throw err;
+            .catch((error: Error) => {
+              recordError(error);
+              throw error;
             });
         }
-        recordSuccess(result);
-        return result;
+        recordSuccess(returnValue);
+        return returnValue;
       } catch (error) {
         recordError(error);
         throw error;
