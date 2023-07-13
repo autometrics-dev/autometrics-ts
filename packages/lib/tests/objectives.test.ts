@@ -45,7 +45,7 @@ describe("Autometrics objectives test", () => {
     successRateFn();
 
     const callCountMetric =
-      /function_calls_count_total\{\S*function="successRate"\S*objective_name="test",objective_percentile="99"\S*\} 2/gm;
+      /function_calls_total\{\S*function="successRate"\S*objective_name="test",objective_percentile="99"\S*\} 2/gm;
 
     const serialized = await collectAndSerialize(exporter);
 
@@ -90,7 +90,7 @@ describe("Autometrics objectives test", () => {
     combinedObjectiveFn();
 
     const callCountMetric =
-      /function_calls_count_total\{\S*function="combinedObjective"\S*objective_name="test",objective_percentile="99"\S*\} 2/gm;
+      /function_calls_total\{\S*function="combinedObjective"\S*objective_name="test",objective_percentile="99"\S*\} 2/gm;
 
     const durationMetric =
       /function_calls_duration_bucket\{\S*function="combinedObjective"\S*objective_name="test",objective_latency_threshold="0.1",objective_percentile="99.9"\S*\} 2/gm;
