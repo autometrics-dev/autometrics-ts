@@ -28,24 +28,5 @@ app.listen(8080, () => {
 });
 
 delay(1000);
-//generateRandomTraffic();
+generateRandomTraffic();
 
-generateTraffic();
-async function generateTraffic() {
-  console.log("Generating traffic...");
-
-  let errors = 0;
-  let ok = 0;
-
-  for (let i = 0; i < 100; i++) {
-    const res = await fetch("http://localhost:8080/users");
-    if (res.status >= 400) {
-      errors++;
-    } else {
-      ok++;
-    }
-  }
-
-  console.log(`Errors: ${errors}`);
-  console.log(`OK: ${ok}`);
-}
