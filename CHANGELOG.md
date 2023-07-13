@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+- Fixed an issue where decorators were changing `this` values for the methods they'd be wrapping, breaking them.
+- Improved how `getModulePath` utility works, passing stack trace as structured data, and making it more robust.
+
 ## [v0.5.3] - 2023-06-26
 
 ### Changed

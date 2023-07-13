@@ -1,4 +1,4 @@
-import { autometrics, init } from "../src";
+import { Autometrics, autometrics, init } from "../src";
 import { describe, test, expect, beforeAll, afterEach } from "vitest";
 import {
   AggregationTemporality,
@@ -56,5 +56,40 @@ describe("Autometrics integration test", () => {
     const serialized = await collectAndSerialize(exporter);
 
     expect(serialized).toMatch(errorCountMetric);
+  });
+
+  test("class method", async () => {
+    const callCountMetric =
+      /function_calls_count_total\{\S*function="helloWorld"\S*module="\/packages\/lib\/tests\/integration.test.ts"\S*\} 2/gm;
+    const durationMetric =
+      /function_calls_duration_bucket\{\S*function="helloWorld"\S*module="\/packages\/lib\/tests\/integration.test.ts"\S*\}/gm;
+
+    // @Autometrics decorator is likely to be used along-side other decorators
+    // this tests for any conflicts
+    function Bar() {
+      return function Bar(
+        target: Object,
+        propertyKey: string,
+        descriptor: PropertyDescriptor,
+      ) {
+        const originalMethod = descriptor.value;
+        descriptor.value = originalMethod;
+      };
+    }
+
+    @Autometrics()
+    class Foo {
+      @Bar()
+      helloWorld() {}
+    }
+
+    const foo = new Foo();
+    foo.helloWorld();
+    foo.helloWorld();
+
+    const serialized = await collectAndSerialize(exporter);
+
+    expect(serialized).toMatch(callCountMetric);
+    expect(serialized).toMatch(durationMetric);
   });
 });

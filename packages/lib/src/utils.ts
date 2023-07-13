@@ -20,13 +20,20 @@ export function getRuntime(): Runtime {
 // HACK: this entire function is a hacky way to acquire the module name for a
 // given function e.g.: dist/index.js
 export function getModulePath(): string | undefined {
-  Error.stackTraceLimit = 5;
-  const stack = new Error()?.stack?.split("\n");
+  const defaultPrepareStackTrace = Error.prepareStackTrace;
+  Error.prepareStackTrace = (_, stack) => stack;
+  const { stack: stackConstructor } = new Error() as Error & {
+    stack: NodeJS.CallSite[];
+  };
+  Error.prepareStackTrace = defaultPrepareStackTrace; // we have to make sure to reset this to normal
+
+  const stack = stackConstructor.map((callSite) => ({
+    name: callSite.getFunctionName(),
+    file: callSite.getFileName(),
+  }));
 
   let rootDir: string;
-
   const runtime = getRuntime();
-
   if (runtime === "browser") {
     rootDir = "";
   } else if (runtime === "deno") {
@@ -45,30 +52,27 @@ export function getModulePath(): string | undefined {
   }
 
   /**
+   * Finds the original wrapped function, first it checks if it's a decorator,
+   * and returns that filename or gets the 3th item of the stack trace:
    *
    * 0: Error
-   * 1: at getModulePath() ...
-   * 2: at autometrics() ...
-   * 3: at ... -> 4th line is always the original caller
+   * 1: at getModulePath ...
+   * 2: at autometrics ...
+   * 3: at ... -> 4th line is always the original wrapped function
    */
-  const originalCaller = 3 as const;
+  const wrappedFunctionPath =
+    stack.find((call) => {
+      if (call.name === "__decorateClass") return true;
+    })?.file ?? stack[2]?.file;
 
-  // The last element in this array will have the full path
-  const fullPath = stack[originalCaller].split(" ").pop();
-
-  const containsFileProtocol = fullPath.includes("file://");
+  const containsFileProtocol = wrappedFunctionPath.includes("file://");
 
   // We split away everything up to the root directory of the project,
   // if the path contains file:// we need to remove it
-  let modulePath = fullPath.replace(
+  return wrappedFunctionPath.replace(
     containsFileProtocol ? `file://${rootDir}` : rootDir,
     "",
   );
-
-  // We split away the line and column numbers index.js:14:6
-  modulePath = modulePath.substring(0, modulePath.indexOf(":"));
-
-  return modulePath;
 }
 
 type ALSContext = {
