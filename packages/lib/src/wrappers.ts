@@ -1,6 +1,15 @@
 import { Attributes } from "@opentelemetry/api";
-import type { Objective } from "./objectives";
+import { setBuildInfo } from "./buildInfo";
+import {
+  COUNTER_DESCRIPTION,
+  COUNTER_NAME,
+  GAUGE_DESCRIPTION,
+  GAUGE_NAME,
+  HISTOGRAM_DESCRIPTION,
+  HISTOGRAM_NAME,
+} from "./constants";
 import { getMeter } from "./instrumentation";
+import type { Objective } from "./objectives";
 import {
   ALSInstance,
   getALSCaller,
@@ -10,7 +19,6 @@ import {
   isObject,
   isPromise,
 } from "./utils";
-import { setBuildInfo } from "./buildInfo";
 
 let asyncLocalStorage: ALSInstance | undefined;
 if (typeof window === "undefined") {
@@ -181,9 +189,15 @@ export function autometrics<F extends FunctionSig>(
 
   const meter = getMeter();
   setBuildInfo();
-  const counter = meter.createCounter("function.calls.count");
-  const histogram = meter.createHistogram("function.calls.duration");
-  const gauge = meter.createUpDownCounter("function.calls.concurrent");
+  const counter = meter.createCounter(COUNTER_NAME, {
+    description: COUNTER_DESCRIPTION,
+  });
+  const histogram = meter.createHistogram(HISTOGRAM_NAME, {
+    description: HISTOGRAM_DESCRIPTION,
+  });
+  const gauge = meter.createUpDownCounter(GAUGE_NAME, {
+    description: GAUGE_DESCRIPTION,
+  });
   const caller = getALSCaller(asyncLocalStorage);
 
   counter.add(0, {
