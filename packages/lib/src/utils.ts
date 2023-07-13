@@ -62,7 +62,7 @@ export function getModulePath(): string | undefined {
    */
   const wrappedFunctionPath =
     stack.find((call) => {
-      if (call.name === "__decorateClass") return true;
+      if (call.name?.includes("__decorate")) return true;
     })?.file ?? stack[2]?.file;
 
   const containsFileProtocol = wrappedFunctionPath.includes("file://");
