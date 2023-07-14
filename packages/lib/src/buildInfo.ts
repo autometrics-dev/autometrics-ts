@@ -1,6 +1,7 @@
 import { getMeter } from "./instrumentation";
 import { getRuntime, Runtime } from "./utils";
 import { UpDownCounter } from "@opentelemetry/api";
+import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants";
 
 /**
  * BuildInfo is used to create the `build_info` metric that
@@ -18,7 +19,9 @@ let buildInfoGauge: UpDownCounter;
 
 export function recordBuildInfo(buildInfo: BuildInfo) {
   if (!buildInfoGauge) {
-    buildInfoGauge = getMeter().createUpDownCounter("build_info");
+    buildInfoGauge = getMeter().createUpDownCounter(BUILD_INFO_NAME, {
+      description: BUILD_INFO_DESCRIPTION,
+    });
   }
 
   buildInfoGauge.add(1, buildInfo);

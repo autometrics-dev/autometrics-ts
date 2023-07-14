@@ -28,7 +28,7 @@ describe("Autometrics integration test", () => {
 
   test("single function", async () => {
     const callCountMetric =
-      /function_calls_count_total\{\S*function="helloWorld"\S*module="\/packages\/lib\/tests\/integration.test.ts"\S*\} 2/gm;
+      /function_calls_total\{\S*function="helloWorld"\S*module="\/packages\/lib\/tests\/integration.test.ts"\S*\} 2/gm;
     const durationMetric =
       /function_calls_duration_bucket\{\S*function="helloWorld"\S*module="\/packages\/lib\/tests\/integration.test.ts"\S*\}/gm;
 
@@ -45,7 +45,7 @@ describe("Autometrics integration test", () => {
 
   test("single function with throw", async () => {
     const errorCountMetric =
-      /function_calls_count_total\{\S*function="error"\S*result="error"\S*\} 1/gm;
+      /function_calls_total\{\S*function="error"\S*result="error"\S*\} 1/gm;
 
     const errorFn = autometrics(async function error() {
       return Promise.reject("Oh no");
@@ -60,7 +60,7 @@ describe("Autometrics integration test", () => {
 
   test("class method", async () => {
     const callCountMetric =
-      /function_calls_count_total\{\S*function="helloWorld"\S*module="\/packages\/lib\/tests\/integration.test.ts"\S*\} 2/gm;
+      /function_calls_total\{\S*function="helloWorld"\S*module="\/packages\/lib\/tests\/integration.test.ts"\S*\} 2/gm;
     const durationMetric =
       /function_calls_duration_bucket\{\S*function="helloWorld"\S*module="\/packages\/lib\/tests\/integration.test.ts"\S*\}/gm;
 
