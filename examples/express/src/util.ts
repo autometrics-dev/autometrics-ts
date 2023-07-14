@@ -1,5 +1,5 @@
 export function shouldError() {
-  if (Math.random() > 0.5) {
+  if ((Math.floor(Math.random() * 100) + 1) === 1) {
     throw new Error("Error occurred");
   }
 }
