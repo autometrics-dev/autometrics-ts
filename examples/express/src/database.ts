@@ -1,12 +1,23 @@
 import { delayRandomDuration, shouldError } from "./util.js";
-import { Autometrics } from "@autometrics/autometrics";
+import {
+  Autometrics,
+  Objective,
+  ObjectiveLatency,
+  ObjectivePercentile,
+} from "@autometrics/autometrics";
 
 interface User {
   id: number;
   name: string;
 }
 
-@Autometrics()
+export const API_SLO: Objective = {
+  name: "api",
+  successRate: ObjectivePercentile.P99,
+  latency: [ObjectiveLatency.Ms250, ObjectivePercentile.P99],
+};
+
+@Autometrics({objective: API_SLO})
 export class DatabaseClient {
   public users: User[];
   constructor() {
