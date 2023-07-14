@@ -9,17 +9,23 @@
 
 ### AutometricsClassDecoratorOptions
 
-Ƭ **AutometricsClassDecoratorOptions**: `Omit`<[`AutometricsOptions`](README.md#autometricsoptions), ``"functionName"``\>
+Ƭ **AutometricsClassDecoratorOptions**: `Omit`<[`AutometricsOptions`](README.md#autometricsoptions)<[`FunctionSig`](README.md#functionsig)\>, ``"functionName"``\>
 
 #### Defined in
 
-[wrappers.ts:289](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/wrappers.ts#L289)
+[wrappers.ts:375](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/wrappers.ts#L375)
 
 ___
 
 ### AutometricsOptions
 
-Ƭ **AutometricsOptions**: `Object`
+Ƭ **AutometricsOptions**<`F`\>: `Object`
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `F` | extends [`FunctionSig`](README.md#functionsig) |
 
 #### Type declaration
 
@@ -28,11 +34,37 @@ ___
 | `functionName?` | `string` | Name of your function. Only necessary if using the decorator/wrapper on the client side where builds get minified. |
 | `moduleName?` | `string` | Name of the module (usually filename) |
 | `objective?` | [`Objective`](README.md#objective) | Include this function's metrics in the specified objective or SLO. See the docs for [Objective](README.md#objective) for details on how to create objectives. |
+| `recordErrorIf?` | [`ReportErrorCondition`](README.md#reporterrorcondition)<`F`\> | A custom callback function that determines whether a function return should be considered an error by Autometrics. This may be most useful in top-level functions such as the HTTP handler which would catch any errors thrown called from inside the handler. **`Example`** ```typescript async function createUser(payload: User) { // ... } // This will record an error if the handler response status is 4xx or 5xx const recordErrorIf = (res) => res.status >= 400; app.post("/users", autometrics({ recordErrorIf }, createUser) ``` |
+| `recordSuccessIf?` | [`ReportSuccessCondition`](README.md#reportsuccesscondition) | A custom callback function that determines whether a function result should be considered a success (regardless if it threw an error). This may be most useful when you want to ignore certain errors that are thrown by the function. |
 | `trackConcurrency?` | `boolean` | Pass this argument to track the number of concurrent calls to the function (using a gauge). This may be most useful for top-level functions such as the main HTTP handler that passes requests off to other functions. (default: `false`) |
 
 #### Defined in
 
-[wrappers.ts:43](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/wrappers.ts#L43)
+[wrappers.ts:47](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/wrappers.ts#L47)
+
+___
+
+### FunctionSig
+
+Ƭ **FunctionSig**: (...`args`: `any`[]) => `any`
+
+#### Type declaration
+
+▸ (`...args`): `any`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `...args` | `any`[] |
+
+##### Returns
+
+`any`
+
+#### Defined in
+
+[wrappers.ts:33](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/wrappers.ts#L33)
 
 ___
 
@@ -85,7 +117,61 @@ However, they are enabled when the special labels are present on certain metrics
 
 #### Defined in
 
-[objectives.ts:36](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/objectives.ts#L36)
+[objectives.ts:36](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L36)
+
+___
+
+### ReportErrorCondition
+
+Ƭ **ReportErrorCondition**<`F`\>: (`result`: `Awaited`<`ReturnType`<`F`\>\>) => `boolean`
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `F` | extends [`FunctionSig`](README.md#functionsig) |
+
+#### Type declaration
+
+▸ (`result`): `boolean`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `result` | `Awaited`<`ReturnType`<`F`\>\> |
+
+##### Returns
+
+`boolean`
+
+#### Defined in
+
+[wrappers.ts:99](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/wrappers.ts#L99)
+
+___
+
+### ReportSuccessCondition
+
+Ƭ **ReportSuccessCondition**: (`result`: `Error`) => `boolean`
+
+#### Type declaration
+
+▸ (`result`): `boolean`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `result` | `Error` |
+
+##### Returns
+
+`boolean`
+
+#### Defined in
+
+[wrappers.ts:103](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/wrappers.ts#L103)
 
 ___
 
@@ -104,7 +190,7 @@ ___
 
 #### Defined in
 
-[instrumentation.ts:19](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/instrumentation.ts#L19)
+[instrumentation.ts:19](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/instrumentation.ts#L19)
 
 ## Functions
 
@@ -226,7 +312,7 @@ class Foo {
 
 #### Defined in
 
-[wrappers.ts:357](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/wrappers.ts#L357)
+[wrappers.ts:443](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/wrappers.ts#L443)
 
 ___
 
@@ -287,13 +373,13 @@ const user = createUser();
 
 | Name | Type |
 | :------ | :------ |
-| `F` | extends `FunctionSig` |
+| `F` | extends [`FunctionSig`](README.md#functionsig) |
 
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `functionOrOptions` | [`AutometricsOptions`](README.md#autometricsoptions) \| `F` | {(F\|AutometricsOptions)} - the function that will be wrapped and instrumented with metrics, or an options object |
+| `functionOrOptions` | `F` \| [`AutometricsOptions`](README.md#autometricsoptions)<`F`\> | {(F\|AutometricsOptions)} - the function that will be wrapped and instrumented with metrics, or an options object |
 | `fnInput?` | `F` | {F} - the function that will be wrapped and instrumented with metrics (only necessary if the first argument is an options object) |
 
 #### Returns
@@ -302,7 +388,68 @@ const user = createUser();
 
 #### Defined in
 
-[wrappers.ts:124](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/wrappers.ts#L124)
+[wrappers.ts:161](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/wrappers.ts#L161)
+
+___
+
+### getAutometricsClassDecorator
+
+▸ **getAutometricsClassDecorator**(`autometricsOptions?`): `ClassDecorator`
+
+Decorator factory that returns a class decorator that instruments all methods
+of a class with autometrics. Optionally accepts an autometrics options
+object.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `autometricsOptions?` | [`AutometricsClassDecoratorOptions`](README.md#autometricsclassdecoratoroptions) |
+
+#### Returns
+
+`ClassDecorator`
+
+#### Defined in
+
+[wrappers.ts:502](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/wrappers.ts#L502)
+
+___
+
+### getAutometricsMethodDecorator
+
+▸ **getAutometricsMethodDecorator**(`autometricsOptions?`): (`_target`: `Object`, `_propertyKey`: `string`, `descriptor`: `PropertyDescriptor`) => `PropertyDescriptor`
+
+Decorator factory that returns a method decorator. Optionally accepts
+an autometrics options object.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `autometricsOptions?` | [`AutometricsOptions`](README.md#autometricsoptions)<[`FunctionSig`](README.md#functionsig)\> |
+
+#### Returns
+
+`fn`
+
+▸ (`_target`, `_propertyKey`, `descriptor`): `PropertyDescriptor`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `_target` | `Object` |
+| `_propertyKey` | `string` |
+| `descriptor` | `PropertyDescriptor` |
+
+##### Returns
+
+`PropertyDescriptor`
+
+#### Defined in
+
+[wrappers.ts:478](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/wrappers.ts#L478)
 
 ___
 
@@ -325,4 +472,4 @@ Required if using autometrics in a client-side application. See [initOptions](RE
 
 #### Defined in
 
-[instrumentation.ts:46](https://github.com/autometrics-dev/autometrics-ts/blob/6b4817b/packages/lib/src/instrumentation.ts#L46)
+[instrumentation.ts:46](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/instrumentation.ts#L46)
