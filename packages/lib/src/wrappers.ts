@@ -261,7 +261,7 @@ export function autometrics<F extends FunctionSig>(
     }
 
     const onSuccess = () => {
-      const autometricsDuration = performance.now() - autometricsStart;
+      const autometricsDuration = (performance.now() - autometricsStart) / 1000;
 
       counter.add(1, {
         function: functionName,
@@ -289,7 +289,7 @@ export function autometrics<F extends FunctionSig>(
     };
 
     const onError = () => {
-      const autometricsDuration = performance.now() - autometricsStart;
+      const autometricsDuration = (performance.now() - autometricsStart) / 1000;
 
       counter.add(1, {
         function: functionName,
