@@ -97,7 +97,7 @@ export function eagerlyPushMetricsIfConfigured() {
 async function pushToGateway(gateway: string) {
   const exporterResponse = await exporter.collect();
   const serialized = new PrometheusSerializer().serialize(
-    exporterResponse.resourceMetrics
+    exporterResponse.resourceMetrics,
   );
 
   await fetch(gateway, {
@@ -117,7 +117,7 @@ export function getMetricsProvider() {
   if (!autometricsMeterProvider) {
     if (!exporter) {
       logger(
-        "Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics"
+        "Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics",
       );
       exporter = new PrometheusExporter();
     }
