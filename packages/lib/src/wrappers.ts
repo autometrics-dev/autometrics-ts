@@ -27,8 +27,11 @@ if (typeof window === "undefined") {
   })();
 }
 
-// Function Wrapper
-// This seems to be the preferred way for defining functions in TypeScript
+/**
+ * Function Wrapper
+ * This seems to be the preferred way for defining functions in TypeScript
+ * @internal
+ */
 // rome-ignore lint/suspicious/noExplicitAny:
 export type FunctionSig = (...args: any[]) => any;
 
@@ -44,14 +47,20 @@ type AnyFunction<T extends FunctionSig> = (
 breaks the language server plugin */
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
+/**
+ * @group Wrapper and Decorator API
+ */
 export type AutometricsOptions<F extends FunctionSig> = {
   /**
    * Name of your function. Only necessary if using the decorator/wrapper on the
    * client side where builds get minified.
+   *
+   * @group Wrapper and Decorator API
    */
   functionName?: string;
   /**
    * Name of the module (usually filename)
+   * @group Wrapper and Decorator API
    */
   moduleName?: string;
   /**
@@ -96,10 +105,16 @@ export type AutometricsOptions<F extends FunctionSig> = {
   recordSuccessIf?: ReportSuccessCondition;
 };
 
+/**
+ * @internal
+ */
 export type ReportErrorCondition<F extends FunctionSig> = (
   result: Awaited<ReturnType<F>>,
 ) => boolean;
 
+/**
+ * @internal
+ */
 export type ReportSuccessCondition = (result: Error) => boolean;
 
 /**
@@ -156,7 +171,7 @@ export type ReportSuccessCondition = (result: Error) => boolean;
  *
  * const user = createUser();
  * ```
- *
+ * @group Wrapper and Decorator API
  */
 export function autometrics<F extends FunctionSig>(
   functionOrOptions: F | AutometricsOptions<F>,
@@ -372,6 +387,9 @@ export function autometrics<F extends FunctionSig>(
   };
 }
 
+/**
+ * @internal
+ */
 export type AutometricsClassDecoratorOptions = Omit<
   AutometricsOptions<FunctionSig>,
   "functionName"
@@ -439,6 +457,8 @@ type AutometricsDecoratorOptions<F> = F extends FunctionSig
  *   }
  * }
  * ```
+ *
+ * @group Wrapper and Decorator API
  */
 export function Autometrics<T extends Function | Object>(
   autometricsOptions?: AutometricsDecoratorOptions<T>,
@@ -474,6 +494,7 @@ export function Autometrics<T extends Function | Object>(
  * Decorator factory that returns a method decorator. Optionally accepts
  * an autometrics options object.
  * @param autometricsOptions
+ * @internal
  */
 export function getAutometricsMethodDecorator(
   autometricsOptions?: AutometricsOptions<FunctionSig>,
@@ -498,6 +519,7 @@ export function getAutometricsMethodDecorator(
  * of a class with autometrics. Optionally accepts an autometrics options
  * object.
  * @param autometricsOptions
+ * @internal
  */
 export function getAutometricsClassDecorator(
   autometricsOptions?: AutometricsClassDecoratorOptions,

@@ -16,6 +16,9 @@ let exporter: MetricReader;
 
 type Exporter = MetricReader;
 
+/**
+ * @group Initialization API
+ */
 export type initOptions = {
   /**
    * A custom exporter to be used instead of the bundled Prometheus Exporter on port 9464
@@ -42,6 +45,7 @@ export type initOptions = {
  * Required if using autometrics in a client-side application. See {@link initOptions} for details.
  *
  * @param {initOptions} options
+ * @group Initialization API
  */
 export function init(options: initOptions) {
   logger("Using the user's Exporter configuration");
