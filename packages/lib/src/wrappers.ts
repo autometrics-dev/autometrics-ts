@@ -237,6 +237,7 @@ export function autometrics<F extends FunctionSig>(
   });
   const histogram = meter.createHistogram(HISTOGRAM_NAME, {
     description: HISTOGRAM_DESCRIPTION,
+    // unit: "s"
   });
   const gauge = meter.createUpDownCounter(GAUGE_NAME, {
     description: GAUGE_DESCRIPTION,
@@ -262,6 +263,8 @@ export function autometrics<F extends FunctionSig>(
 
     const onSuccess = () => {
       const autometricsDuration = (performance.now() - autometricsStart) / 1000;
+
+      console.log("autometricsDuration", autometricsDuration)
 
       counter.add(1, {
         function: functionName,

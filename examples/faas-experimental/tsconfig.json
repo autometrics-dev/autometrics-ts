@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "experimentalDecorators": true,
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "removeComments": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "target": "ESNext",
+    "strictNullChecks": true,
+    "plugins": [{ "name": "@autometrics/typescript-plugin" }]
+  },
+  "include": ["index.ts"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts"]
+}

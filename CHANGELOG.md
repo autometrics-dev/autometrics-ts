@@ -7,6 +7,7 @@
 - Improved how `getModulePath` utility works, passing stack trace as structured data, and making it more robust.
 - Change duration metric to report seconds instead of milliseconds
 - Push metrics to gateway "eagerly" when pushInterval is set to 0
+- Log error when fetch is not defined in push context
 
 ## [v0.5.3] - 2023-06-26
 

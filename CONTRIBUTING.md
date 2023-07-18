@@ -63,7 +63,7 @@ npm uninstall @autometrics/autometrics @autometrics/typescript-plugin
 ```shell
 # from examples/express
 npm install ../../packages/autometrics/
-npm install -D ../../packages/autometrics-typescript-plugin/
+npm install -D ../../packages/typescript-plugin/
 ```
 
 Now every time you will save and rebuild any of the packages they will update in
@@ -72,7 +72,7 @@ your example repo automatically (you won't need to re-run `npm install`)
 Open the `express` app with your editor, e.g.: VSCode - `code examples/express/`
 
 This is now your "lab" environment for testing out how the library or the plugin
-work and feel like.
+work and feel.
 
 #### Debugging TypeScript plugin
 
