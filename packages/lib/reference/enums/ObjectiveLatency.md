@@ -12,7 +12,7 @@ The latency threshold, in milliseconds, for a given objective.
 
 #### Defined in
 
-[objectives.ts:75](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L75)
+[objectives.ts:81](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L81)
 
 ___
 
@@ -24,7 +24,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:91](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L91)
+[objectives.ts:97](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L97)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:107](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L107)
+[objectives.ts:113](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L113)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:123](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L123)
+[objectives.ts:129](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L129)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:79](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L79)
+[objectives.ts:85](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L85)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:95](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L95)
+[objectives.ts:101](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L101)
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:111](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L111)
+[objectives.ts:117](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L117)
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:71](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L71)
+[objectives.ts:77](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L77)
 
 ___
 
@@ -108,7 +108,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:83](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L83)
+[objectives.ts:89](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L89)
 
 ___
 
@@ -120,7 +120,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:99](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L99)
+[objectives.ts:105](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L105)
 
 ___
 
@@ -132,7 +132,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:115](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L115)
+[objectives.ts:121](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L121)
 
 ___
 
@@ -144,7 +144,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:87](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L87)
+[objectives.ts:93](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L93)
 
 ___
 
@@ -156,7 +156,7 @@ ___
 
 #### Defined in
 
-[objectives.ts:103](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L103)
+[objectives.ts:109](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L109)
 
 ___
 
@@ -168,4 +168,4 @@ ___
 
 #### Defined in
 
-[objectives.ts:119](https://github.com/autometrics-dev/autometrics-ts/blob/54e7cc0/packages/lib/src/objectives.ts#L119)
+[objectives.ts:125](https://github.com/autometrics-dev/autometrics-ts/blob/db1e410/packages/lib/src/objectives.ts#L125)
