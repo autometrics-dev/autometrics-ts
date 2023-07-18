@@ -63,7 +63,8 @@ export function init(options: initOptions) {
 
     if (interval > 0) {
       setInterval(_pushMetrics, interval);
-    } else {
+    } else if (interval === 0) {
+      logger("Configuring autometrics to push metrics eagerly");
       IS_EAGERLY_PUSHED = true;
       _pushMetrics();
     }
