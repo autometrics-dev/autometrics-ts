@@ -11,6 +11,8 @@ import {
 } from "@opentelemetry/sdk-metrics";
 import { buildInfo, BuildInfo, recordBuildInfo } from "./buildInfo";
 
+let IS_EAGERLY_PUSHED = false;
+let _pushMetrics = () => {};
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
 
@@ -56,10 +58,15 @@ export function init(options: initOptions) {
     // Make sure the provider is initialized and exporter is registered
     getMetricsProvider();
 
-    setInterval(
-      () => pushToGateway(options.pushGateway),
-      options.pushInterval ?? 5000,
-    );
+    const interval = options.pushInterval ?? 5000;
+    _pushMetrics = () => pushToGateway(options.pushGateway);
+
+    if (interval > 0) {
+      setInterval(_pushMetrics, interval);
+    } else {
+      IS_EAGERLY_PUSHED = true;
+      _pushMetrics();
+    }
   }
 
   // buildInfo is added to init function only for client-side applications
@@ -73,10 +80,24 @@ export function init(options: initOptions) {
   }
 }
 
+export function eagerlyPushMetricsIfConfigured() {
+  if (!IS_EAGERLY_PUSHED) {
+    return;
+  }
+
+  if (exporter instanceof PeriodicExportingMetricReader) {
+    logger("Pushing metrics to gateway");
+    _pushMetrics();
+  }
+}
+
+// TODO - add a way to stop the push interval
+// TODO - handle errors
+// TODO - allow configuration of timeout
 async function pushToGateway(gateway: string) {
   const exporterResponse = await exporter.collect();
   const serialized = new PrometheusSerializer().serialize(
-    exporterResponse.resourceMetrics,
+    exporterResponse.resourceMetrics
   );
 
   await fetch(gateway, {
@@ -96,7 +117,7 @@ export function getMetricsProvider() {
   if (!autometricsMeterProvider) {
     if (!exporter) {
       logger(
-        "Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics",
+        "Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics"
       );
       exporter = new PrometheusExporter();
     }

@@ -8,7 +8,7 @@ import {
   HISTOGRAM_DESCRIPTION,
   HISTOGRAM_NAME,
 } from "./constants";
-import { getMeter } from "./instrumentation";
+import { getMeter, eagerlyPushMetricsIfConfigured } from "./instrumentation";
 import type { Objective } from "./objectives";
 import {
   ALSInstance,
@@ -97,7 +97,7 @@ export type AutometricsOptions<F extends FunctionSig> = {
 };
 
 export type ReportErrorCondition<F extends FunctionSig> = (
-  result: Awaited<ReturnType<F>>,
+  result: Awaited<ReturnType<F>>
 ) => boolean;
 
 export type ReportSuccessCondition = (result: Error) => boolean;
@@ -160,7 +160,7 @@ export type ReportSuccessCondition = (result: Error) => boolean;
  */
 export function autometrics<F extends FunctionSig>(
   functionOrOptions: F | AutometricsOptions<F>,
-  fnInput?: F,
+  fnInput?: F
 ): AutometricsWrapper<F> {
   let functionName: string;
   let moduleName: string;
@@ -205,7 +205,7 @@ export function autometrics<F extends FunctionSig>(
 
   if (!functionName) {
     console.trace(
-      "Autometrics decorated function must have a name to successfully create a metric. Function will not be instrumented.",
+      "Autometrics decorated function must have a name to successfully create a metric. Function will not be instrumented."
     );
     return fn;
   }
@@ -284,6 +284,8 @@ export function autometrics<F extends FunctionSig>(
           module: moduleName,
         });
       }
+
+      eagerlyPushMetricsIfConfigured();
     };
 
     const onError = () => {
@@ -311,6 +313,8 @@ export function autometrics<F extends FunctionSig>(
           caller,
         });
       }
+
+      eagerlyPushMetricsIfConfigured();
     };
 
     const recordSuccess = (returnValue: Awaited<ReturnType<F>>) => {
@@ -364,7 +368,7 @@ export function autometrics<F extends FunctionSig>(
     if (asyncLocalStorage) {
       return asyncLocalStorage.run(
         { caller: functionName },
-        instrumentedFunction,
+        instrumentedFunction
       );
     }
 
@@ -441,18 +445,18 @@ type AutometricsDecoratorOptions<F> = F extends FunctionSig
  * ```
  */
 export function Autometrics<T extends Function | Object>(
-  autometricsOptions?: AutometricsDecoratorOptions<T>,
+  autometricsOptions?: AutometricsDecoratorOptions<T>
 ) {
   function decorator<T extends Function>(target: T): void;
   function decorator<T extends Object>(
     target: T,
     propertyKey: string,
-    descriptor: PropertyDescriptor,
+    descriptor: PropertyDescriptor
   ): void;
   function decorator<T extends Function | Object>(
     target: T,
     propertyKey?: string,
-    descriptor?: PropertyDescriptor,
+    descriptor?: PropertyDescriptor
   ) {
     if (isFunction(target)) {
       const classDecorator = getAutometricsClassDecorator(autometricsOptions);
@@ -476,12 +480,12 @@ export function Autometrics<T extends Function | Object>(
  * @param autometricsOptions
  */
 export function getAutometricsMethodDecorator(
-  autometricsOptions?: AutometricsOptions<FunctionSig>,
+  autometricsOptions?: AutometricsOptions<FunctionSig>
 ) {
   return function (
     _target: Object,
     _propertyKey: string,
-    descriptor: PropertyDescriptor,
+    descriptor: PropertyDescriptor
   ) {
     const originalFunction = descriptor.value;
     const functionOrOptions = autometricsOptions ?? originalFunction;
@@ -500,7 +504,7 @@ export function getAutometricsMethodDecorator(
  * @param autometricsOptions
  */
 export function getAutometricsClassDecorator(
-  autometricsOptions?: AutometricsClassDecoratorOptions,
+  autometricsOptions?: AutometricsClassDecoratorOptions
 ): ClassDecorator {
   return function (classConstructor: Function) {
     const prototype = classConstructor.prototype;
@@ -511,7 +515,7 @@ export function getAutometricsClassDecorator(
       const property = prototype[propertyName];
       const descriptor = Object.getOwnPropertyDescriptor(
         prototype,
-        propertyName,
+        propertyName
       );
 
       if (
@@ -525,7 +529,7 @@ export function getAutometricsClassDecorator(
       const instrumentedDescriptor = methodDecorator(
         {},
         propertyName,
-        descriptor,
+        descriptor
       );
 
       Object.defineProperty(prototype, propertyName, instrumentedDescriptor);
