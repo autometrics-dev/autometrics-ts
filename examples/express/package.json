@@ -16,7 +16,7 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@autometrics/autometrics": "file:../../packages/lib",
+    "@autometrics/autometrics": "^0.5.0",
     "@opentelemetry/exporter-prometheus": "^0.35.1",
     "@opentelemetry/sdk-metrics": "^1.9.1",
     "express": "^4.18.2",
