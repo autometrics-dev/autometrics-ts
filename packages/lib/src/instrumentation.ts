@@ -8,8 +8,11 @@ import {
   MeterProvider,
   MetricReader,
   PeriodicExportingMetricReader,
+  ExplicitBucketHistogramAggregation,
+  View,
 } from "@opentelemetry/sdk-metrics";
 import { buildInfo, BuildInfo, recordBuildInfo } from "./buildInfo";
+import { HISTOGRAM_NAME } from "./constants";
 
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
@@ -101,7 +104,17 @@ export function getMetricsProvider() {
       exporter = new PrometheusExporter();
     }
 
-    autometricsMeterProvider = new MeterProvider();
+    autometricsMeterProvider = new MeterProvider({
+      views: [
+        new View({
+          aggregation: new ExplicitBucketHistogramAggregation([
+            0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5,
+            7.5, 10,
+          ]),
+          instrumentName: HISTOGRAM_NAME,
+        }),
+      ],
+    });
     autometricsMeterProvider.addMetricReader(exporter);
   }
 
