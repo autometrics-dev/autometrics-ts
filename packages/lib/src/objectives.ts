@@ -32,6 +32,8 @@
  *
  * By default, these recording rules will effectively lay dormant.
  * However, they are enabled when the special labels are present on certain metrics.
+ *
+ * @group Service Level Objective API
  */
 export type Objective = {
   name: string;
@@ -41,6 +43,8 @@ export type Objective = {
 
 /**
  * The percentage of requests that must meet the given criteria (success rate or latency)
+ *
+ * @group Service Level Objective API
  */
 export enum ObjectivePercentile {
   /**
@@ -63,6 +67,8 @@ export enum ObjectivePercentile {
 
 /**
  * The latency threshold, in milliseconds, for a given objective.
+ *
+ * @group Service Level Objective API
  */
 export enum ObjectiveLatency {
   /**

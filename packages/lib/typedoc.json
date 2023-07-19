@@ -1,6 +1,7 @@
 {
   "readme": "none",
   "entryPoints": ["src/index.ts"],
+  "excludeInternal": true,
   "cleanOutputDir": true,
   "out": "./reference",
   "plugin": ["typedoc-plugin-markdown"],
