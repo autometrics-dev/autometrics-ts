@@ -237,6 +237,7 @@ export function autometrics<F extends FunctionSig>(
   });
   const histogram = meter.createHistogram(HISTOGRAM_NAME, {
     description: HISTOGRAM_DESCRIPTION,
+    unit: "seconds",
   });
   const gauge = meter.createUpDownCounter(GAUGE_NAME, {
     description: GAUGE_DESCRIPTION,
