@@ -7,16 +7,42 @@ import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants";
  * BuildInfo is used to create the `build_info` metric that
  * helps to identify the version, commit, and branch of the
  * application, the metrics of which are being collected.
+ *
+ * @group Initialization API
  */
 export type BuildInfo = {
+  /**
+   * The current version of the application. Should be set through an
+   * environment variable: `AUTOMETRICS_VERSION` or `PACKAGE_VERSION`.
+   */
   version?: string;
+  /**
+   * The current commit hash of the application. Should be set through an
+   * environment variable: `AUTOMETRICS_COMMIT` or `COMMIT_SHA`.
+   */
   commit?: string;
+  /**
+   * The current commit hash of the application. Should be set through an
+   * environment variable: `AUTOMETRICS_BRANCH` or `BRANCH_NAME`.
+   */
   branch?: string;
 };
 
+/**
+ * The build info of the application.
+ *
+ * Should be set through the `init` function.
+ *
+ * @internal
+ */
 export let buildInfo: BuildInfo = {};
 let buildInfoGauge: UpDownCounter;
 
+/**
+ * Records the build info for the application.
+ *
+ * @internal
+ */
 export function recordBuildInfo(buildInfo: BuildInfo) {
   if (!buildInfoGauge) {
     buildInfoGauge = getMeter().createUpDownCounter(BUILD_INFO_NAME, {
@@ -27,6 +53,11 @@ export function recordBuildInfo(buildInfo: BuildInfo) {
   buildInfoGauge.add(1, buildInfo);
 }
 
+/**
+ * Sets the build info for the application.
+ *
+ * @internal
+ */
 export function setBuildInfo() {
   if (Object.keys(buildInfo).length > 0) {
     return buildInfo;
@@ -45,6 +76,11 @@ export function setBuildInfo() {
   return buildInfo;
 }
 
+/**
+ * Gets the version of the application.
+ *
+ * @internal
+ */
 function getVersion(runtime: Runtime): string | undefined {
   if (runtime === "node") {
     if (process.env.npm_package_version) {
@@ -61,6 +97,11 @@ function getVersion(runtime: Runtime): string | undefined {
   }
 }
 
+/**
+ * Gets the commit hash of the current state of the application.
+ *
+ * @internal
+ */
 function getCommit(runtime: Runtime) {
   if (runtime === "node") {
     return process.env.COMMIT_SHA || process.env.AUTOMETRICS_COMMIT;
@@ -72,6 +113,11 @@ function getCommit(runtime: Runtime) {
   }
 }
 
+/**
+ * Gets the current branch of the application.
+ *
+ * @internal
+ */
 function getBranch(runtime: Runtime) {
   if (runtime === "node") {
     return process.env.BRANCH_NAME || process.env.AUTOMETRICS_BRANCH;

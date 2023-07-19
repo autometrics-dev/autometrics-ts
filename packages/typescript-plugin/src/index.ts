@@ -58,8 +58,8 @@ function init(modules: { typescript: Tsserver }) {
         ts,
       );
 
-      // If either autometrics checker or node type is undefined return early
-      if (!(autometrics && nodeType)) {
+      // If either autometrics checker return early
+      if (!autometrics) {
         return prior;
       }
 

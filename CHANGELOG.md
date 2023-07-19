@@ -5,9 +5,9 @@
 - Added functionality to initialize metrics at 0, so instrumented functions can be registered.
 - Fixed an issue where decorators were changing `this` values for the methods they'd be wrapping, breaking them.
 - Improved how `getModulePath` utility works, passing stack trace as structured data, and making it more robust.
-- Change duration metric to report seconds instead of milliseconds
-- Push metrics to gateway "eagerly" when pushInterval is set to 0
+- Measure function duration in seconds, and update the histogram buckets in prometheus accordingly
 - Log error when fetch is not defined in push context
+- Push metrics to gateway "eagerly" when pushInterval is set to 0
 
 ## [v0.5.3] - 2023-06-26
 
@@ -17,7 +17,7 @@
 
 ## [v0.5.2] - 2023-06-16
 
-### Added 
+### Added
 
 - added `docsOutputFormat` config parameter to @autometrics/typescript-plugin. This is for communicating autometrics information from typescript to the autometrics extension.
 
@@ -42,6 +42,7 @@
 - added links to Grafana dashboards in the README
 
 ### Changed
+
 - `launch.json` configurations for easier TypeScript plugin debugging workflow
 
 ## [v0.3] - 2023-04-23

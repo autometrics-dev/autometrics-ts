@@ -8,12 +8,11 @@ import {
   MeterProvider,
   MetricReader,
   PeriodicExportingMetricReader,
-  Aggregation,
   View,
   ExplicitBucketHistogramAggregation,
 } from "@opentelemetry/sdk-metrics";
 import { buildInfo, BuildInfo, recordBuildInfo } from "./buildInfo";
-import { HISTOGRAM_NAME } from "./constants"
+import { HISTOGRAM_NAME } from "./constants";
 
 let IS_EAGERLY_PUSHED = false;
 let _pushMetrics = () => {};
@@ -22,6 +21,9 @@ let exporter: MetricReader;
 
 type Exporter = MetricReader;
 
+/**
+ * @group Initialization API
+ */
 export type initOptions = {
   /**
    * A custom exporter to be used instead of the bundled Prometheus Exporter on port 9464
@@ -48,6 +50,7 @@ export type initOptions = {
  * Required if using autometrics in a client-side application. See {@link initOptions} for details.
  *
  * @param {initOptions} options
+ * @group Initialization API
  */
 export function init(options: initOptions) {
   logger("Using the user's Exporter configuration");
@@ -57,7 +60,7 @@ export function init(options: initOptions) {
     // TODO - use different bucket sizes
     //     DEFAULT_BUCKETS = (.005, .01, .025, .05, .075, .1, .25, .5, .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF)
     const inMemoryExporter = new InMemoryMetricExporter(
-      AggregationTemporality.DELTA,
+      AggregationTemporality.DELTA
     );
 
     exporter = new PeriodicExportingMetricReader({
@@ -111,10 +114,10 @@ async function pushToGateway(gateway: string) {
   console.log(
     "\n\n",
     require("util").inspect(exporterResponse, { depth: null }),
-    "\n\n",
+    "\n\n"
   );
   const serialized = new PrometheusSerializer().serialize(
-    exporterResponse.resourceMetrics,
+    exporterResponse.resourceMetrics
   );
 
   if (typeof fetch === "undefined") {
@@ -139,7 +142,7 @@ async function pushToGateway(gateway: string) {
     logger(
       `Error pushing metrics to gateway: ${
         fetchError?.message ?? "<no error message found>"
-      }`,
+      }`
     );
   }
 
@@ -150,7 +153,7 @@ async function pushToGateway(gateway: string) {
     logger(
       `Error flushing metrics after push: ${
         error?.message ?? "<no error message found>"
-      }`,
+      }`
     );
   }
 }
@@ -163,7 +166,7 @@ export function getMetricsProvider() {
   if (!autometricsMeterProvider) {
     if (!exporter) {
       logger(
-        "Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics",
+        "Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics"
       );
       exporter = new PrometheusExporter();
     }
@@ -171,6 +174,7 @@ export function getMetricsProvider() {
     autometricsMeterProvider = new MeterProvider({
       views: [
         new View({
+          // See: https://github.com/autometrics-dev/autometrics-ts/issues/102
           aggregation: new ExplicitBucketHistogramAggregation([
             0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5,
             7.5, 10,

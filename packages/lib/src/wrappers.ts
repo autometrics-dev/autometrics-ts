@@ -27,8 +27,11 @@ if (typeof window === "undefined") {
   })();
 }
 
-// Function Wrapper
-// This seems to be the preferred way for defining functions in TypeScript
+/**
+ * Function Wrapper
+ * This seems to be the preferred way for defining functions in TypeScript
+ * @internal
+ */
 // rome-ignore lint/suspicious/noExplicitAny:
 export type FunctionSig = (...args: any[]) => any;
 
@@ -44,14 +47,20 @@ type AnyFunction<T extends FunctionSig> = (
 breaks the language server plugin */
 interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
 
+/**
+ * @group Wrapper and Decorator API
+ */
 export type AutometricsOptions<F extends FunctionSig> = {
   /**
    * Name of your function. Only necessary if using the decorator/wrapper on the
    * client side where builds get minified.
+   *
+   * @group Wrapper and Decorator API
    */
   functionName?: string;
   /**
    * Name of the module (usually filename)
+   * @group Wrapper and Decorator API
    */
   moduleName?: string;
   /**
@@ -96,10 +105,16 @@ export type AutometricsOptions<F extends FunctionSig> = {
   recordSuccessIf?: ReportSuccessCondition;
 };
 
+/**
+ * @internal
+ */
 export type ReportErrorCondition<F extends FunctionSig> = (
-  result: Awaited<ReturnType<F>>,
+  result: Awaited<ReturnType<F>>
 ) => boolean;
 
+/**
+ * @internal
+ */
 export type ReportSuccessCondition = (result: Error) => boolean;
 
 /**
@@ -156,11 +171,11 @@ export type ReportSuccessCondition = (result: Error) => boolean;
  *
  * const user = createUser();
  * ```
- *
+ * @group Wrapper and Decorator API
  */
 export function autometrics<F extends FunctionSig>(
   functionOrOptions: F | AutometricsOptions<F>,
-  fnInput?: F,
+  fnInput?: F
 ): AutometricsWrapper<F> {
   let functionName: string;
   let moduleName: string;
@@ -205,7 +220,7 @@ export function autometrics<F extends FunctionSig>(
 
   if (!functionName) {
     console.trace(
-      "Autometrics decorated function must have a name to successfully create a metric. Function will not be instrumented.",
+      "Autometrics decorated function must have a name to successfully create a metric. Function will not be instrumented."
     );
     return fn;
   }
@@ -237,7 +252,7 @@ export function autometrics<F extends FunctionSig>(
   });
   const histogram = meter.createHistogram(HISTOGRAM_NAME, {
     description: HISTOGRAM_DESCRIPTION,
-    // unit: "s"
+    unit: "seconds",
   });
   const gauge = meter.createUpDownCounter(GAUGE_NAME, {
     description: GAUGE_DESCRIPTION,
@@ -264,7 +279,7 @@ export function autometrics<F extends FunctionSig>(
     const onSuccess = () => {
       const autometricsDuration = (performance.now() - autometricsStart) / 1000;
 
-      console.log("autometricsDuration", autometricsDuration)
+      console.log("autometricsDuration", autometricsDuration);
 
       counter.add(1, {
         function: functionName,
@@ -371,7 +386,7 @@ export function autometrics<F extends FunctionSig>(
     if (asyncLocalStorage) {
       return asyncLocalStorage.run(
         { caller: functionName },
-        instrumentedFunction,
+        instrumentedFunction
       );
     }
 
@@ -379,6 +394,9 @@ export function autometrics<F extends FunctionSig>(
   };
 }
 
+/**
+ * @internal
+ */
 export type AutometricsClassDecoratorOptions = Omit<
   AutometricsOptions<FunctionSig>,
   "functionName"
@@ -446,20 +464,22 @@ type AutometricsDecoratorOptions<F> = F extends FunctionSig
  *   }
  * }
  * ```
+ *
+ * @group Wrapper and Decorator API
  */
 export function Autometrics<T extends Function | Object>(
-  autometricsOptions?: AutometricsDecoratorOptions<T>,
+  autometricsOptions?: AutometricsDecoratorOptions<T>
 ) {
   function decorator<T extends Function>(target: T): void;
   function decorator<T extends Object>(
     target: T,
     propertyKey: string,
-    descriptor: PropertyDescriptor,
+    descriptor: PropertyDescriptor
   ): void;
   function decorator<T extends Function | Object>(
     target: T,
     propertyKey?: string,
-    descriptor?: PropertyDescriptor,
+    descriptor?: PropertyDescriptor
   ) {
     if (isFunction(target)) {
       const classDecorator = getAutometricsClassDecorator(autometricsOptions);
@@ -481,14 +501,15 @@ export function Autometrics<T extends Function | Object>(
  * Decorator factory that returns a method decorator. Optionally accepts
  * an autometrics options object.
  * @param autometricsOptions
+ * @internal
  */
 export function getAutometricsMethodDecorator(
-  autometricsOptions?: AutometricsOptions<FunctionSig>,
+  autometricsOptions?: AutometricsOptions<FunctionSig>
 ) {
   return function (
     _target: Object,
     _propertyKey: string,
-    descriptor: PropertyDescriptor,
+    descriptor: PropertyDescriptor
   ) {
     const originalFunction = descriptor.value;
     const functionOrOptions = autometricsOptions ?? originalFunction;
@@ -505,9 +526,10 @@ export function getAutometricsMethodDecorator(
  * of a class with autometrics. Optionally accepts an autometrics options
  * object.
  * @param autometricsOptions
+ * @internal
  */
 export function getAutometricsClassDecorator(
-  autometricsOptions?: AutometricsClassDecoratorOptions,
+  autometricsOptions?: AutometricsClassDecoratorOptions
 ): ClassDecorator {
   return function (classConstructor: Function) {
     const prototype = classConstructor.prototype;
@@ -518,7 +540,7 @@ export function getAutometricsClassDecorator(
       const property = prototype[propertyName];
       const descriptor = Object.getOwnPropertyDescriptor(
         prototype,
-        propertyName,
+        propertyName
       );
 
       if (
@@ -532,7 +554,7 @@ export function getAutometricsClassDecorator(
       const instrumentedDescriptor = methodDecorator(
         {},
         propertyName,
-        descriptor,
+        descriptor
       );
 
       Object.defineProperty(prototype, propertyName, instrumentedDescriptor);

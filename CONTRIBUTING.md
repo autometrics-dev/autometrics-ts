@@ -10,7 +10,6 @@ cd autometrics-ts
 npm install
 ```
 
-
 ### Overview
 
 #### `@autometrics/autometrics`
@@ -21,11 +20,10 @@ exposes them on an endpoint via an exporter.
 #### `@autometrics/typescript-plugin`
 
 Houses code that writes the queries in your IDE on hover. Its main function is
-to intercept the `quick info` (that's the tooltip doc comments) requests from 
+to intercept the `quick info` (that's the tooltip doc comments) requests from
 the language server client, determine whether it should show the generated
 queries for the hovered item, and, if yes, grab the identifier and insert it
 into the generated query templates.
-
 
 ### Getting the wrapper library and plugin running
 
@@ -35,7 +33,6 @@ into the generated query templates.
 # in project root
 npm run dev:lib
 ```
-
 
 ##### TypeScript plugin
 
@@ -83,7 +80,7 @@ debugging (with no extensions running to prevent conflicts), and another to
 attach the "host" VSCode debugger. They are both separated as you might need to
 reattach the host debugger multiple times during the workflow.
 
-To run either of the commands simply select any of the launch configurations in 
+To run either of the commands simply select any of the launch configurations in
 the debugger section of your main VSCode window. The "Launch VSCode" command
 will prompt you to select an example project that you'd want to use for testing
 (make sure your local development version TypeScript plugin is installed there).
@@ -140,7 +137,7 @@ you want to publish you will need to create a separate release.
 2. Make sure that all tests have successfully passed in the latest commit on
    `main` (the CI will run one more time before publishing it to NPM)
 3. Create a release on GitHub along with a respective tag for each package:
-    - `lib/` (main autometrics library) → tag: `lib-*` (e.g.: `lib-v0.7`)
-    - `typescript-plugin/` → tag: `typescript-plugin-*`
-    - `parcel-transformer-autometrics/` → tag: `parcel-transformer-*`
+   - `lib/` (main autometrics library) → tag: `lib-*` (e.g.: `lib-v0.7`)
+   - `typescript-plugin/` → tag: `typescript-plugin-*`
+   - `parcel-transformer-autometrics/` → tag: `parcel-transformer-*`
 4. When the release is published, the relevant GitHub workflow will kick off.
