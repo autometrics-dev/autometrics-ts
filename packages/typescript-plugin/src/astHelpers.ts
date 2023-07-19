@@ -86,10 +86,6 @@ export function getNodeIdentifier(
   typechecker: TypeChecker,
   ts: Tsserver,
 ): string {
-  if (nodeType === "method" && ts.isIdentifier(node)) {
-    return node.escapedText.toString();
-  }
-
   if (nodeType === "function") {
     const declaration = typechecker.getSymbolAtLocation(node).valueDeclaration;
 
@@ -114,11 +110,10 @@ export function getNodeIdentifier(
     ) {
       return declaration.initializer.arguments[0].escapedText.toString();
     }
-
-    // otherwise just return the identifier user is currently hovering over
-    if (ts.isIdentifier(node)) {
-      return node.escapedText.toString();
-    }
+  }
+  // otherwise just return the identifier user is currently hovering over
+  if (ts.isIdentifier(node)) {
+    return node.escapedText.toString();
   }
 }
 
