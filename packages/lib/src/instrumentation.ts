@@ -75,7 +75,7 @@ export function init(options: initOptions) {
       logger("Configuring autometrics to push metrics eagerly");
       IS_EAGERLY_PUSHED = true;
     } else {
-      logger("Invalid pushInterval, metrics will not be pushed");
+      console.error("Invalid pushInterval, metrics will not be pushed");
     }
   }
 
@@ -114,7 +114,7 @@ async function pushToGateway(gateway: string) {
     );
 
     if (typeof fetch === "undefined") {
-      logger(
+      console.error(
         "Fetch is undefined, cannot push metrics to gateway. Consider adding a global polyfill.",
       );
       return;
@@ -127,12 +127,12 @@ async function pushToGateway(gateway: string) {
         body: serialized,
       });
       if (!response.ok) {
-        logger(`Error pushing metrics to gateway: ${response.statusText}`);
+        console.error(`Error pushing metrics to gateway: ${response.statusText}`);
         // NOTE - Uncomment to log the response body
-        // logger(JSON.stringify(await response.text(), null, 2));
+        // console.error(JSON.stringify(await response.text(), null, 2));
       }
     } catch (fetchError) {
-      logger(
+      console.error(
         `Error pushing metrics to gateway: ${
           fetchError?.message ?? "<no error message found>"
         }`,
@@ -143,14 +143,14 @@ async function pushToGateway(gateway: string) {
       // we flush the metrics at the end of the submission to ensure the data is not repeated
       await exporter.forceFlush();
     } catch (error) {
-      logger(
+      console.error(
         `Error flushing metrics after push: ${
           error?.message ?? "<no error message found>"
         }`,
       );
     }
   } catch (collectError) {
-    logger(
+    console.error(
       `Error collecting metrics for push: ${
         collectError?.message ?? "<no error message found>"
       }`,
