@@ -8,8 +8,8 @@ import {
   MeterProvider,
   MetricReader,
   PeriodicExportingMetricReader,
-  View,
   ExplicitBucketHistogramAggregation,
+  View,
 } from "@opentelemetry/sdk-metrics";
 import { buildInfo, BuildInfo, recordBuildInfo } from "./buildInfo";
 import { HISTOGRAM_NAME } from "./constants";
