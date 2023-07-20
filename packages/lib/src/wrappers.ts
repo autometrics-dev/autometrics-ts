@@ -300,6 +300,7 @@ export function autometrics<F extends FunctionSig>(
         });
       }
 
+      // HACK - Experimental "eager pushing" support
       eagerlyPushMetricsIfConfigured();
     };
 
@@ -329,6 +330,7 @@ export function autometrics<F extends FunctionSig>(
         });
       }
 
+      // HACK - Experimental "eager pushing" support
       eagerlyPushMetricsIfConfigured();
     };
 
