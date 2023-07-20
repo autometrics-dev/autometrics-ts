@@ -57,16 +57,10 @@ export function init(options: initOptions) {
   exporter = options.exporter;
   // if a pushGateway is added we overwrite the exporter
   if (options.pushGateway) {
-    // TODO - use different bucket sizes
-    //     DEFAULT_BUCKETS = (.005, .01, .025, .05, .075, .1, .25, .5, .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF)
-    const inMemoryExporter = new InMemoryMetricExporter(
-      AggregationTemporality.DELTA
-    );
-
     exporter = new PeriodicExportingMetricReader({
       // 0 - using delta aggregation temporality setting
       // to ensure data submitted to the gateway is accurate
-      exporter: inMemoryExporter,
+      exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
     });
     // Make sure the provider is initialized and exporter is registered
     getMetricsProvider();
@@ -114,10 +108,10 @@ async function pushToGateway(gateway: string) {
   console.log(
     "\n\n",
     require("util").inspect(exporterResponse, { depth: null }),
-    "\n\n"
+    "\n\n",
   );
   const serialized = new PrometheusSerializer().serialize(
-    exporterResponse.resourceMetrics
+    exporterResponse.resourceMetrics,
   );
 
   if (typeof fetch === "undefined") {
@@ -142,7 +136,7 @@ async function pushToGateway(gateway: string) {
     logger(
       `Error pushing metrics to gateway: ${
         fetchError?.message ?? "<no error message found>"
-      }`
+      }`,
     );
   }
 
@@ -153,7 +147,7 @@ async function pushToGateway(gateway: string) {
     logger(
       `Error flushing metrics after push: ${
         error?.message ?? "<no error message found>"
-      }`
+      }`,
     );
   }
 }
@@ -166,7 +160,7 @@ export function getMetricsProvider() {
   if (!autometricsMeterProvider) {
     if (!exporter) {
       logger(
-        "Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics"
+        "Initiating a Prometheus Exporter on port: 9464, endpoint: /metrics",
       );
       exporter = new PrometheusExporter();
     }
