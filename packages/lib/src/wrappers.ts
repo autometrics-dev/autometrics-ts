@@ -279,8 +279,6 @@ export function autometrics<F extends FunctionSig>(
     const onSuccess = () => {
       const autometricsDuration = (performance.now() - autometricsStart) / 1000;
 
-      console.log("autometricsDuration", autometricsDuration);
-
       counter.add(1, {
         function: functionName,
         module: moduleName,
