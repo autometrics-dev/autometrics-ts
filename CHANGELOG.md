@@ -1,13 +1,20 @@
 # Changelog
 
-## [Unreleased]
+## [unreleased]
+
+- (_experimental_) Push metrics to gateway "eagerly" when pushInterval is set to 0
+- Log error when fetch is not defined in push context
+
+## [v0.6.0] - @autometrics/autometrics - 2023-07-20
 
 - Added functionality to initialize metrics at 0, so instrumented functions can be registered.
 - Fixed an issue where decorators were changing `this` values for the methods they'd be wrapping, breaking them.
 - Improved how `getModulePath` utility works, passing stack trace as structured data, and making it more robust.
 - Measure function duration in seconds, and update the histogram buckets in prometheus accordingly
-- Log error when fetch is not defined in push context
-- Push metrics to gateway "eagerly" when pushInterval is set to 0
+
+## [v0.5.4] - @autometrics/typescript-plugin - 2023-07-20
+
+- Fixed an issue that would cause the Autometrics hover to not appear on wrapped functions.
 
 ## [v0.5.3] - 2023-06-26
 
