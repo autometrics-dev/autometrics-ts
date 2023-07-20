@@ -1,5 +1,9 @@
 # Changelog
 
+## [unreleased]
+
+-
+
 ## [v0.6.0] - @autometrics/autometrics - 2023-07-20
 
 - Added functionality to initialize metrics at 0, so instrumented functions can be registered.
