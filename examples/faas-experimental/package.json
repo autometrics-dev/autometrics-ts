@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Example of experimental usage of autometrics-ts in a faas environment",
   "scripts": {
-    "start": "tsx serve.ts"
+    "start": "tsx index.ts"
   },
   "author": "",
   "license": "ISC",
