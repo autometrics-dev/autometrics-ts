@@ -127,7 +127,9 @@ async function pushToGateway(gateway: string) {
         body: serialized,
       });
       if (!response.ok) {
-        console.error(`Error pushing metrics to gateway: ${response.statusText}`);
+        console.error(
+          `Error pushing metrics to gateway: ${response.statusText}`,
+        );
         // NOTE - Uncomment to log the response body
         // console.error(JSON.stringify(await response.text(), null, 2));
       }
