@@ -11,24 +11,27 @@
  *
  */
 
-// NOTE - for now we need a fetch polyfill
-//        this will already exist in the browser and in Deno, for what it's worth
+// NOTE - For now we need a fetch polyfill in node.
+//        (Fetch will already be defined in the browser and in Deno.)
 import "./fetch-polyfill";
 import { init as initAutometrics, autometrics } from "@autometrics/autometrics";
 
 initAutometrics({
   // NOTE - The current default exporter does not play nicely with Prometheus Push Gateway,
-  //        You'll end up with the error: "pushed metrics are invalid or inconsistent with existing metrics: pushed metrics must not have timestamps"
-  //        However, it does work with aggregation gateways
+  //        You'll end up with the error: 
+  //          "pushed metrics are invalid or inconsistent with existing metrics: pushed metrics must not have timestamps"
+  //
+  //        However, everything works fine with aggregation gateways
   //
   pushGateway: "http://localhost:9092/metrics",
   pushInterval: 0,
 });
 
 // Create a getCheese function that returns "gouda"
-const getGouda = autometrics(async function getGouda() {
+const getCheese = autometrics(async function getCheese() {
   await new Promise((resolve) => setTimeout(resolve, 120));
   return "gouda";
 });
 
-getGouda();
+// This should produce proper metrics
+getCheese();
