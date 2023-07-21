@@ -1,0 +1,22 @@
+{
+  "name": "faas-experimental",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Example of experimental usage of autometrics-ts in a faas environment",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@autometrics/typescript-plugin": "file:../../packages/typescript-plugin",
+    "tsx": "^3.12.7",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@opentelemetry/exporter-prometheus": "^0.35.1",
+    "@opentelemetry/sdk-metrics": "^1.9.1",
+    "autometrics": "file:../../packages/autometrics",
+    "node-fetch": "^3.3.1"
+  }
+}

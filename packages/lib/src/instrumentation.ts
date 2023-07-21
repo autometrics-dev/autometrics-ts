@@ -4,16 +4,18 @@ import {
 } from "@opentelemetry/exporter-prometheus";
 import {
   AggregationTemporality,
+  ExplicitBucketHistogramAggregation,
   InMemoryMetricExporter,
   MeterProvider,
   MetricReader,
   PeriodicExportingMetricReader,
-  ExplicitBucketHistogramAggregation,
   View,
 } from "@opentelemetry/sdk-metrics";
-import { buildInfo, BuildInfo, recordBuildInfo } from "./buildInfo";
+import { BuildInfo, buildInfo, recordBuildInfo } from "./buildInfo";
 import { HISTOGRAM_NAME } from "./constants";
 
+let globalShouldEagerlyPush = false;
+let pushMetrics = () => {};
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
 
@@ -55,6 +57,7 @@ export function init(options: initOptions) {
   exporter = options.exporter;
   // if a pushGateway is added we overwrite the exporter
   if (options.pushGateway) {
+    // INVESTIGATE - Do we want a periodic exporter when we're pushing metrics eagerly?
     exporter = new PeriodicExportingMetricReader({
       // 0 - using delta aggregation temporality setting
       // to ensure data submitted to the gateway is accurate
@@ -63,10 +66,17 @@ export function init(options: initOptions) {
     // Make sure the provider is initialized and exporter is registered
     getMetricsProvider();
 
-    setInterval(
-      () => pushToGateway(options.pushGateway),
-      options.pushInterval ?? 5000,
-    );
+    const interval = options.pushInterval ?? 5000;
+    pushMetrics = () => pushToGateway(options.pushGateway);
+
+    if (interval > 0) {
+      setInterval(pushMetrics, interval);
+    } else if (interval === 0) {
+      logger("Configuring autometrics to push metrics eagerly");
+      globalShouldEagerlyPush = true;
+    } else {
+      console.error("Invalid pushInterval, metrics will not be pushed");
+    }
   }
 
   // buildInfo is added to init function only for client-side applications
@@ -80,19 +90,86 @@ export function init(options: initOptions) {
   }
 }
 
+export function eagerlyPushMetricsIfConfigured() {
+  if (!globalShouldEagerlyPush) {
+    return;
+  }
+
+  if (exporter instanceof PeriodicExportingMetricReader) {
+    logger("Pushing metrics to gateway");
+    pushMetrics();
+  }
+}
+
+// TODO - add a way to stop the push interval
+// TODO - improve error logging
+// TODO - allow custom fetch function to be passed in
+// TODO - allow configuration of timeout for fetch
 async function pushToGateway(gateway: string) {
-  const exporterResponse = await exporter.collect();
+  if (typeof fetch === "undefined") {
+    console.error(
+      "Fetch is undefined, cannot push metrics to gateway. Consider adding a global polyfill.",
+    );
+    return;
+  }
+
+  // Collect metrics
+  // We return early if there was an error
+  const exporterResponse = await safeCollect();
+  if (exporterResponse === null) {
+    return;
+  }
+
   const serialized = new PrometheusSerializer().serialize(
     exporterResponse.resourceMetrics,
   );
 
-  await fetch(gateway, {
-    method: "POST",
-    mode: "cors",
-    body: serialized,
-  });
-  // we flush the metrics at the end of the submission to ensure the data is not repeated
-  await exporter.forceFlush();
+  try {
+    const response = await fetch(gateway, {
+      method: "POST",
+      mode: "cors",
+      body: serialized,
+    });
+    if (!response.ok) {
+      console.error(`Error pushing metrics to gateway: ${response.statusText}`);
+      // NOTE - Uncomment to log the response body
+      // console.error(JSON.stringify(await response.text(), null, 2));
+    }
+  } catch (fetchError) {
+    console.error(
+      `Error pushing metrics to gateway: ${
+        fetchError?.message ?? "<no error message found>"
+      }`,
+    );
+  }
+
+  await safeFlush();
+}
+
+async function safeCollect() {
+  try {
+    return await exporter.collect();
+  } catch (error) {
+    console.error(
+      `Error collecting metrics for push: ${
+        error?.message ?? "<no error message found>"
+      }`,
+    );
+    return null;
+  }
+}
+
+async function safeFlush() {
+  try {
+    // we flush the metrics at the end of the submission to ensure the data is not repeated
+    await exporter.forceFlush();
+  } catch (error) {
+    console.error(
+      `Error flushing metrics after push: ${
+        error?.message ?? "<no error message found>"
+      }`,
+    );
+  }
 }
 
 /**
@@ -120,6 +197,7 @@ export function getMetricsProvider() {
         }),
       ],
     });
+
     autometricsMeterProvider.addMetricReader(exporter);
   }
 

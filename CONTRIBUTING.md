@@ -69,7 +69,7 @@ your example repo automatically (you won't need to re-run `npm install`)
 Open the `express` app with your editor, e.g.: VSCode - `code examples/express/`
 
 This is now your "lab" environment for testing out how the library or the plugin
-work and feel like.
+work and feel.
 
 #### Debugging TypeScript plugin
 

@@ -2,7 +2,8 @@
 
 ## [unreleased]
 
--
+- (_experimental_) Push metrics to gateway "eagerly" when pushInterval is set to 0
+- Log error when fetch is not defined in push context
 
 ## [v0.6.0] - @autometrics/autometrics - 2023-07-20
 

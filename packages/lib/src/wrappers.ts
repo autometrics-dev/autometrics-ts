@@ -8,7 +8,7 @@ import {
   HISTOGRAM_DESCRIPTION,
   HISTOGRAM_NAME,
 } from "./constants";
-import { getMeter } from "./instrumentation";
+import { eagerlyPushMetricsIfConfigured, getMeter } from "./instrumentation";
 import type { Objective } from "./objectives";
 import {
   ALSInstance,
@@ -100,7 +100,6 @@ export type AutometricsOptions<F extends FunctionSig> = {
    * should be considered a success (regardless if it threw an error). This
    * may be most useful when you want to ignore certain errors that are thrown
    * by the function.
-   *
    */
   recordSuccessIf?: ReportSuccessCondition;
 };
@@ -300,6 +299,9 @@ export function autometrics<F extends FunctionSig>(
           module: moduleName,
         });
       }
+
+      // HACK - Experimental "eager pushing" support
+      eagerlyPushMetricsIfConfigured();
     };
 
     const onError = () => {
@@ -327,6 +329,9 @@ export function autometrics<F extends FunctionSig>(
           caller,
         });
       }
+
+      // HACK - Experimental "eager pushing" support
+      eagerlyPushMetricsIfConfigured();
     };
 
     const recordSuccess = (returnValue: Awaited<ReturnType<F>>) => {
