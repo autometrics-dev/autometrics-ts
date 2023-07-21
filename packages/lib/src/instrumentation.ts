@@ -4,14 +4,14 @@ import {
 } from "@opentelemetry/exporter-prometheus";
 import {
   AggregationTemporality,
+  ExplicitBucketHistogramAggregation,
   InMemoryMetricExporter,
   MeterProvider,
   MetricReader,
   PeriodicExportingMetricReader,
-  ExplicitBucketHistogramAggregation,
   View,
 } from "@opentelemetry/sdk-metrics";
-import { buildInfo, BuildInfo, recordBuildInfo } from "./buildInfo";
+import { BuildInfo, buildInfo, recordBuildInfo } from "./buildInfo";
 import { HISTOGRAM_NAME } from "./constants";
 
 let globalShouldEagerlyPush = false;
@@ -106,55 +106,67 @@ export function eagerlyPushMetricsIfConfigured() {
 // TODO - allow custom fetch function to be passed in
 // TODO - allow configuration of timeout for fetch
 async function pushToGateway(gateway: string) {
-  try {
-    const exporterResponse = await exporter.collect();
-
-    const serialized = new PrometheusSerializer().serialize(
-      exporterResponse.resourceMetrics,
+  if (typeof fetch === "undefined") {
+    console.error(
+      "Fetch is undefined, cannot push metrics to gateway. Consider adding a global polyfill.",
     );
+    return;
+  }
 
-    if (typeof fetch === "undefined") {
-      console.error(
-        "Fetch is undefined, cannot push metrics to gateway. Consider adding a global polyfill.",
-      );
-      return;
-    }
+  // Collect metrics
+  // We return early if there was an error
+  const exporterResponse = await safeCollect();
+  if (exporterResponse === null) {
+    return;
+  }
 
-    try {
-      const response = await fetch(gateway, {
-        method: "POST",
-        mode: "cors",
-        body: serialized,
-      });
-      if (!response.ok) {
-        console.error(
-          `Error pushing metrics to gateway: ${response.statusText}`,
-        );
-        // NOTE - Uncomment to log the response body
-        // console.error(JSON.stringify(await response.text(), null, 2));
-      }
-    } catch (fetchError) {
-      console.error(
-        `Error pushing metrics to gateway: ${
-          fetchError?.message ?? "<no error message found>"
-        }`,
-      );
-    }
+  const serialized = new PrometheusSerializer().serialize(
+    exporterResponse.resourceMetrics,
+  );
 
-    try {
-      // we flush the metrics at the end of the submission to ensure the data is not repeated
-      await exporter.forceFlush();
-    } catch (error) {
-      console.error(
-        `Error flushing metrics after push: ${
-          error?.message ?? "<no error message found>"
-        }`,
-      );
+  try {
+    const response = await fetch(gateway, {
+      method: "POST",
+      mode: "cors",
+      body: serialized,
+    });
+    if (!response.ok) {
+      console.error(`Error pushing metrics to gateway: ${response.statusText}`);
+      // NOTE - Uncomment to log the response body
+      // console.error(JSON.stringify(await response.text(), null, 2));
     }
-  } catch (collectError) {
+  } catch (fetchError) {
+    console.error(
+      `Error pushing metrics to gateway: ${
+        fetchError?.message ?? "<no error message found>"
+      }`,
+    );
+  }
+
+  await safeFlush();
+}
+
+async function safeCollect() {
+  try {
+    return await exporter.collect();
+  } catch (error) {
     console.error(
       `Error collecting metrics for push: ${
-        collectError?.message ?? "<no error message found>"
+        error?.message ?? "<no error message found>"
+      }`,
+    );
+    return null;
+  }
+}
+
+async function safeFlush() {
+  try {
+    // we flush the metrics at the end of the submission to ensure the data is not repeated
+    await exporter.forceFlush();
+  } catch (error) {
+    console.error(
+      `Error flushing metrics after push: ${
+        error?.message ?? "<no error message found>"
       }`,
     );
   }
@@ -178,8 +190,21 @@ export function getMetricsProvider() {
         new View({
           // See: https://github.com/autometrics-dev/autometrics-ts/issues/102
           aggregation: new ExplicitBucketHistogramAggregation([
-            0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5,
-            7.5, 10,
+            0,
+            0.005,
+            0.01,
+            0.025,
+            0.05,
+            0.075,
+            0.1,
+            0.25,
+            0.5,
+            0.75,
+            1,
+            2.5,
+            5,
+            7.5,
+            10,
           ]),
           instrumentName: HISTOGRAM_NAME,
         }),
