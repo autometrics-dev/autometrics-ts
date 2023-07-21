@@ -14,8 +14,8 @@ import {
 import { buildInfo, BuildInfo, recordBuildInfo } from "./buildInfo";
 import { HISTOGRAM_NAME } from "./constants";
 
-let IS_EAGERLY_PUSHED = false;
-let _pushMetrics = () => {};
+let globalShouldEagerlyPush = false;
+let pushMetrics = () => {};
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
 
@@ -67,13 +67,13 @@ export function init(options: initOptions) {
     getMetricsProvider();
 
     const interval = options.pushInterval ?? 5000;
-    _pushMetrics = () => pushToGateway(options.pushGateway);
+    pushMetrics = () => pushToGateway(options.pushGateway);
 
     if (interval > 0) {
-      setInterval(_pushMetrics, interval);
+      setInterval(pushMetrics, interval);
     } else if (interval === 0) {
       logger("Configuring autometrics to push metrics eagerly");
-      IS_EAGERLY_PUSHED = true;
+      globalShouldEagerlyPush = true;
     } else {
       console.error("Invalid pushInterval, metrics will not be pushed");
     }
@@ -91,13 +91,13 @@ export function init(options: initOptions) {
 }
 
 export function eagerlyPushMetricsIfConfigured() {
-  if (!IS_EAGERLY_PUSHED) {
+  if (!globalShouldEagerlyPush) {
     return;
   }
 
   if (exporter instanceof PeriodicExportingMetricReader) {
     logger("Pushing metrics to gateway");
-    _pushMetrics();
+    pushMetrics();
   }
 }
 
