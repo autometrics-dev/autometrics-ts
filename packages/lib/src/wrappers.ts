@@ -227,6 +227,14 @@ export function autometrics<F extends FunctionSig>(
   const counterObjectiveAttributes: Attributes = {};
   const histogramObjectiveAttributes: Attributes = {};
 
+  // NOTE - Gravel Gateway will reject two metrics of the same name if one of them has a subset of the attributes of the other
+  //        This means to be able to support functions that have objectives, as well as functions that don't, we need to
+  //        default to setting the objective_* labels to the empty string.
+  histogramObjectiveAttributes.objective_latency_threshold = "";
+  histogramObjectiveAttributes.objective_percentile = "";
+
+  counterObjectiveAttributes.objective_percentile = "";
+
   if (objective) {
     const { latency, name, successRate } = objective;
 
