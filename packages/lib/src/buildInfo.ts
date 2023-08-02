@@ -26,6 +26,15 @@ export type BuildInfo = {
    * environment variable: `AUTOMETRICS_BRANCH` or `BRANCH_NAME`.
    */
   branch?: string;
+
+  /**
+   * The "clearmode" label of the `build_info` metric.
+   * This label is used when pushing to a Gravel Gateway
+   *
+   * When pushing to a Gravel Gateway, it's recommended to use the "family" clearmode.
+   * See Gravel documentation for more details.
+   */
+  clearmode?: "replace" | "aggregate" | "family";
 };
 
 /**

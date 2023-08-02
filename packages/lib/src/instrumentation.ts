@@ -86,6 +86,8 @@ export function init(options: initOptions) {
     buildInfo.version = options.buildInfo?.version;
     buildInfo.commit = options.buildInfo?.commit;
     buildInfo.branch = options.buildInfo?.branch;
+    buildInfo.clearmode = options.buildInfo?.clearmode;
+
     recordBuildInfo(buildInfo); // record build info only after the exporter is initialized
   }
 }
@@ -123,6 +125,7 @@ async function pushToGateway(gateway: string) {
   const serialized = new PrometheusSerializer().serialize(
     exporterResponse.resourceMetrics,
   );
+  console.log(serialized);
 
   try {
     const response = await fetch(gateway, {

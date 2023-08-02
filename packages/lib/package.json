@@ -1,6 +1,6 @@
 {
   "name": "brettermetrics",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Easily add metrics to your system -- and actually understand them using automatically customized Prometheus queries",
   "author": "Fiberplane<info@fiberplane.com>",
   "contributors": [

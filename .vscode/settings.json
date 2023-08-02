@@ -1,0 +1,6 @@
+{
+  "rust-analyzer.restartServerOnConfigChange": false,
+  "rust-analyzer.server.extraEnv": {
+    "AUTOMETRICS_DISABLE_DOCS": "1"
+  }
+}
