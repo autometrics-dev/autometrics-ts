@@ -83,9 +83,10 @@ export function init(options: initOptions) {
   // if it is provided - we register it
   if (options.buildInfo) {
     logger("Registering build info");
-    buildInfo.version = options.buildInfo?.version;
-    buildInfo.commit = options.buildInfo?.commit;
-    buildInfo.branch = options.buildInfo?.branch;
+    buildInfo.version = options.buildInfo?.version ?? "";
+    buildInfo.commit = options.buildInfo?.commit ?? "";
+    buildInfo.branch = options.buildInfo?.branch ?? "";
+    buildInfo.clearmode = options.buildInfo?.clearmode ?? "";
     recordBuildInfo(buildInfo); // record build info only after the exporter is initialized
   }
 }
