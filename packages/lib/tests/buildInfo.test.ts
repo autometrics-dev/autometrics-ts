@@ -33,7 +33,7 @@ describe("Autometrics build info tests", () => {
 
   test("build info is recorded", async () => {
     const buildInfoMetric =
-      /build_info{version="1.0.0",commit="123456789",branch="main"}/gm;
+      /build_info{version="1.0.0",commit="123456789",branch="main",clearmode=""}/gm;
 
     const serialized = await collectAndSerialize(exporter);
 

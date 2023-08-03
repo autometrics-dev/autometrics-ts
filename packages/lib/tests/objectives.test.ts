@@ -97,6 +97,8 @@ describe("Autometrics objectives test", () => {
 
     const serialized = await collectAndSerialize(exporter);
 
+    console.log(serialized);
+
     expect(serialized).toMatch(callCountMetric);
     expect(serialized).toMatch(durationMetric);
   });
