@@ -1,6 +1,6 @@
 {
   "name": "@autometrics/autometrics",
-  "version": "0.7.0-beta",
+  "version": "0.7.0-beta2",
   "description": "Easily add metrics to your system -- and actually understand them using automatically customized Prometheus queries",
   "author": "Fiberplane<info@fiberplane.com>",
   "contributors": [
