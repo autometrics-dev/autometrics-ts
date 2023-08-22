@@ -11,8 +11,8 @@ import {
   PeriodicExportingMetricReader,
   View,
 } from "@opentelemetry/sdk-metrics";
-import { BuildInfo, buildInfo, recordBuildInfo } from "./buildInfo";
-import { HISTOGRAM_NAME } from "./constants";
+import { BuildInfo, buildInfo, recordBuildInfo } from "./buildInfo.ts";
+import { HISTOGRAM_NAME } from "./constants.ts";
 
 let globalShouldEagerlyPush = false;
 let pushMetrics = () => {};
@@ -24,7 +24,7 @@ type Exporter = MetricReader;
 /**
  * @group Initialization API
  */
-export type initOptions = {
+export type InitOptions = {
   /**
    * A custom exporter to be used instead of the bundled Prometheus Exporter on port 9464
    */
@@ -47,16 +47,20 @@ export type initOptions = {
 
 /**
  * Optional initialization function to set a custom exporter or push gateway for client-side applications.
- * Required if using autometrics in a client-side application. See {@link initOptions} for details.
+ * Required if using autometrics in a client-side application. See {@link InitOptions} for details.
  *
- * @param {initOptions} options
+ * @param {InitOptions} options
  * @group Initialization API
  */
-export function init(options: initOptions) {
+export function init(options: InitOptions) {
   logger("Using the user's Exporter configuration");
-  exporter = options.exporter;
+  if (options.exporter) {
+    exporter = options.exporter;
+  }
+
   // if a pushGateway is added we overwrite the exporter
-  if (options.pushGateway) {
+  const { pushGateway } = options;
+  if (pushGateway) {
     // INVESTIGATE - Do we want a periodic exporter when we're pushing metrics eagerly?
     exporter = new PeriodicExportingMetricReader({
       // 0 - using delta aggregation temporality setting
@@ -67,7 +71,7 @@ export function init(options: initOptions) {
     getMetricsProvider();
 
     const interval = options.pushInterval ?? 5000;
-    pushMetrics = () => pushToGateway(options.pushGateway);
+    pushMetrics = () => pushToGateway(pushGateway);
 
     if (interval > 0) {
       setInterval(pushMetrics, interval);
@@ -83,10 +87,10 @@ export function init(options: initOptions) {
   // if it is provided - we register it
   if (options.buildInfo) {
     logger("Registering build info");
-    buildInfo.version = options.buildInfo?.version ?? "";
-    buildInfo.commit = options.buildInfo?.commit ?? "";
-    buildInfo.branch = options.buildInfo?.branch ?? "";
-    buildInfo.clearmode = options.buildInfo?.clearmode ?? "";
+    buildInfo.version = options.buildInfo.version ?? "";
+    buildInfo.commit = options.buildInfo.commit ?? "";
+    buildInfo.branch = options.buildInfo.branch ?? "";
+    buildInfo.clearmode = options.buildInfo.clearmode ?? "";
     recordBuildInfo(buildInfo); // record build info only after the exporter is initialized
   }
 }

@@ -1,11 +1,12 @@
 export type Runtime = "node" | "deno" | "browser" | "unknown";
 
 export function getRuntime(): Runtime {
+  // @ts-ignore
   if (typeof process === "object" && "cwd" in process) {
     return "node";
   }
 
-  //@ts-ignore
+  // @ts-ignore
   if (typeof Deno === "object") {
     return "deno";
   }
@@ -42,6 +43,7 @@ export function getModulePath(): string | undefined {
   } else if (runtime === "node") {
     // HACK: this assumes the entire app was run from the root directory of the
     // project
+    // @ts-ignore
     rootDir = process.cwd();
   } else {
     rootDir = "";
@@ -64,6 +66,9 @@ export function getModulePath(): string | undefined {
     stack.find((call) => {
       if (call.name?.includes("__decorate")) return true;
     })?.file ?? stack[2]?.file;
+  if (!wrappedFunctionPath) {
+    return;
+  }
 
   const containsFileProtocol = wrappedFunctionPath.includes("file://");
 
@@ -96,6 +101,7 @@ export function getALSCaller(context?: ALSInstance) {
 export function isPromise<T extends Promise<void>>(val: unknown): val is T {
   return (
     typeof val === "object" &&
+    val != null &&
     "then" in val &&
     typeof val.then === "function" &&
     "catch" in val &&

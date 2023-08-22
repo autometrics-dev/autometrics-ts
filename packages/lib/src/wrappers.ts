@@ -1,5 +1,5 @@
-import { Attributes } from "@opentelemetry/api";
-import { setBuildInfo } from "./buildInfo";
+import { Attributes } from "npm:@opentelemetry/api";
+import { setBuildInfo } from "./buildInfo.ts";
 import {
   COUNTER_DESCRIPTION,
   COUNTER_NAME,
@@ -7,9 +7,9 @@ import {
   GAUGE_NAME,
   HISTOGRAM_DESCRIPTION,
   HISTOGRAM_NAME,
-} from "./constants";
-import { eagerlyPushMetricsIfConfigured, getMeter } from "./instrumentation";
-import type { Objective } from "./objectives";
+} from "./constants.ts";
+import { eagerlyPushMetricsIfConfigured, getMeter } from "./instrumentation.ts";
+import type { Objective } from "./objectives.ts";
 import {
   ALSInstance,
   getALSCaller,
@@ -18,7 +18,7 @@ import {
   isFunction,
   isObject,
   isPromise,
-} from "./utils";
+} from "./utils.ts";
 
 let asyncLocalStorage: ALSInstance | undefined;
 if (typeof window === "undefined") {
@@ -173,48 +173,38 @@ export type ReportSuccessCondition = (result: Error) => boolean;
  * @group Wrapper and Decorator API
  */
 export function autometrics<F extends FunctionSig>(
-  functionOrOptions: F | AutometricsOptions<F>,
-  fnInput?: F,
+  fnInput: F,
+): AutometricsWrapper<F>;
+export function autometrics<F extends FunctionSig>(
+  options: AutometricsOptions<F>,
+  fnInput: F,
+): AutometricsWrapper<F>;
+export function autometrics<F extends FunctionSig>(
+  ...args: [F] | [AutometricsOptions<F>, F]
 ): AutometricsWrapper<F> {
   let functionName: string;
-  let moduleName: string;
+  let moduleName: string | undefined;
   let fn: F;
   let objective: Objective | undefined;
   let trackConcurrency = false;
   let recordErrorIf: ReportErrorCondition<F> | undefined;
   let recordSuccessIf: ReportSuccessCondition | undefined;
 
-  if (typeof functionOrOptions === "function") {
-    fn = functionOrOptions;
+  if (args.length === 1) {
+    fn = args[0];
     functionName = fn.name;
     moduleName = getModulePath();
   } else {
-    fn = fnInput;
-    functionName =
-      "functionName" in functionOrOptions
-        ? functionOrOptions.functionName
-        : fn.name;
+    const options = args[0];
+    fn = args[1];
 
-    moduleName =
-      "moduleName" in functionOrOptions
-        ? functionOrOptions.moduleName
-        : getModulePath();
+    functionName = options.functionName ?? fn.name;
+    moduleName = options.moduleName ?? getModulePath();
 
-    if ("objective" in functionOrOptions) {
-      objective = functionOrOptions.objective;
-    }
-
-    if ("trackConcurrency" in functionOrOptions) {
-      trackConcurrency = functionOrOptions.trackConcurrency;
-    }
-
-    if ("recordErrorIf" in functionOrOptions) {
-      recordErrorIf = functionOrOptions.recordErrorIf;
-    }
-
-    if ("recordSuccessIf" in functionOrOptions) {
-      recordSuccessIf = functionOrOptions.recordSuccessIf;
-    }
+    objective = options.objective;
+    trackConcurrency = options.trackConcurrency ?? false;
+    recordErrorIf = options.recordErrorIf;
+    recordSuccessIf = options.recordSuccessIf;
   }
 
   if (!functionName) {
@@ -372,6 +362,7 @@ export function autometrics<F extends FunctionSig>(
 
     function instrumentedFunction() {
       try {
+        // @ts-ignore
         const returnValue: ReturnType<F> = fn.apply(this, params);
         if (isPromise<ReturnType<F>>(returnValue)) {
           return returnValue

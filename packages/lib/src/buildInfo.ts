@@ -1,7 +1,8 @@
-import { getMeter } from "./instrumentation";
-import { getRuntime, Runtime } from "./utils";
-import { UpDownCounter } from "@opentelemetry/api";
-import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants";
+import type { UpDownCounter } from "@opentelemetry/api";
+
+import { getMeter } from "./instrumentation.ts";
+import { getRuntime, Runtime } from "./utils.ts";
+import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants.ts";
 
 /**
  * BuildInfo is used to create the `build_info` metric that
@@ -92,9 +93,12 @@ export function setBuildInfo() {
  */
 function getVersion(runtime: Runtime): string | undefined {
   if (runtime === "node") {
+    // @ts-ignore
     if (process.env.npm_package_version) {
+      // @ts-ignore
       return process.env.npm_package_version;
     }
+    // @ts-ignore
     return process.env.PACKAGE_VERSION || process.env.AUTOMETRICS_VERSION;
   }
 
@@ -113,6 +117,7 @@ function getVersion(runtime: Runtime): string | undefined {
  */
 function getCommit(runtime: Runtime) {
   if (runtime === "node") {
+    // @ts-ignore
     return process.env.COMMIT_SHA || process.env.AUTOMETRICS_COMMIT;
   }
 
@@ -129,6 +134,7 @@ function getCommit(runtime: Runtime) {
  */
 function getBranch(runtime: Runtime) {
   if (runtime === "node") {
+    // @ts-ignore
     return process.env.BRANCH_NAME || process.env.AUTOMETRICS_BRANCH;
   }
 

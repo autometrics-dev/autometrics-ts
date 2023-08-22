@@ -5,8 +5,8 @@ import {
 } from "@opentelemetry/sdk-metrics";
 import { afterEach, beforeAll, describe, expect, test } from "vitest";
 import { init } from "../src";
-import { getMetricsProvider } from "../src/instrumentation";
-import { collectAndSerialize } from "./util";
+import { getMetricsProvider } from "../src/instrumentation.ts";
+import { collectAndSerialize } from "./util.ts";
 
 const buildInfo = {
   version: "1.0.0",
