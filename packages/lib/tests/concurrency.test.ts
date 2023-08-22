@@ -4,7 +4,7 @@ import {
 } from "@opentelemetry/sdk-metrics";
 import { assertMatch } from "./deps.ts";
 import { autometrics, init } from "../mod.ts";
-import { getMetricsProvider } from "../src/instrumentation.ts";
+import { getMetricsProvider } from "../instrumentation.ts";
 import { collectAndSerialize } from "./util.ts";
 
 /*Deno.test("Autometrics concurrency tests", async (t) => {

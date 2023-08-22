@@ -5,7 +5,7 @@ import {
   PeriodicExportingMetricReader,
 } from "@opentelemetry/sdk-metrics";
 import { assertMatch, assertRejects } from "./deps.ts";
-import { getMetricsProvider } from "../src/instrumentation.ts";
+import { getMetricsProvider } from "../instrumentation.ts";
 import { collectAndSerialize } from "./util.ts";
 
 /*Deno.test("Autometrics integration test", async (t) => {

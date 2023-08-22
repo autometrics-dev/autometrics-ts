@@ -9,7 +9,7 @@ import {
   ObjectiveLatency,
   ObjectivePercentile,
 } from "../mod.ts";
-import { getMetricsProvider } from "../src/instrumentation.ts";
+import { getMetricsProvider } from "../instrumentation.ts";
 import { collectAndSerialize } from "./util.ts";
 
 /*Deno.test("Autometrics objectives test", async (t) => {

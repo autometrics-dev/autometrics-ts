@@ -1,22 +1,4 @@
-export type Runtime = "node" | "deno" | "browser" | "unknown";
-
-export function getRuntime(): Runtime {
-  // @ts-ignore
-  if (typeof process === "object" && "cwd" in process) {
-    return "node";
-  }
-
-  // @ts-ignore
-  if (typeof Deno === "object") {
-    return "deno";
-  }
-
-  if (typeof window === "object") {
-    return "browser";
-  }
-
-  return "unknown";
-}
+import { getRootDir } from "./platform.deno.ts";
 
 // HACK: this entire function is a hacky way to acquire the module name for a
 // given function e.g.: dist/index.js
@@ -32,23 +14,6 @@ export function getModulePath(): string | undefined {
     name: callSite.getFunctionName(),
     file: callSite.getFileName(),
   }));
-
-  let rootDir: string;
-  const runtime = getRuntime();
-  if (runtime === "browser") {
-    rootDir = "";
-  } else if (runtime === "deno") {
-    //@ts-ignore
-    rootDir = Deno.cwd();
-  } else if (runtime === "node") {
-    // HACK: this assumes the entire app was run from the root directory of the
-    // project
-    // @ts-ignore
-    rootDir = process.cwd();
-  } else {
-    rootDir = "";
-  }
-
   if (!stack) {
     return;
   }
@@ -74,6 +39,7 @@ export function getModulePath(): string | undefined {
 
   // We split away everything up to the root directory of the project,
   // if the path contains file:// we need to remove it
+  const rootDir = getRootDir();
   return wrappedFunctionPath.replace(
     containsFileProtocol ? `file://${rootDir}` : rootDir,
     "",

@@ -1,4 +1,4 @@
-import { Attributes } from "npm:@opentelemetry/api";
+import { Attributes } from "@opentelemetry/api";
 import { setBuildInfo } from "./buildInfo.ts";
 import {
   COUNTER_DESCRIPTION,

@@ -4,8 +4,8 @@ import {
   AggregationTemporality,
 } from "@opentelemetry/sdk-metrics";
 import { assertMatch } from "./deps.ts";
-import { init } from "../src/instrumentation.ts";
-import { getMetricsProvider } from "../src/instrumentation.ts";
+import { init } from "../instrumentation.ts";
+import { getMetricsProvider } from "../instrumentation.ts";
 import { collectAndSerialize } from "./util.ts";
 
 const buildInfo = {

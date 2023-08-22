@@ -1,5 +1,5 @@
 import { assertEquals } from "./deps.ts";
-import { getModulePath } from "../src/utils.ts";
+import { getModulePath } from "../utils.ts";
 
 // the existing getModulePath function is a hack that parses the stack trace
 // as string and extracts the module path from it. This test is to ensure that

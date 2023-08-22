@@ -1,8 +1,8 @@
 import type { UpDownCounter } from "@opentelemetry/api";
 
-import { getMeter } from "./instrumentation.ts";
-import { getRuntime, Runtime } from "./utils.ts";
 import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants.ts";
+import { getBranch, getCommit, getVersion } from "./platform.deno.ts";
+import { getMeter } from "./instrumentation.ts";
 
 /**
  * BuildInfo is used to create the `build_info` metric that
@@ -73,73 +73,13 @@ export function setBuildInfo() {
     return buildInfo;
   }
 
-  const runtime = getRuntime();
-
   buildInfo = {
-    version: getVersion(runtime),
-    commit: getCommit(runtime),
-    branch: getBranch(runtime),
+    version: getVersion(),
+    commit: getCommit(),
+    branch: getBranch(),
   };
 
   recordBuildInfo(buildInfo);
 
   return buildInfo;
-}
-
-/**
- * Gets the version of the application.
- *
- * @internal
- */
-function getVersion(runtime: Runtime): string | undefined {
-  if (runtime === "node") {
-    // @ts-ignore
-    if (process.env.npm_package_version) {
-      // @ts-ignore
-      return process.env.npm_package_version;
-    }
-    // @ts-ignore
-    return process.env.PACKAGE_VERSION || process.env.AUTOMETRICS_VERSION;
-  }
-
-  if (runtime === "deno") {
-    return (
-      //@ts-ignore
-      Deno.env.get("AUTOMETRICS_VERSION") || Deno.env.get("PACKAGE_VERSION")
-    );
-  }
-}
-
-/**
- * Gets the commit hash of the current state of the application.
- *
- * @internal
- */
-function getCommit(runtime: Runtime) {
-  if (runtime === "node") {
-    // @ts-ignore
-    return process.env.COMMIT_SHA || process.env.AUTOMETRICS_COMMIT;
-  }
-
-  if (runtime === "deno") {
-    //@ts-ignore
-    return Deno.env.get("AUTOMETRICS_COMMIT");
-  }
-}
-
-/**
- * Gets the current branch of the application.
- *
- * @internal
- */
-function getBranch(runtime: Runtime) {
-  if (runtime === "node") {
-    // @ts-ignore
-    return process.env.BRANCH_NAME || process.env.AUTOMETRICS_BRANCH;
-  }
-
-  if (runtime === "deno") {
-    //@ts-ignore
-    return Deno.env.get("AUTOMETRICS_BRANCH");
-  }
 }
