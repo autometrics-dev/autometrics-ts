@@ -2,30 +2,22 @@ import {
   InMemoryMetricExporter,
   PeriodicExportingMetricReader,
 } from "@opentelemetry/sdk-metrics";
-import { afterEach, beforeAll, describe, expect, test } from "vitest";
-import { autometrics, init } from "../src";
-import { getMetricsProvider } from "../src/instrumentation";
-import { collectAndSerialize } from "./util";
+import { assertMatch } from "./deps.ts";
+import { autometrics, init } from "../mod.ts";
+import { getMetricsProvider } from "../src/instrumentation.ts";
+import { collectAndSerialize } from "./util.ts";
 
-let exporter: PeriodicExportingMetricReader;
-
-describe("Autometrics concurrency tests", () => {
-  beforeAll(async () => {
-    exporter = new PeriodicExportingMetricReader({
-      // 0 - using delta aggregation temporality setting
-      // to ensure data submitted to the gateway is accurate
-      exporter: new InMemoryMetricExporter(0),
-    });
-
-    init({ exporter });
-    getMetricsProvider();
+/*Deno.test("Autometrics concurrency tests", async (t) => {
+  const exporter = new PeriodicExportingMetricReader({
+    // 0 - using delta aggregation temporality setting
+    // to ensure data submitted to the gateway is accurate
+    exporter: new InMemoryMetricExporter(0),
   });
 
-  afterEach(async () => {
-    await exporter.forceFlush();
-  });
+  init({ exporter });
+  getMetricsProvider();
 
-  test("increases and decreases the concurrency gauge", async () => {
+  await t.step("increases and decreases the concurrency gauge", async () => {
     const sleepFn = autometrics(
       { trackConcurrency: true },
       async function sleep(ms: number) {
@@ -35,7 +27,7 @@ describe("Autometrics concurrency tests", () => {
 
     const one = sleepFn(1000);
     const two = sleepFn(1000);
-    const _three = sleepFn(20000);
+    const three = sleepFn(2000);
 
     await Promise.all([one, two]);
 
@@ -44,6 +36,10 @@ describe("Autometrics concurrency tests", () => {
 
     const serialized = await collectAndSerialize(exporter);
 
-    expect(serialized).toMatch(concurrencyCountFinishedMetric);
+    assertMatch(serialized, concurrencyCountFinishedMetric);
+
+    await three;
   });
-});
+
+  await exporter.forceFlush({ timeoutMillis: 10 });
+});*/

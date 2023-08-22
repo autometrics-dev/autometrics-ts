@@ -1,8 +1,8 @@
-import { getMetricsProvider } from "../src/instrumentation";
-import { describe, test, expect } from "vitest";
+import { assertEquals } from "./deps.ts";
+import { getMetricsProvider } from "../src/instrumentation.ts";
 
-describe("Autometrics initializer", () => {
-  test("Test if autometrics initializes only once", () => {
-    expect(getMetricsProvider()).to.equal(getMetricsProvider());
+Deno.test("Autometrics initializer", async (t) => {
+  await t.step("Test if autometrics initializes only once", () => {
+    assertEquals(getMetricsProvider(), getMetricsProvider());
   });
 });

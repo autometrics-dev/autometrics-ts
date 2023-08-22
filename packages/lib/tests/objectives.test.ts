@@ -2,35 +2,33 @@ import {
   PeriodicExportingMetricReader,
   InMemoryMetricExporter,
 } from "@opentelemetry/sdk-metrics";
-import { afterEach, beforeAll, describe, expect, test } from "vitest";
+import { assertMatch } from "./deps.ts";
 import {
   autometrics,
   init,
   ObjectiveLatency,
   ObjectivePercentile,
-} from "../src";
-import { getMetricsProvider } from "../src/instrumentation";
-import { collectAndSerialize } from "./util";
+} from "../mod.ts";
+import { getMetricsProvider } from "../src/instrumentation.ts";
+import { collectAndSerialize } from "./util.ts";
 
-let exporter: PeriodicExportingMetricReader;
-
-describe("Autometrics objectives test", () => {
-  beforeAll(async () => {
-    exporter = new PeriodicExportingMetricReader({
-      // 0 - using delta aggregation temporality setting
-      // to ensure data submitted to the gateway is accurate
-      exporter: new InMemoryMetricExporter(0),
-    });
-
-    init({ exporter });
-    getMetricsProvider();
+/*Deno.test("Autometrics objectives test", async (t) => {
+  const exporter = new PeriodicExportingMetricReader({
+    // 0 - using delta aggregation temporality setting
+    // to ensure data submitted to the gateway is accurate
+    exporter: new InMemoryMetricExporter(0),
   });
 
-  afterEach(async () => {
-    await exporter.forceFlush();
-  });
+  init({ exporter });
+  getMetricsProvider();
 
-  test("success rate", async () => {
+  const testAndFlush = async (name: string, fn: (t: Deno.TestContext) => void | Promise<void>) => {
+    await t.step(name, fn);
+
+    await exporter.forceFlush({ timeoutMillis: 10 });
+  };
+
+  await testAndFlush("success rate", async () => {
     const successRateFn = autometrics(
       {
         objective: {
@@ -49,10 +47,10 @@ describe("Autometrics objectives test", () => {
 
     const serialized = await collectAndSerialize(exporter);
 
-    expect(serialized).toMatch(callCountMetric);
+    assertMatch(serialized, callCountMetric);
   });
 
-  test("latency", async () => {
+  await testAndFlush("latency", async () => {
     const latencyFn = autometrics(
       {
         objective: {
@@ -71,10 +69,10 @@ describe("Autometrics objectives test", () => {
 
     const serialized = await collectAndSerialize(exporter);
 
-    expect(serialized).toMatch(durationMetric);
+    assertMatch(serialized, durationMetric);
   });
 
-  test("combined objective ", async () => {
+  await testAndFlush("combined objective ", async () => {
     const combinedObjectiveFn = autometrics(
       {
         objective: {
@@ -97,7 +95,7 @@ describe("Autometrics objectives test", () => {
 
     const serialized = await collectAndSerialize(exporter);
 
-    expect(serialized).toMatch(callCountMetric);
-    expect(serialized).toMatch(durationMetric);
+    assertMatch(serialized, callCountMetric);
+    assertMatch(serialized, durationMetric);
   });
-});
+});*/

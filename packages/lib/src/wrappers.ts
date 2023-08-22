@@ -182,21 +182,23 @@ export function autometrics<F extends FunctionSig>(
 export function autometrics<F extends FunctionSig>(
   ...args: [F] | [AutometricsOptions<F>, F]
 ): AutometricsWrapper<F> {
-  let functionName: string;
+  let functionName: string | undefined;
   let moduleName: string | undefined;
-  let fn: F;
+  let fn: F | undefined;
   let objective: Objective | undefined;
   let trackConcurrency = false;
   let recordErrorIf: ReportErrorCondition<F> | undefined;
   let recordSuccessIf: ReportSuccessCondition | undefined;
 
-  if (args.length === 1) {
-    fn = args[0];
+  let fnOrOptions = args[0];
+  let maybeFn = args[1];
+  if (typeof fnOrOptions === "function") {
+    fn = fnOrOptions;
     functionName = fn.name;
     moduleName = getModulePath();
-  } else {
-    const options = args[0];
-    fn = args[1];
+  } else if (maybeFn) {
+    const options = fnOrOptions;
+    fn = maybeFn;
 
     functionName = options.functionName ?? fn.name;
     moduleName = options.moduleName ?? getModulePath();
@@ -211,7 +213,7 @@ export function autometrics<F extends FunctionSig>(
     console.trace(
       "Autometrics decorated function must have a name to successfully create a metric. Function will not be instrumented.",
     );
-    return fn;
+    return fn as F;
   }
 
   const counterObjectiveAttributes: Attributes = {};
