@@ -56,9 +56,17 @@ for (const [dir, name] of Object.entries(packages)) {
         peerDependency: true,
         version: "^1.4.0",
       },
+      "./vendor/opentelemetry-core/mod.ts": {
+        name: "@opentelemetry/core",
+        version: "^1.15.0",
+      },
       "./vendor/opentelemetry-exporter-prometheus/mod.ts": {
         name: "@opentelemetry/exporter-prometheus",
         version: "^0.41.0",
+      },
+      "./vendor/opentelemetry-resources/mod.ts": {
+        name: "@opentelemetry/resources",
+        version: "^1.15.0",
       },
       "./vendor/opentelemetry-sdk-metrics/mod.ts": {
         name: "@opentelemetry/sdk-metrics",
