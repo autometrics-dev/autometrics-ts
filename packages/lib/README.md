@@ -8,7 +8,7 @@ Full documentation for the `autometrics` library can be found
 ## Basic example
 
 ```typescript
-import { autometrics } from "https://deno.land/x/autometrics";
+import { autometrics } from "https://deno.land/x/autometrics/mod.ts";
 
 async function createUser(payload: User) {
   // ...
