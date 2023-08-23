@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
-import { MetricCollectOptions } from '../export/MetricProducer.ts';
-import { ScopeMetrics } from '../export/MetricData.ts';
+import { HrTime } from "../../../opentelemetry-api/mod.ts";
+import { InstrumentationScope } from "../../../opentelemetry-core/mod.ts";
+import { MetricCollectOptions } from "../export/MetricProducer.ts";
+import { ScopeMetrics } from "../export/MetricData.ts";
 import {
   createInstrumentDescriptorWithView,
   InstrumentDescriptor,
-} from '../InstrumentDescriptor.ts';
-import { Meter } from '../Meter.ts';
-import { isNotNullish, Maybe } from '../utils.ts';
-import { AsyncMetricStorage } from './AsyncMetricStorage.ts';
-import { MeterProviderSharedState } from './MeterProviderSharedState.ts';
-import { MetricCollectorHandle } from './MetricCollector.ts';
-import { MetricStorageRegistry } from './MetricStorageRegistry.ts';
-import { MultiMetricStorage } from './MultiWritableMetricStorage.ts';
-import { ObservableRegistry } from './ObservableRegistry.ts';
-import { SyncMetricStorage } from './SyncMetricStorage.ts';
-import { Accumulation, Aggregator } from '../aggregator/types.ts';
-import { AttributesProcessor } from '../view/AttributesProcessor.ts';
-import { MetricStorage } from './MetricStorage.ts';
+} from "../InstrumentDescriptor.ts";
+import { Meter } from "../Meter.ts";
+import { isNotNullish, Maybe } from "../utils.ts";
+import { AsyncMetricStorage } from "./AsyncMetricStorage.ts";
+import { MeterProviderSharedState } from "./MeterProviderSharedState.ts";
+import { MetricCollectorHandle } from "./MetricCollector.ts";
+import { MetricStorageRegistry } from "./MetricStorageRegistry.ts";
+import { MultiMetricStorage } from "./MultiWritableMetricStorage.ts";
+import { ObservableRegistry } from "./ObservableRegistry.ts";
+import { SyncMetricStorage } from "./SyncMetricStorage.ts";
+import { Accumulation, Aggregator } from "../aggregator/types.ts";
+import { AttributesProcessor } from "../view/AttributesProcessor.ts";
+import { MetricStorage } from "./MetricStorage.ts";
 
 /**
  * An internal record for shared meter provider states.
@@ -45,7 +45,7 @@ export class MeterSharedState {
 
   constructor(
     private _meterProviderSharedState: MeterProviderSharedState,
-    private _instrumentationScope: InstrumentationScope
+    private _instrumentationScope: InstrumentationScope,
   ) {
     this.meter = new Meter(this);
   }
@@ -62,7 +62,7 @@ export class MeterSharedState {
   registerAsyncMetricStorage(descriptor: InstrumentDescriptor) {
     const storages = this._registerMetricStorage(
       descriptor,
-      AsyncMetricStorage
+      AsyncMetricStorage,
     );
 
     return storages;
@@ -77,7 +77,7 @@ export class MeterSharedState {
   async collect(
     collector: MetricCollectorHandle,
     collectionTime: HrTime,
-    options?: MetricCollectOptions
+    options?: MetricCollectOptions,
   ): Promise<ScopeMetricsResult> {
     /**
      * 1. Call all observable callbacks first.
@@ -85,16 +85,16 @@ export class MeterSharedState {
      */
     const errors = await this.observableRegistry.observe(
       collectionTime,
-      options?.timeoutMillis
+      options?.timeoutMillis,
     );
     const metricDataList = Array.from(
-      this.metricStorageRegistry.getStorages(collector)
+      this.metricStorageRegistry.getStorages(collector),
     )
-      .map(metricStorage => {
+      .map((metricStorage) => {
         return metricStorage.collect(
           collector,
           this._meterProviderSharedState.metricCollectors,
-          collectionTime
+          collectionTime,
         );
       })
       .filter(isNotNullish);
@@ -110,23 +110,23 @@ export class MeterSharedState {
 
   private _registerMetricStorage<
     MetricStorageType extends MetricStorageConstructor,
-    R extends InstanceType<MetricStorageType>
+    R extends InstanceType<MetricStorageType>,
   >(
     descriptor: InstrumentDescriptor,
-    MetricStorageType: MetricStorageType
+    MetricStorageType: MetricStorageType,
   ): R[] {
     const views = this._meterProviderSharedState.viewRegistry.findViews(
       descriptor,
-      this._instrumentationScope
+      this._instrumentationScope,
     );
-    let storages = views.map(view => {
+    let storages = views.map((view) => {
       const viewDescriptor = createInstrumentDescriptorWithView(
         view,
-        descriptor
+        descriptor,
       );
       const compatibleStorage =
         this.metricStorageRegistry.findOrUpdateCompatibleStorage<R>(
-          viewDescriptor
+          viewDescriptor,
         );
       if (compatibleStorage != null) {
         return compatibleStorage;
@@ -135,7 +135,7 @@ export class MeterSharedState {
       const viewStorage = new MetricStorageType(
         viewDescriptor,
         aggregator,
-        view.attributesProcessor
+        view.attributesProcessor,
       ) as R;
       this.metricStorageRegistry.register(viewStorage);
       return viewStorage;
@@ -150,7 +150,7 @@ export class MeterSharedState {
           const compatibleStorage =
             this.metricStorageRegistry.findOrUpdateCompatibleCollectorStorage<R>(
               collector,
-              descriptor
+              descriptor,
             );
           if (compatibleStorage != null) {
             return compatibleStorage;
@@ -159,11 +159,11 @@ export class MeterSharedState {
           const storage = new MetricStorageType(
             descriptor,
             aggregator,
-            AttributesProcessor.Noop()
+            AttributesProcessor.Noop(),
           ) as R;
           this.metricStorageRegistry.registerForCollector(collector, storage);
           return storage;
-        }
+        },
       );
       storages = storages.concat(collectorStorages);
     }
@@ -181,6 +181,6 @@ interface MetricStorageConstructor {
   new (
     instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<Maybe<Accumulation>>,
-    attributesProcessor: AttributesProcessor
+    attributesProcessor: AttributesProcessor,
   ): MetricStorage;
 }

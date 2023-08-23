@@ -19,12 +19,15 @@ import {
   AccumulationRecord,
   Aggregator,
   AggregatorKind,
-} from './types.ts';
-import { DataPointType, HistogramMetricData } from '../export/MetricData.ts';
-import { HrTime } from '@opentelemetry/api';
-import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor.ts';
-import { binarySearchLB, Maybe } from '../utils.ts';
-import { AggregationTemporality } from '../export/AggregationTemporality.ts';
+} from "./types.ts";
+import { DataPointType, HistogramMetricData } from "../export/MetricData.ts";
+import { HrTime } from "../../../opentelemetry-api/mod.ts";
+import {
+  InstrumentDescriptor,
+  InstrumentType,
+} from "../InstrumentDescriptor.ts";
+import { binarySearchLB, Maybe } from "../utils.ts";
+import { AggregationTemporality } from "../export/AggregationTemporality.ts";
 
 /**
  * Internal value type for HistogramAggregation.
@@ -64,7 +67,7 @@ export class HistogramAccumulation implements Accumulation {
     public startTime: HrTime,
     private readonly _boundaries: number[],
     private _recordMinMax = true,
-    private _current: InternalHistogram = createNewEmptyCheckpoint(_boundaries)
+    private _current: InternalHistogram = createNewEmptyCheckpoint(_boundaries),
   ) {}
 
   record(value: number): void {
@@ -103,14 +106,14 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
    */
   constructor(
     private readonly _boundaries: number[],
-    private readonly _recordMinMax: boolean
+    private readonly _recordMinMax: boolean,
   ) {}
 
   createAccumulation(startTime: HrTime) {
     return new HistogramAccumulation(
       startTime,
       this._boundaries,
-      this._recordMinMax
+      this._recordMinMax,
     );
   }
 
@@ -121,7 +124,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
    */
   merge(
     previous: HistogramAccumulation,
-    delta: HistogramAccumulation
+    delta: HistogramAccumulation,
   ): HistogramAccumulation {
     const previousValue = previous.toPointValue();
     const deltaValue = delta.toPointValue();
@@ -166,7 +169,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
           (previousValue.hasMinMax || deltaValue.hasMinMax),
         min: min,
         max: max,
-      }
+      },
     );
   }
 
@@ -175,7 +178,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
    */
   diff(
     previous: HistogramAccumulation,
-    current: HistogramAccumulation
+    current: HistogramAccumulation,
   ): HistogramAccumulation {
     const previousValue = previous.toPointValue();
     const currentValue = current.toPointValue();
@@ -202,7 +205,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
         hasMinMax: false,
         min: Infinity,
         max: -Infinity,
-      }
+      },
     );
   }
 
@@ -210,7 +213,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<HistogramAccumulation>[],
-    endTime: HrTime
+    endTime: HrTime,
   ): Maybe<HistogramMetricData> {
     return {
       descriptor,

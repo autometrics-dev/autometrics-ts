@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-import { ExportResultCode } from '@opentelemetry/core';
-import { ExportResult } from '@opentelemetry/core';
-import { InstrumentType } from '../InstrumentDescriptor.ts';
-import { AggregationTemporality } from './AggregationTemporality.ts';
-import { ResourceMetrics } from './MetricData.ts';
-import { PushMetricExporter } from './MetricExporter.ts';
+import {
+  ExportResultCode,
+  ExportResult,
+} from "../../../opentelemetry-core/mod.ts";
+import { InstrumentType } from "../InstrumentDescriptor.ts";
+import { AggregationTemporality } from "./AggregationTemporality.ts";
+import { ResourceMetrics } from "./MetricData.ts";
+import { PushMetricExporter } from "./MetricExporter.ts";
 
 /**
  * In-memory Metrics Exporter is a Push Metric Exporter
@@ -40,7 +42,7 @@ export class InMemoryMetricExporter implements PushMetricExporter {
    */
   export(
     metrics: ResourceMetrics,
-    resultCallback: (result: ExportResult) => void
+    resultCallback: (result: ExportResult) => void,
   ): void {
     // Avoid storing metrics when exporter is shutdown
     if (this._shutdown) {
@@ -69,7 +71,7 @@ export class InMemoryMetricExporter implements PushMetricExporter {
   }
 
   selectAggregationTemporality(
-    _instrumentType: InstrumentType
+    _instrumentType: InstrumentType,
   ): AggregationTemporality {
     return this._aggregationTemporality;
   }

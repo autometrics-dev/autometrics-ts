@@ -21,16 +21,16 @@ import {
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
-} from '@opentelemetry/api';
+} from "../../../../opentelemetry-api/mod.ts";
 
-import { isTracingSuppressed } from '../../trace/suppress-tracing.ts';
+import { isTracingSuppressed } from "../../trace/suppress-tracing.ts";
 import {
   BAGGAGE_HEADER,
   BAGGAGE_ITEMS_SEPARATOR,
   BAGGAGE_MAX_NAME_VALUE_PAIRS,
   BAGGAGE_MAX_PER_NAME_VALUE_PAIRS,
-} from '../constants.ts';
-import { getKeyPairs, parsePairKeyValue, serializeKeyPairs } from '../utils.ts';
+} from "../constants.ts";
+import { getKeyPairs, parsePairKeyValue, serializeKeyPairs } from "../utils.ts";
 
 /**
  * Propagates {@link Baggage} through Context format propagation.
@@ -64,7 +64,7 @@ export class W3CBaggagePropagator implements TextMapPropagator {
       return context;
     }
     const pairs = baggageString.split(BAGGAGE_ITEMS_SEPARATOR);
-    pairs.forEach(entry => {
+    pairs.forEach((entry) => {
       const keyPair = parsePairKeyValue(entry);
       if (keyPair) {
         const baggageEntry: BaggageEntry = { value: keyPair.value };

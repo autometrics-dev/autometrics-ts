@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
-import { ExemplarFilter } from './ExemplarFilter.ts';
+import {
+  Context,
+  HrTime,
+  MetricAttributes,
+} from "../../../opentelemetry-api/mod.ts";
+import { ExemplarFilter } from "./ExemplarFilter.ts";
 
 export class AlwaysSampleExemplarFilter implements ExemplarFilter {
   shouldSample(
     _value: number,
     _timestamp: HrTime,
     _attributes: MetricAttributes,
-    _ctx: Context
+    _ctx: Context,
   ): boolean {
     return true;
   }

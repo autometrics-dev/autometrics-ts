@@ -21,10 +21,10 @@ import {
   ValueType,
   BatchObservableResult,
   Observable,
-} from '@opentelemetry/api';
-import { AttributeHashMap } from './state/HashMap.ts';
-import { isObservableInstrument, ObservableInstrument } from './Instruments.ts';
-import { InstrumentDescriptor } from './index.ts';
+} from "../../opentelemetry-api/mod.ts";
+import { AttributeHashMap } from "./state/HashMap.ts";
+import { isObservableInstrument, ObservableInstrument } from "./Instruments.ts";
+import { InstrumentDescriptor } from "./index.ts";
 
 /**
  * The class implements {@link ObservableResult} interface.
@@ -41,9 +41,9 @@ export class ObservableResultImpl implements ObservableResult {
    * Observe a measurement of the value associated with the given attributes.
    */
   observe(value: number, attributes: MetricAttributes = {}): void {
-    if (typeof value !== 'number') {
+    if (typeof value !== "number") {
       diag.warn(
-        `non-number value provided to metric ${this._descriptor.name}: ${value}`
+        `non-number value provided to metric ${this._descriptor.name}: ${value}`,
       );
       return;
     }
@@ -52,7 +52,7 @@ export class ObservableResultImpl implements ObservableResult {
       !Number.isInteger(value)
     ) {
       diag.warn(
-        `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`
+        `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`,
       );
       value = Math.trunc(value);
       // ignore non-finite values.
@@ -79,7 +79,7 @@ export class BatchObservableResultImpl implements BatchObservableResult {
   observe(
     metric: Observable,
     value: number,
-    attributes: MetricAttributes = {}
+    attributes: MetricAttributes = {},
   ): void {
     if (!isObservableInstrument(metric)) {
       return;
@@ -89,9 +89,9 @@ export class BatchObservableResultImpl implements BatchObservableResult {
       map = new AttributeHashMap();
       this._buffer.set(metric, map);
     }
-    if (typeof value !== 'number') {
+    if (typeof value !== "number") {
       diag.warn(
-        `non-number value provided to metric ${metric._descriptor.name}: ${value}`
+        `non-number value provided to metric ${metric._descriptor.name}: ${value}`,
       );
       return;
     }
@@ -100,7 +100,7 @@ export class BatchObservableResultImpl implements BatchObservableResult {
       !Number.isInteger(value)
     ) {
       diag.warn(
-        `INT value type cannot accept a floating-point value for ${metric._descriptor.name}, ignoring the fractional digits.`
+        `INT value type cannot accept a floating-point value for ${metric._descriptor.name}, ignoring the fractional digits.`,
       );
       value = Math.trunc(value);
       // ignore non-finite values.

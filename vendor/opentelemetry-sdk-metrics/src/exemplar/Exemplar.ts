@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime, MetricAttributes } from '@opentelemetry/api';
+import { HrTime, MetricAttributes } from "../../../opentelemetry-api/mod.ts";
 
 /**
  * A representation of an exemplar, which is a sample input measurement.

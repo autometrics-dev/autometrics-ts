@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DiagLogLevel } from "@opentelemetry/api";
+import { DiagLogLevel } from "../../../opentelemetry-api/mod.ts";
 import { TracesSamplerValues } from "./sampling.ts";
 
 const DEFAULT_LIST_SEPARATOR = ",";

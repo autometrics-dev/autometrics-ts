@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Exception } from '@opentelemetry/api';
+import { Exception } from "../../../opentelemetry-api/mod.ts";
 
 /**
  * This interface defines a fallback to read a timeOrigin when it is not available on performance.timeOrigin,

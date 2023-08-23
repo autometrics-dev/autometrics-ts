@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
-import { AggregationTemporality } from '../export/AggregationTemporality.ts';
-import { MetricData } from '../export/MetricData.ts';
-import { InstrumentDescriptor } from '../InstrumentDescriptor.ts';
-import { Maybe } from '../utils.ts';
-import { AggregatorKind, Aggregator, AccumulationRecord } from './types.ts';
+import { HrTime } from "../../../opentelemetry-api/mod.ts";
+import { AggregationTemporality } from "../export/AggregationTemporality.ts";
+import { MetricData } from "../export/MetricData.ts";
+import { InstrumentDescriptor } from "../InstrumentDescriptor.ts";
+import { Maybe } from "../utils.ts";
+import { AggregatorKind, Aggregator, AccumulationRecord } from "./types.ts";
 
 /** Basic aggregator for None which keeps no recorded value. */
 export class DropAggregator implements Aggregator<undefined> {
@@ -41,7 +41,7 @@ export class DropAggregator implements Aggregator<undefined> {
     _descriptor: InstrumentDescriptor,
     _aggregationTemporality: AggregationTemporality,
     _accumulationByAttributes: AccumulationRecord<undefined>[],
-    _endTime: HrTime
+    _endTime: HrTime,
   ): Maybe<MetricData> {
     return undefined;
   }

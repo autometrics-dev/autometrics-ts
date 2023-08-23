@@ -1,4 +1,4 @@
-import { Attributes } from "@opentelemetry/api";
+import { otelApi } from "./deps.ts";
 import { setBuildInfo } from "./buildInfo.ts";
 import {
   COUNTER_DESCRIPTION,
@@ -190,8 +190,8 @@ export function autometrics<F extends FunctionSig>(
   let recordErrorIf: ReportErrorCondition<F> | undefined;
   let recordSuccessIf: ReportSuccessCondition | undefined;
 
-  let fnOrOptions = args[0];
-  let maybeFn = args[1];
+  const fnOrOptions = args[0];
+  const maybeFn = args[1];
   if (typeof fnOrOptions === "function") {
     fn = fnOrOptions;
     functionName = fn.name;
@@ -216,8 +216,8 @@ export function autometrics<F extends FunctionSig>(
     return fn as F;
   }
 
-  const counterObjectiveAttributes: Attributes = {};
-  const histogramObjectiveAttributes: Attributes = {};
+  const counterObjectiveAttributes: otelApi.Attributes = {};
+  const histogramObjectiveAttributes: otelApi.Attributes = {};
 
   // NOTE - Gravel Gateway will reject two metrics of the same name if one of them has a subset of the attributes of the other
   //        This means to be able to support functions that have objectives, as well as functions that don't, we need to

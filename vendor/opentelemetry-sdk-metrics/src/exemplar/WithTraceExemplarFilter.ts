@@ -21,15 +21,15 @@ import {
   trace,
   TraceFlags,
   MetricAttributes,
-} from '@opentelemetry/api';
-import { ExemplarFilter } from './ExemplarFilter.ts';
+} from "../../../opentelemetry-api/mod.ts";
+import { ExemplarFilter } from "./ExemplarFilter.ts";
 
 export class WithTraceExemplarFilter implements ExemplarFilter {
   shouldSample(
     value: number,
     timestamp: HrTime,
     attributes: MetricAttributes,
-    ctx: Context
+    ctx: Context,
   ): boolean {
     const spanContext = trace.getSpanContext(ctx);
     if (!spanContext || !isSpanContextValid(spanContext)) return false;

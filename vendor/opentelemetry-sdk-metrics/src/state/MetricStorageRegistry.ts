@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import { MetricStorage } from './MetricStorage.ts';
+import { MetricStorage } from "./MetricStorage.ts";
 import {
   InstrumentDescriptor,
   isDescriptorCompatibleWith,
-} from '../InstrumentDescriptor.ts';
-import * as api from '@opentelemetry/api';
+} from "../InstrumentDescriptor.ts";
+import * as api from "../../../opentelemetry-api/mod.ts";
 import {
   getConflictResolutionRecipe,
   getIncompatibilityDetails,
-} from '../view/RegistrationConflicts.ts';
-import { MetricCollectorHandle } from './MetricCollector.ts';
+} from "../view/RegistrationConflicts.ts";
+import { MetricCollectorHandle } from "./MetricCollector.ts";
 
 type StorageMap = Map<string, MetricStorage[]>;
 
@@ -64,7 +64,7 @@ export class MetricStorageRegistry {
 
   registerForCollector(
     collector: MetricCollectorHandle,
-    storage: MetricStorage
+    storage: MetricStorage,
   ) {
     let storageMap = this._perCollectorRegistry.get(collector);
     if (storageMap == null) {
@@ -75,7 +75,7 @@ export class MetricStorageRegistry {
   }
 
   findOrUpdateCompatibleStorage<T extends MetricStorage>(
-    expectedDescriptor: InstrumentDescriptor
+    expectedDescriptor: InstrumentDescriptor,
   ): T | null {
     const storages = this._sharedRegistry.get(expectedDescriptor.name);
     if (storages === undefined) {
@@ -89,7 +89,7 @@ export class MetricStorageRegistry {
 
   findOrUpdateCompatibleCollectorStorage<T extends MetricStorage>(
     collector: MetricCollectorHandle,
-    expectedDescriptor: InstrumentDescriptor
+    expectedDescriptor: InstrumentDescriptor,
   ): T | null {
     const storageMap = this._perCollectorRegistry.get(collector);
     if (storageMap === undefined) {
@@ -120,7 +120,7 @@ export class MetricStorageRegistry {
 
   private _findOrUpdateCompatibleStorage<T extends MetricStorage>(
     expectedDescriptor: InstrumentDescriptor,
-    existingStorages: MetricStorage[]
+    existingStorages: MetricStorage[],
   ): T | null {
     let compatibleStorage = null;
 
@@ -138,13 +138,13 @@ export class MetricStorageRegistry {
           }
 
           api.diag.warn(
-            'A view or instrument with the name ',
+            "A view or instrument with the name ",
             expectedDescriptor.name,
-            ' has already been registered, but has a different description and is incompatible with another registered view.\n',
-            'Details:\n',
+            " has already been registered, but has a different description and is incompatible with another registered view.\n",
+            "Details:\n",
             getIncompatibilityDetails(existingDescriptor, expectedDescriptor),
-            'The longer description will be used.\nTo resolve the conflict:',
-            getConflictResolutionRecipe(existingDescriptor, expectedDescriptor)
+            "The longer description will be used.\nTo resolve the conflict:",
+            getConflictResolutionRecipe(existingDescriptor, expectedDescriptor),
           );
         }
         // Storage is fully compatible. There will never be more than one pre-existing fully compatible storage.
@@ -153,13 +153,13 @@ export class MetricStorageRegistry {
         // The implementation SHOULD warn about duplicate instrument registration
         // conflicts after applying View configuration.
         api.diag.warn(
-          'A view or instrument with the name ',
+          "A view or instrument with the name ",
           expectedDescriptor.name,
-          ' has already been registered and is incompatible with another registered view.\n',
-          'Details:\n',
+          " has already been registered and is incompatible with another registered view.\n",
+          "Details:\n",
           getIncompatibilityDetails(existingDescriptor, expectedDescriptor),
-          'To resolve the conflict:\n',
-          getConflictResolutionRecipe(existingDescriptor, expectedDescriptor)
+          "To resolve the conflict:\n",
+          getConflictResolutionRecipe(existingDescriptor, expectedDescriptor),
         );
       }
     }

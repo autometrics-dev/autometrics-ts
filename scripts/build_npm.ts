@@ -49,7 +49,6 @@ for (const [dir, name] of Object.entries(packages)) {
       name,
       ...packageJsonFields,
     },
-    importMap: "./deno.json",
     mappings: {
       "./packages/lib/platform.deno.ts": "./packages/lib/platform.node.ts",
       "./vendor/opentelemetry-api/mod.ts": {

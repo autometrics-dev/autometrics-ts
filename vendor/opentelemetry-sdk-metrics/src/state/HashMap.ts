@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { MetricAttributes } from '@opentelemetry/api';
-import { hashAttributes } from '../utils.ts';
+import { MetricAttributes } from "../../../opentelemetry-api/mod.ts";
+import { hashAttributes } from "../utils.ts";
 
 export interface Hash<ValueType, HashCodeType> {
   (value: ValueType): HashCodeType;

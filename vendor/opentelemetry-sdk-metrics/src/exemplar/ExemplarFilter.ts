@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
+import {
+  Context,
+  HrTime,
+  MetricAttributes,
+} from "../../../opentelemetry-api/mod.ts";
 
 /**
  * This interface represents a ExemplarFilter. Exemplar filters are
@@ -34,6 +38,6 @@ export interface ExemplarFilter {
     value: number,
     timestamp: HrTime,
     attributes: MetricAttributes,
-    ctx: Context
+    ctx: Context,
   ): boolean;
 }

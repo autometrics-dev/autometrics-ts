@@ -24,10 +24,10 @@ import {
   SpanKind,
   TraceFlags,
   trace,
-} from '@opentelemetry/api';
-import { globalErrorHandler } from '../../common/global-error-handler.ts';
-import { AlwaysOffSampler } from './AlwaysOffSampler.ts';
-import { AlwaysOnSampler } from './AlwaysOnSampler.ts';
+} from "../../../../opentelemetry-api/mod.ts";
+import { globalErrorHandler } from "../../common/global-error-handler.ts";
+import { AlwaysOffSampler } from "./AlwaysOffSampler.ts";
+import { AlwaysOnSampler } from "./AlwaysOnSampler.ts";
 
 /**
  * @deprecated Use the one defined in @opentelemetry/sdk-trace-base instead.
@@ -46,7 +46,7 @@ export class ParentBasedSampler implements Sampler {
 
     if (!this._root) {
       globalErrorHandler(
-        new Error('ParentBasedSampler must have a root sampler configured')
+        new Error("ParentBasedSampler must have a root sampler configured"),
       );
       this._root = new AlwaysOnSampler();
     }
@@ -67,7 +67,7 @@ export class ParentBasedSampler implements Sampler {
     spanName: string,
     spanKind: SpanKind,
     attributes: SpanAttributes,
-    links: Link[]
+    links: Link[],
   ): SamplingResult {
     const parentContext = trace.getSpanContext(context);
 
@@ -78,7 +78,7 @@ export class ParentBasedSampler implements Sampler {
         spanName,
         spanKind,
         attributes,
-        links
+        links,
       );
     }
 
@@ -90,7 +90,7 @@ export class ParentBasedSampler implements Sampler {
           spanName,
           spanKind,
           attributes,
-          links
+          links,
         );
       }
       return this._remoteParentNotSampled.shouldSample(
@@ -99,7 +99,7 @@ export class ParentBasedSampler implements Sampler {
         spanName,
         spanKind,
         attributes,
-        links
+        links,
       );
     }
 
@@ -110,7 +110,7 @@ export class ParentBasedSampler implements Sampler {
         spanName,
         spanKind,
         attributes,
-        links
+        links,
       );
     }
 
@@ -120,7 +120,7 @@ export class ParentBasedSampler implements Sampler {
       spanName,
       spanKind,
       attributes,
-      links
+      links,
     );
   }
 

@@ -20,19 +20,19 @@ import {
   Aggregator,
   Accumulation,
   AccumulationRecord,
-} from './types.ts';
-import { HrTime } from '@opentelemetry/api';
-import { DataPointType, SumMetricData } from '../export/MetricData.ts';
-import { InstrumentDescriptor } from '../InstrumentDescriptor.ts';
-import { Maybe } from '../utils.ts';
-import { AggregationTemporality } from '../export/AggregationTemporality.ts';
+} from "./types.ts";
+import { HrTime } from "../../../opentelemetry-api/mod.ts";
+import { DataPointType, SumMetricData } from "../export/MetricData.ts";
+import { InstrumentDescriptor } from "../InstrumentDescriptor.ts";
+import { Maybe } from "../utils.ts";
+import { AggregationTemporality } from "../export/AggregationTemporality.ts";
 
 export class SumAccumulation implements Accumulation {
   constructor(
     public startTime: HrTime,
     public monotonic: boolean,
     private _current: number = 0,
-    public reset = false
+    public reset = false,
   ) {}
 
   record(value: number): void {
@@ -72,13 +72,13 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
         delta.startTime,
         this.monotonic,
         deltaPv,
-        delta.reset
+        delta.reset,
       );
     }
     return new SumAccumulation(
       previous.startTime,
       this.monotonic,
-      prevPv + deltaPv
+      prevPv + deltaPv,
     );
   }
 
@@ -98,13 +98,13 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
         current.startTime,
         this.monotonic,
         currPv,
-        true
+        true,
       );
     }
     return new SumAccumulation(
       current.startTime,
       this.monotonic,
-      currPv - prevPv
+      currPv - prevPv,
     );
   }
 
@@ -112,7 +112,7 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<SumAccumulation>[],
-    endTime: HrTime
+    endTime: HrTime,
   ): Maybe<SumMetricData> {
     return {
       descriptor,

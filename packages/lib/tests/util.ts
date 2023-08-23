@@ -1,10 +1,11 @@
-import { PrometheusSerializer } from "@opentelemetry/exporter-prometheus";
-import type { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
+import { otelExporterPrometheus, otelSdkMetrics } from "../deps.ts";
 
 export async function collectAndSerialize(
-  exporter: PeriodicExportingMetricReader,
+  exporter: otelSdkMetrics.PeriodicExportingMetricReader,
 ) {
   const response = await exporter.collect();
 
-  return new PrometheusSerializer().serialize(response.resourceMetrics);
+  return new otelExporterPrometheus.PrometheusSerializer().serialize(
+    response.resourceMetrics,
+  );
 }

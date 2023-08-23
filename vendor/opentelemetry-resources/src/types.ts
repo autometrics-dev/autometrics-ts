@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { ResourceDetectionConfig } from './config.ts';
-import { SpanAttributes } from '@opentelemetry/api';
-import { IResource } from './IResource.ts';
+import { ResourceDetectionConfig } from "./config.ts";
+import { SpanAttributes } from "../../opentelemetry-api/mod.ts";
+import { IResource } from "./IResource.ts";
 
 /**
  * Interface for Resource attributes.

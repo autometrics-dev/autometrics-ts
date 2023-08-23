@@ -17,13 +17,13 @@ import {
   Baggage,
   BaggageEntryMetadata,
   baggageEntryMetadataFromString,
-} from '@opentelemetry/api';
+} from "../../../opentelemetry-api/mod.ts";
 import {
   BAGGAGE_ITEMS_SEPARATOR,
   BAGGAGE_PROPERTIES_SEPARATOR,
   BAGGAGE_KEY_PAIR_SEPARATOR,
   BAGGAGE_MAX_TOTAL_LENGTH,
-} from './constants.ts';
+} from "./constants.ts";
 
 type ParsedBaggageKeyValue = {
   key: string;
@@ -34,10 +34,10 @@ type ParsedBaggageKeyValue = {
 export function serializeKeyPairs(keyPairs: string[]): string {
   return keyPairs.reduce((hValue: string, current: string) => {
     const value = `${hValue}${
-      hValue !== '' ? BAGGAGE_ITEMS_SEPARATOR : ''
+      hValue !== "" ? BAGGAGE_ITEMS_SEPARATOR : ""
     }${current}`;
     return value.length > BAGGAGE_MAX_TOTAL_LENGTH ? hValue : value;
-  }, '');
+  }, "");
 }
 
 export function getKeyPairs(baggage: Baggage): string[] {
@@ -55,7 +55,7 @@ export function getKeyPairs(baggage: Baggage): string[] {
 }
 
 export function parsePairKeyValue(
-  entry: string
+  entry: string,
 ): ParsedBaggageKeyValue | undefined {
   const valueProps = entry.split(BAGGAGE_PROPERTIES_SEPARATOR);
   if (valueProps.length <= 0) return;
@@ -64,15 +64,15 @@ export function parsePairKeyValue(
   const separatorIndex = keyPairPart.indexOf(BAGGAGE_KEY_PAIR_SEPARATOR);
   if (separatorIndex <= 0) return;
   const key = decodeURIComponent(
-    keyPairPart.substring(0, separatorIndex).trim()
+    keyPairPart.substring(0, separatorIndex).trim(),
   );
   const value = decodeURIComponent(
-    keyPairPart.substring(separatorIndex + 1).trim()
+    keyPairPart.substring(separatorIndex + 1).trim(),
   );
   let metadata;
   if (valueProps.length > 0) {
     metadata = baggageEntryMetadataFromString(
-      valueProps.join(BAGGAGE_PROPERTIES_SEPARATOR)
+      valueProps.join(BAGGAGE_PROPERTIES_SEPARATOR),
     );
   }
   return { key, value, metadata };
@@ -83,15 +83,15 @@ export function parsePairKeyValue(
  * https://github.com/w3c/baggage/blob/master/baggage/HTTP_HEADER_FORMAT.md
  */
 export function parseKeyPairsIntoRecord(
-  value?: string
+  value?: string,
 ): Record<string, string> {
-  if (typeof value !== 'string' || value.length === 0) return {};
+  if (typeof value !== "string" || value.length === 0) return {};
   return value
     .split(BAGGAGE_ITEMS_SEPARATOR)
-    .map(entry => {
+    .map((entry) => {
       return parsePairKeyValue(entry);
     })
-    .filter(keyPair => keyPair !== undefined && keyPair.value.length > 0)
+    .filter((keyPair) => keyPair !== undefined && keyPair.value.length > 0)
     .reduce<Record<string, string>>((headers, keyPair) => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       headers[keyPair!.key] = keyPair!.value;

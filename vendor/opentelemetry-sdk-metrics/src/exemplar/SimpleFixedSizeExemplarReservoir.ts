@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
-import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir.ts';
+import {
+  Context,
+  HrTime,
+  MetricAttributes,
+} from "../../../opentelemetry-api/mod.ts";
+import { FixedSizeExemplarReservoirBase } from "./ExemplarReservoir.ts";
 
 /**
  * Fixed size reservoir that uses equivalent of naive reservoir sampling
@@ -38,7 +42,7 @@ export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoir
     _value: number,
     _timestamp: HrTime,
     _attributes: MetricAttributes,
-    _ctx: Context
+    _ctx: Context,
   ) {
     if (this._numMeasurementsSeen < this._size)
       return this._numMeasurementsSeen++;
@@ -50,7 +54,7 @@ export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoir
     value: number,
     timestamp: HrTime,
     attributes: MetricAttributes,
-    ctx: Context
+    ctx: Context,
   ): void {
     const index = this._findBucketIndex(value, timestamp, attributes, ctx);
     if (index !== -1) {

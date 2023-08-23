@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import { MetricOptions, ValueType } from '@opentelemetry/api';
-import { View } from './view/View.ts';
+import { MetricOptions, ValueType } from "../../opentelemetry-api/mod.ts";
+import { View } from "./view/View.ts";
 
 /**
  * Supported types of metric instruments.
  */
 export enum InstrumentType {
-  COUNTER = 'COUNTER',
-  HISTOGRAM = 'HISTOGRAM',
-  UP_DOWN_COUNTER = 'UP_DOWN_COUNTER',
-  OBSERVABLE_COUNTER = 'OBSERVABLE_COUNTER',
-  OBSERVABLE_GAUGE = 'OBSERVABLE_GAUGE',
-  OBSERVABLE_UP_DOWN_COUNTER = 'OBSERVABLE_UP_DOWN_COUNTER',
+  COUNTER = "COUNTER",
+  HISTOGRAM = "HISTOGRAM",
+  UP_DOWN_COUNTER = "UP_DOWN_COUNTER",
+  OBSERVABLE_COUNTER = "OBSERVABLE_COUNTER",
+  OBSERVABLE_GAUGE = "OBSERVABLE_GAUGE",
+  OBSERVABLE_UP_DOWN_COUNTER = "OBSERVABLE_UP_DOWN_COUNTER",
 }
 
 /**
@@ -43,20 +43,20 @@ export interface InstrumentDescriptor {
 export function createInstrumentDescriptor(
   name: string,
   type: InstrumentType,
-  options?: MetricOptions
+  options?: MetricOptions,
 ): InstrumentDescriptor {
   return {
     name,
     type,
-    description: options?.description ?? '',
-    unit: options?.unit ?? '',
+    description: options?.description ?? "",
+    unit: options?.unit ?? "",
     valueType: options?.valueType ?? ValueType.DOUBLE,
   };
 }
 
 export function createInstrumentDescriptorWithView(
   view: View,
-  instrument: InstrumentDescriptor
+  instrument: InstrumentDescriptor,
 ): InstrumentDescriptor {
   return {
     name: view.name ?? instrument.name,
@@ -69,7 +69,7 @@ export function createInstrumentDescriptorWithView(
 
 export function isDescriptorCompatibleWith(
   descriptor: InstrumentDescriptor,
-  otherDescriptor: InstrumentDescriptor
+  otherDescriptor: InstrumentDescriptor,
 ) {
   return (
     descriptor.name === otherDescriptor.name &&

@@ -20,19 +20,22 @@ import {
   Aggregator,
   AggregatorKind,
   LastValue,
-} from './types.ts';
-import { HrTime } from '@opentelemetry/api';
-import { millisToHrTime, hrTimeToMicroseconds } from '@opentelemetry/core';
-import { DataPointType, GaugeMetricData } from '../export/MetricData.ts';
-import { InstrumentDescriptor } from '../InstrumentDescriptor.ts';
-import { Maybe } from '../utils.ts';
-import { AggregationTemporality } from '../export/AggregationTemporality.ts';
+} from "./types.ts";
+import { HrTime } from "../../../opentelemetry-api/mod.ts";
+import {
+  millisToHrTime,
+  hrTimeToMicroseconds,
+} from "../../../opentelemetry-core/mod.ts";
+import { DataPointType, GaugeMetricData } from "../export/MetricData.ts";
+import { InstrumentDescriptor } from "../InstrumentDescriptor.ts";
+import { Maybe } from "../utils.ts";
+import { AggregationTemporality } from "../export/AggregationTemporality.ts";
 
 export class LastValueAccumulation implements Accumulation {
   constructor(
     public startTime: HrTime,
     private _current: number = 0,
-    public sampleTime: HrTime = [0, 0]
+    public sampleTime: HrTime = [0, 0],
   ) {}
 
   record(value: number): void {
@@ -64,7 +67,7 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
    */
   merge(
     previous: LastValueAccumulation,
-    delta: LastValueAccumulation
+    delta: LastValueAccumulation,
   ): LastValueAccumulation {
     // nanoseconds may lose precisions.
     const latestAccumulation =
@@ -75,7 +78,7 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
     return new LastValueAccumulation(
       previous.startTime,
       latestAccumulation.toPointValue(),
-      latestAccumulation.sampleTime
+      latestAccumulation.sampleTime,
     );
   }
 
@@ -87,7 +90,7 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
    */
   diff(
     previous: LastValueAccumulation,
-    current: LastValueAccumulation
+    current: LastValueAccumulation,
   ): LastValueAccumulation {
     // nanoseconds may lose precisions.
     const latestAccumulation =
@@ -98,7 +101,7 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
     return new LastValueAccumulation(
       current.startTime,
       latestAccumulation.toPointValue(),
-      latestAccumulation.sampleTime
+      latestAccumulation.sampleTime,
     );
   }
 
@@ -106,7 +109,7 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<LastValueAccumulation>[],
-    endTime: HrTime
+    endTime: HrTime,
   ): Maybe<GaugeMetricData> {
     return {
       descriptor,

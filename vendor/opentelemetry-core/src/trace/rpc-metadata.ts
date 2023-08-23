@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-import { Context, createContextKey, Span } from '@opentelemetry/api';
+import {
+  Context,
+  createContextKey,
+  Span,
+} from "../../../opentelemetry-api/mod.ts";
 
 const RPC_METADATA_KEY = createContextKey(
-  'OpenTelemetry SDK Context Key RPC_METADATA'
+  "OpenTelemetry SDK Context Key RPC_METADATA",
 );
 
 export enum RPCType {
-  HTTP = 'http',
+  HTTP = "http",
 }
 
 type HTTPMetadata = {

@@ -1,25 +1,23 @@
-import {
-  PrometheusExporter,
-  PrometheusSerializer,
-} from "@opentelemetry/exporter-prometheus";
-import {
+import { BuildInfo, buildInfo, recordBuildInfo } from "./buildInfo.ts";
+import { HISTOGRAM_NAME } from "./constants.ts";
+import { otelExporterPrometheus, otelSdkMetrics } from "./deps.ts";
+
+const { PrometheusExporter, PrometheusSerializer } = otelExporterPrometheus;
+const {
   AggregationTemporality,
   ExplicitBucketHistogramAggregation,
   InMemoryMetricExporter,
   MeterProvider,
-  MetricReader,
   PeriodicExportingMetricReader,
   View,
-} from "@opentelemetry/sdk-metrics";
-import { BuildInfo, buildInfo, recordBuildInfo } from "./buildInfo.ts";
-import { HISTOGRAM_NAME } from "./constants.ts";
+} = otelSdkMetrics;
 
 let globalShouldEagerlyPush = false;
 let pushMetrics = () => {};
-let autometricsMeterProvider: MeterProvider;
-let exporter: MetricReader;
+let autometricsMeterProvider: otelSdkMetrics.MeterProvider;
+let exporter: otelSdkMetrics.MetricReader;
 
-type Exporter = MetricReader;
+type Exporter = otelSdkMetrics.MetricReader;
 
 /**
  * @group Initialization API

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { InstrumentationScope } from '@opentelemetry/core';
-import { IResource } from '@opentelemetry/resources';
-import { Aggregation, InstrumentType } from '../index.ts';
-import { instrumentationScopeId } from '../utils.ts';
-import { ViewRegistry } from '../view/ViewRegistry.ts';
-import { MeterSharedState } from './MeterSharedState.ts';
-import { MetricCollector, MetricCollectorHandle } from './MetricCollector.ts';
+import { InstrumentationScope } from "../../../opentelemetry-core/mod.ts";
+import { IResource } from "../../../opentelemetry-resources/mod.ts";
+import { Aggregation, InstrumentType } from "../index.ts";
+import { instrumentationScopeId } from "../utils.ts";
+import { ViewRegistry } from "../view/ViewRegistry.ts";
+import { MeterSharedState } from "./MeterSharedState.ts";
+import { MetricCollector, MetricCollectorHandle } from "./MetricCollector.ts";
 
 /**
  * An internal record for shared meter provider states.

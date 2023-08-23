@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { HrTime, MetricAttributes } from '@opentelemetry/api';
-import { AggregationTemporality } from '../export/AggregationTemporality.ts';
-import { MetricData } from '../export/MetricData.ts';
-import { InstrumentDescriptor } from '../InstrumentDescriptor.ts';
-import { Maybe } from '../utils.ts';
+import { HrTime, MetricAttributes } from "../../../opentelemetry-api/mod.ts";
+import { AggregationTemporality } from "../export/AggregationTemporality.ts";
+import { MetricData } from "../export/MetricData.ts";
+import { InstrumentDescriptor } from "../InstrumentDescriptor.ts";
+import { Maybe } from "../utils.ts";
 
 /** The kind of aggregator. */
 export enum AggregatorKind {
@@ -138,6 +138,6 @@ export interface Aggregator<T> {
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<T>[],
-    endTime: HrTime
+    endTime: HrTime,
   ): Maybe<MetricData>;
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import * as api from "../../../opentelemetry-api/mod.ts";
 import {
   Aggregator,
   SumAggregator,
@@ -22,10 +22,13 @@ import {
   LastValueAggregator,
   HistogramAggregator,
   ExponentialHistogramAggregator,
-} from '../aggregator/index.ts';
-import { Accumulation } from '../aggregator/types.ts';
-import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor.ts';
-import { Maybe } from '../utils.ts';
+} from "../aggregator/index.ts";
+import { Accumulation } from "../aggregator/types.ts";
+import {
+  InstrumentDescriptor,
+  InstrumentType,
+} from "../InstrumentDescriptor.ts";
+import { Maybe } from "../utils.ts";
 
 /**
  * Configures how measurements are combined into metrics for views.
@@ -34,7 +37,7 @@ import { Maybe } from '../utils.ts';
  */
 export abstract class Aggregation {
   abstract createAggregator(
-    instrument: InstrumentDescriptor
+    instrument: InstrumentDescriptor,
   ): Aggregator<Maybe<Accumulation>>;
 
   static Drop(): Aggregation {
@@ -108,7 +111,7 @@ export class LastValueAggregation extends Aggregation {
 export class HistogramAggregation extends Aggregation {
   private static DEFAULT_INSTANCE = new HistogramAggregator(
     [0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000],
-    true
+    true,
   );
   createAggregator(_instrument: InstrumentDescriptor) {
     return HistogramAggregation.DEFAULT_INSTANCE;
@@ -128,7 +131,7 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
   constructor(boundaries: number[], private readonly _recordMinMax = true) {
     super();
     if (boundaries === undefined || boundaries.length === 0) {
-      throw new Error('HistogramAggregator should be created with boundaries.');
+      throw new Error("HistogramAggregator should be created with boundaries.");
     }
     // Copy the boundaries array for modification.
     boundaries = boundaries.concat();
@@ -152,14 +155,14 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
 export class ExponentialHistogramAggregation extends Aggregation {
   constructor(
     private readonly _maxSize: number = 160,
-    private readonly _recordMinMax = true
+    private readonly _recordMinMax = true,
   ) {
     super();
   }
   createAggregator(_instrument: InstrumentDescriptor) {
     return new ExponentialHistogramAggregator(
       this._maxSize,
-      this._recordMinMax
+      this._recordMinMax,
     );
   }
 }
@@ -189,7 +192,7 @@ export class DefaultAggregation extends Aggregation {
   }
 
   createAggregator(
-    instrument: InstrumentDescriptor
+    instrument: InstrumentDescriptor,
   ): Aggregator<Maybe<Accumulation>> {
     return this._resolve(instrument).createAggregator(instrument);
   }

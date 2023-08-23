@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-import { millisToHrTime } from '@opentelemetry/core';
-import { AggregationTemporalitySelector } from '../export/AggregationSelector.ts';
-import { CollectionResult } from '../export/MetricData.ts';
-import { MetricProducer, MetricCollectOptions } from '../export/MetricProducer.ts';
-import { MetricReader } from '../export/MetricReader.ts';
-import { InstrumentType } from '../InstrumentDescriptor.ts';
-import { ForceFlushOptions, ShutdownOptions } from '../types.ts';
-import { FlatMap } from '../utils.ts';
-import { MeterProviderSharedState } from './MeterProviderSharedState.ts';
+import { millisToHrTime } from "../../../opentelemetry-core/mod.ts";
+import { AggregationTemporalitySelector } from "../export/AggregationSelector.ts";
+import { CollectionResult } from "../export/MetricData.ts";
+import {
+  MetricProducer,
+  MetricCollectOptions,
+} from "../export/MetricProducer.ts";
+import { MetricReader } from "../export/MetricReader.ts";
+import { InstrumentType } from "../InstrumentDescriptor.ts";
+import { ForceFlushOptions, ShutdownOptions } from "../types.ts";
+import { FlatMap } from "../utils.ts";
+import { MeterProviderSharedState } from "./MeterProviderSharedState.ts";
 
 /**
  * An internal opaque interface that the MetricReader receives as
@@ -32,24 +35,24 @@ import { MeterProviderSharedState } from './MeterProviderSharedState.ts';
 export class MetricCollector implements MetricProducer {
   constructor(
     private _sharedState: MeterProviderSharedState,
-    private _metricReader: MetricReader
+    private _metricReader: MetricReader,
   ) {}
 
   async collect(options?: MetricCollectOptions): Promise<CollectionResult> {
     const collectionTime = millisToHrTime(Date.now());
     const meterCollectionPromises = Array.from(
-      this._sharedState.meterSharedStates.values()
-    ).map(meterSharedState =>
-      meterSharedState.collect(this, collectionTime, options)
+      this._sharedState.meterSharedStates.values(),
+    ).map((meterSharedState) =>
+      meterSharedState.collect(this, collectionTime, options),
     );
     const result = await Promise.all(meterCollectionPromises);
 
     return {
       resourceMetrics: {
         resource: this._sharedState.resource,
-        scopeMetrics: result.map(it => it.scopeMetrics),
+        scopeMetrics: result.map((it) => it.scopeMetrics),
       },
-      errors: FlatMap(result, it => it.errors),
+      errors: FlatMap(result, (it) => it.errors),
     };
   }
 

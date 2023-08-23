@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { MetricAttributes } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
+import { MetricAttributes } from "../../opentelemetry-api/mod.ts";
+import { InstrumentationScope } from "../../opentelemetry-core/mod.ts";
 
 export type Maybe<T> = T | undefined;
 
@@ -29,11 +29,11 @@ export function isNotNullish<T>(item: Maybe<T>): item is T {
  */
 export function hashAttributes(attributes: MetricAttributes): string {
   let keys = Object.keys(attributes);
-  if (keys.length === 0) return '';
+  if (keys.length === 0) return "";
 
   // Return a string that is stable on key orders.
   keys = keys.sort();
-  return JSON.stringify(keys.map(key => [key, attributes[key]]));
+  return JSON.stringify(keys.map((key) => [key, attributes[key]]));
 }
 
 /**
@@ -41,10 +41,10 @@ export function hashAttributes(attributes: MetricAttributes): string {
  * @param instrumentationScope
  */
 export function instrumentationScopeId(
-  instrumentationScope: InstrumentationScope
+  instrumentationScope: InstrumentationScope,
 ): string {
-  return `${instrumentationScope.name}:${instrumentationScope.version ?? ''}:${
-    instrumentationScope.schemaUrl ?? ''
+  return `${instrumentationScope.name}:${instrumentationScope.version ?? ""}:${
+    instrumentationScope.schemaUrl ?? ""
   }`;
 }
 
@@ -72,38 +72,38 @@ export class TimeoutError extends Error {
  */
 export function callWithTimeout<T>(
   promise: Promise<T>,
-  timeout: number
+  timeout: number,
 ): Promise<T> {
   let timeoutHandle: ReturnType<typeof setTimeout>;
 
   const timeoutPromise = new Promise<never>(function timeoutFunction(
     _resolve,
-    reject
+    reject,
   ) {
     timeoutHandle = setTimeout(function timeoutHandler() {
-      reject(new TimeoutError('Operation timed out.'));
+      reject(new TimeoutError("Operation timed out."));
     }, timeout);
   });
 
   return Promise.race([promise, timeoutPromise]).then(
-    result => {
+    (result) => {
       clearTimeout(timeoutHandle);
       return result;
     },
-    reason => {
+    (reason) => {
       clearTimeout(timeoutHandle);
       throw reason;
-    }
+    },
   );
 }
 
 export interface PromiseAllSettledFulfillResult<T> {
-  status: 'fulfilled';
+  status: "fulfilled";
   value: T;
 }
 
 export interface PromiseAllSettledRejectionResult {
-  status: 'rejected';
+  status: "rejected";
   reason: unknown;
 }
 
@@ -115,30 +115,30 @@ export type PromiseAllSettledResult<T> =
  * Node.js v12.9 lower and browser compatible `Promise.allSettled`.
  */
 export async function PromiseAllSettled<T>(
-  promises: Promise<T>[]
+  promises: Promise<T>[],
 ): Promise<PromiseAllSettledResult<T>[]> {
   return Promise.all(
-    promises.map<Promise<PromiseAllSettledResult<T>>>(async p => {
+    promises.map<Promise<PromiseAllSettledResult<T>>>(async (p) => {
       try {
         const ret = await p;
         return {
-          status: 'fulfilled',
+          status: "fulfilled",
           value: ret,
         };
       } catch (e) {
         return {
-          status: 'rejected',
+          status: "rejected",
           reason: e,
         };
       }
-    })
+    }),
   );
 }
 
 export function isPromiseAllSettledRejectionResult(
-  it: PromiseAllSettledResult<unknown>
+  it: PromiseAllSettledResult<unknown>,
 ): it is PromiseAllSettledRejectionResult {
-  return it.status === 'rejected';
+  return it.status === "rejected";
 }
 
 /**
@@ -146,7 +146,7 @@ export function isPromiseAllSettledRejectionResult(
  */
 export function FlatMap<T, R>(arr: T[], fn: (it: T) => R[]): R[] {
   const result: R[] = [];
-  arr.forEach(it => {
+  arr.forEach((it) => {
     result.push(...fn(it));
   });
   return result;

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { InstrumentationScope } from '@opentelemetry/core';
-import { InstrumentDescriptor } from '../InstrumentDescriptor.ts';
-import { InstrumentSelector } from './InstrumentSelector.ts';
-import { MeterSelector } from './MeterSelector.ts';
-import { View } from './View.ts';
+import type { InstrumentationScope } from "../../../opentelemetry-core/mod.ts";
+import { InstrumentDescriptor } from "../InstrumentDescriptor.ts";
+import { InstrumentSelector } from "./InstrumentSelector.ts";
+import { MeterSelector } from "./MeterSelector.ts";
+import { View } from "./View.ts";
 
 export class ViewRegistry {
   private _registeredViews: View[] = [];
@@ -29,9 +29,9 @@ export class ViewRegistry {
 
   findViews(
     instrument: InstrumentDescriptor,
-    meter: InstrumentationScope
+    meter: InstrumentationScope,
   ): View[] {
-    const views = this._registeredViews.filter(registeredView => {
+    const views = this._registeredViews.filter((registeredView) => {
       return (
         this._matchInstrument(registeredView.instrumentSelector, instrument) &&
         this._matchMeter(registeredView.meterSelector, meter)
@@ -43,7 +43,7 @@ export class ViewRegistry {
 
   private _matchInstrument(
     selector: InstrumentSelector,
-    instrument: InstrumentDescriptor
+    instrument: InstrumentDescriptor,
   ): boolean {
     return (
       (selector.getType() === undefined ||
@@ -55,7 +55,7 @@ export class ViewRegistry {
 
   private _matchMeter(
     selector: MeterSelector,
-    meter: InstrumentationScope
+    meter: InstrumentationScope,
   ): boolean {
     return (
       selector.getNameFilter().match(meter.name) &&

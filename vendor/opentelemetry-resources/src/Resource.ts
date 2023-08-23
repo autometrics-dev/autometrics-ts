@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { SDK_INFO } from '@opentelemetry/core';
-import { ResourceAttributes } from './types.ts';
-import { defaultServiceName } from './platform/index.ts';
-import { IResource } from './IResource.ts';
+import { diag } from "../../opentelemetry-api/mod.ts";
+import { SemanticResourceAttributes } from "../../opentelemetry-semantic-conventions/mod.ts";
+import { SDK_INFO } from "../../opentelemetry-core/mod.ts";
+import { ResourceAttributes } from "./types.ts";
+import { defaultServiceName } from "./platform/index.ts";
+import { IResource } from "./IResource.ts";
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -68,29 +68,29 @@ export class Resource implements IResource {
      * TODO: Consider to add check/validation on attributes.
      */
     attributes: ResourceAttributes,
-    asyncAttributesPromise?: Promise<ResourceAttributes>
+    asyncAttributesPromise?: Promise<ResourceAttributes>,
   ) {
     this._attributes = attributes;
     this.asyncAttributesPending = asyncAttributesPromise != null;
     this._syncAttributes = this._attributes ?? {};
     this._asyncAttributesPromise = asyncAttributesPromise?.then(
-      asyncAttributes => {
+      (asyncAttributes) => {
         this._attributes = Object.assign({}, this._attributes, asyncAttributes);
         this.asyncAttributesPending = false;
         return asyncAttributes;
       },
-      err => {
+      (err) => {
         diag.debug("a resource's async attributes promise rejected: %s", err);
         this.asyncAttributesPending = false;
         return {};
-      }
+      },
     );
   }
 
   get attributes(): ResourceAttributes {
     if (this.asyncAttributesPending) {
       diag.error(
-        'Accessing resource attributes before async attributes settled'
+        "Accessing resource attributes before async attributes settled",
       );
     }
 

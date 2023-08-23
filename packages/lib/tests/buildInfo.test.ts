@@ -1,12 +1,8 @@
-import {
-  PeriodicExportingMetricReader,
-  InMemoryMetricExporter,
-  AggregationTemporality,
-} from "@opentelemetry/sdk-metrics";
 import { assertMatch } from "./deps.ts";
-import { init } from "../instrumentation.ts";
-import { getMetricsProvider } from "../instrumentation.ts";
 import { collectAndSerialize } from "./util.ts";
+import { getMetricsProvider } from "../instrumentation.ts";
+import { init } from "../instrumentation.ts";
+import { otelSdkMetrics } from "../deps.ts";
 
 const buildInfo = {
   version: "1.0.0",
@@ -15,8 +11,8 @@ const buildInfo = {
 };
 
 /*Deno.test("Autometrics build info tests", async (t) => {
-  const exporter = new PeriodicExportingMetricReader({
-    exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
+  const exporter = new otelSdkMetrics.PeriodicExportingMetricReader({
+    exporter: new otelSdkMetrics.InMemoryMetricExporter(otelSdkMetrics.AggregationTemporality.DELTA),
   });
 
   init({ buildInfo, exporter });

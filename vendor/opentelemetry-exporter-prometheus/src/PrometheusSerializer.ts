@@ -18,7 +18,7 @@ import {
   diag,
   MetricAttributes,
   MetricAttributeValue,
-} from '@opentelemetry/api';
+} from "../../opentelemetry-api/mod.ts";
 import {
   ResourceMetrics,
   InstrumentType,
@@ -27,19 +27,19 @@ import {
   MetricData,
   DataPoint,
   Histogram,
-} from '@opentelemetry/sdk-metrics';
-import { hrTimeToMilliseconds } from '@opentelemetry/core';
-import { IResource } from '@opentelemetry/resources';
+} from "../../opentelemetry-sdk-metrics/mod.ts";
+import { hrTimeToMilliseconds } from "../../opentelemetry-core/mod.ts";
+import { IResource } from "../../opentelemetry-resources/mod.ts";
 
 type PrometheusDataTypeLiteral =
-  | 'counter'
-  | 'gauge'
-  | 'histogram'
-  | 'summary'
-  | 'untyped';
+  | "counter"
+  | "gauge"
+  | "histogram"
+  | "summary"
+  | "untyped";
 
 function escapeString(str: string) {
-  return str.replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
+  return str.replace(/\\/g, "\\\\").replace(/\n/g, "\\n");
 }
 
 /**
@@ -48,8 +48,8 @@ function escapeString(str: string) {
  *
  * `undefined` is converted to an empty string.
  */
-function escapeAttributeValue(str: MetricAttributeValue = '') {
-  if (typeof str !== 'string') {
+function escapeAttributeValue(str: MetricAttributeValue = "") {
+  if (typeof str !== "string") {
     str = JSON.stringify(str);
   }
   return escapeString(str).replace(/"/g, '\\"');
@@ -79,8 +79,8 @@ const multipleUnderscoreRegex = /_{2,}/g;
 function sanitizePrometheusMetricName(name: string): string {
   // replace all invalid characters with '_'
   return name
-    .replace(invalidCharacterRegex, '_')
-    .replace(multipleUnderscoreRegex, '_');
+    .replace(invalidCharacterRegex, "_")
+    .replace(multipleUnderscoreRegex, "_");
 }
 
 /**
@@ -94,11 +94,11 @@ function sanitizePrometheusMetricName(name: string): string {
  */
 function enforcePrometheusNamingConvention(
   name: string,
-  type: InstrumentType
+  type: InstrumentType,
 ): string {
   // Prometheus requires that metrics of the Counter kind have "_total" suffix
-  if (!name.endsWith('_total') && type === InstrumentType.COUNTER) {
-    name = name + '_total';
+  if (!name.endsWith("_total") && type === InstrumentType.COUNTER) {
+    name = name + "_total";
   }
 
   return name;
@@ -106,12 +106,12 @@ function enforcePrometheusNamingConvention(
 
 function valueString(value: number) {
   if (Number.isNaN(value)) {
-    return 'NaN';
+    return "NaN";
   } else if (!Number.isFinite(value)) {
     if (value < 0) {
-      return '-Inf';
+      return "-Inf";
     } else {
-      return '+Inf';
+      return "+Inf";
     }
   } else {
     return `${value}`;
@@ -122,15 +122,15 @@ function toPrometheusType(metricData: MetricData): PrometheusDataTypeLiteral {
   switch (metricData.dataPointType) {
     case DataPointType.SUM:
       if (metricData.isMonotonic) {
-        return 'counter';
+        return "counter";
       }
-      return 'gauge';
+      return "gauge";
     case DataPointType.GAUGE:
-      return 'gauge';
+      return "gauge";
     case DataPointType.HISTOGRAM:
-      return 'histogram';
+      return "histogram";
     default:
-      return 'untyped';
+      return "untyped";
   }
 }
 
@@ -139,16 +139,16 @@ function stringify(
   attributes: MetricAttributes,
   value: number,
   timestamp?: number,
-  additionalAttributes?: MetricAttributes
+  additionalAttributes?: MetricAttributes,
 ) {
   let hasAttribute = false;
-  let attributesStr = '';
+  let attributesStr = "";
 
   for (const [key, val] of Object.entries(attributes)) {
     const sanitizedAttributeName = sanitizePrometheusMetricName(key);
     hasAttribute = true;
     attributesStr += `${
-      attributesStr.length > 0 ? ',' : ''
+      attributesStr.length > 0 ? "," : ""
     }${sanitizedAttributeName}="${escapeAttributeValue(val)}"`;
   }
   if (additionalAttributes) {
@@ -156,7 +156,7 @@ function stringify(
       const sanitizedAttributeName = sanitizePrometheusMetricName(key);
       hasAttribute = true;
       attributesStr += `${
-        attributesStr.length > 0 ? ',' : ''
+        attributesStr.length > 0 ? "," : ""
       }${sanitizedAttributeName}="${escapeAttributeValue(val)}"`;
     }
   }
@@ -166,11 +166,11 @@ function stringify(
   }
 
   return `${metricName} ${valueString(value)}${
-    timestamp !== undefined ? ' ' + String(timestamp) : ''
+    timestamp !== undefined ? " " + String(timestamp) : ""
   }\n`;
 }
 
-const NO_REGISTERED_METRICS = '# no registered metrics';
+const NO_REGISTERED_METRICS = "# no registered metrics";
 
 export class PrometheusSerializer {
   private _prefix: string | undefined;
@@ -178,19 +178,19 @@ export class PrometheusSerializer {
 
   constructor(prefix?: string, appendTimestamp = false) {
     if (prefix) {
-      this._prefix = prefix + '_';
+      this._prefix = prefix + "_";
     }
     this._appendTimestamp = appendTimestamp;
   }
 
   serialize(resourceMetrics: ResourceMetrics): string {
-    let str = '';
+    let str = "";
 
     for (const scopeMetrics of resourceMetrics.scopeMetrics) {
       str += this._serializeScopeMetrics(scopeMetrics);
     }
 
-    if (str === '') {
+    if (str === "") {
       str += NO_REGISTERED_METRICS;
     }
 
@@ -198,16 +198,16 @@ export class PrometheusSerializer {
   }
 
   private _serializeScopeMetrics(scopeMetrics: ScopeMetrics) {
-    let str = '';
+    let str = "";
     for (const metric of scopeMetrics.metrics) {
-      str += this._serializeMetricData(metric) + '\n';
+      str += this._serializeMetricData(metric) + "\n";
     }
     return str;
   }
 
   private _serializeMetricData(metricData: MetricData) {
     let name = sanitizePrometheusMetricName(
-      escapeString(metricData.descriptor.name)
+      escapeString(metricData.descriptor.name),
     );
     if (this._prefix) {
       name = `${this._prefix}${name}`;
@@ -217,43 +217,43 @@ export class PrometheusSerializer {
     name = enforcePrometheusNamingConvention(name, metricData.descriptor.type);
 
     const help = `# HELP ${name} ${escapeString(
-      metricData.descriptor.description || 'description missing'
+      metricData.descriptor.description || "description missing",
     )}`;
     const unit = metricData.descriptor.unit
       ? `\n# UNIT ${name} ${escapeString(metricData.descriptor.unit)}`
-      : '';
+      : "";
     const type = `# TYPE ${name} ${toPrometheusType(metricData)}`;
 
-    let results = '';
+    let results = "";
     switch (dataPointType) {
       case DataPointType.SUM:
       case DataPointType.GAUGE: {
         results = metricData.dataPoints
-          .map(it =>
+          .map((it) =>
             this._serializeSingularDataPoint(
               name,
               metricData.descriptor.type,
-              it
-            )
+              it,
+            ),
           )
-          .join('');
+          .join("");
         break;
       }
       case DataPointType.HISTOGRAM: {
         results = metricData.dataPoints
-          .map(it =>
+          .map((it) =>
             this._serializeHistogramDataPoint(
               name,
               metricData.descriptor.type,
-              it
-            )
+              it,
+            ),
           )
-          .join('');
+          .join("");
         break;
       }
       default: {
         diag.error(
-          `Unrecognizable DataPointType: ${dataPointType} for metric "${name}"`
+          `Unrecognizable DataPointType: ${dataPointType} for metric "${name}"`,
         );
       }
     }
@@ -264,9 +264,9 @@ export class PrometheusSerializer {
   private _serializeSingularDataPoint(
     name: string,
     type: InstrumentType,
-    dataPoint: DataPoint<number>
+    dataPoint: DataPoint<number>,
   ): string {
-    let results = '';
+    let results = "";
 
     name = enforcePrometheusNamingConvention(name, type);
     const { value, attributes } = dataPoint;
@@ -276,7 +276,7 @@ export class PrometheusSerializer {
       attributes,
       value,
       this._appendTimestamp ? timestamp : undefined,
-      undefined
+      undefined,
     );
     return results;
   }
@@ -284,24 +284,24 @@ export class PrometheusSerializer {
   private _serializeHistogramDataPoint(
     name: string,
     type: InstrumentType,
-    dataPoint: DataPoint<Histogram>
+    dataPoint: DataPoint<Histogram>,
   ): string {
-    let results = '';
+    let results = "";
 
     name = enforcePrometheusNamingConvention(name, type);
     const attributes = dataPoint.attributes;
     const histogram = dataPoint.value;
     const timestamp = hrTimeToMilliseconds(dataPoint.endTime);
     /** Histogram["bucket"] is not typed with `number` */
-    for (const key of ['count', 'sum'] as ('count' | 'sum')[]) {
+    for (const key of ["count", "sum"] as ("count" | "sum")[]) {
       const value = histogram[key];
       if (value != null)
         results += stringify(
-          name + '_' + key,
+          name + "_" + key,
           attributes,
           value,
           this._appendTimestamp ? timestamp : undefined,
-          undefined
+          undefined,
         );
     }
 
@@ -324,16 +324,16 @@ export class PrometheusSerializer {
         infiniteBoundaryDefined = true;
       }
       results += stringify(
-        name + '_bucket',
+        name + "_bucket",
         attributes,
         cumulativeSum,
         this._appendTimestamp ? timestamp : undefined,
         {
           le:
             upperBound === undefined || upperBound === Infinity
-              ? '+Inf'
+              ? "+Inf"
               : String(upperBound),
-        }
+        },
       );
     }
 
@@ -341,7 +341,7 @@ export class PrometheusSerializer {
   }
 
   protected _serializeResource(resource: IResource): string {
-    const name = 'target_info';
+    const name = "target_info";
     const help = `# HELP ${name} Target metadata`;
     const type = `# TYPE ${name} gauge`;
 

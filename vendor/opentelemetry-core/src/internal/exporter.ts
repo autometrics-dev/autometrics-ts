@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { context } from '@opentelemetry/api';
-import { ExportResult } from '../ExportResult.ts';
-import { suppressTracing } from '../trace/suppress-tracing.ts';
+import { context } from "../../../opentelemetry-api/mod.ts";
+import { ExportResult } from "../ExportResult.ts";
+import { suppressTracing } from "../trace/suppress-tracing.ts";
 
 export interface Exporter<T> {
   export(arg: T, resultCallback: (result: ExportResult) => void): void;
@@ -28,9 +28,9 @@ export interface Exporter<T> {
  */
 export function _export<T>(
   exporter: Exporter<T>,
-  arg: T
+  arg: T,
 ): Promise<ExportResult> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     // prevent downstream exporter calls from generating spans
     context.with(suppressTracing(context.active()), () => {
       exporter.export(arg, (result: ExportResult) => {

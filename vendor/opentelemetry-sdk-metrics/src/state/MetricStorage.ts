@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
-import { MetricData } from '../export/MetricData.ts';
-import { Maybe } from '../utils.ts';
-import { MetricCollectorHandle } from './MetricCollector.ts';
+import { HrTime } from "../../../opentelemetry-api/mod.ts";
+import { MetricData } from "../export/MetricData.ts";
+import { Maybe } from "../utils.ts";
+import { MetricCollectorHandle } from "./MetricCollector.ts";
 import {
   createInstrumentDescriptor,
   InstrumentDescriptor,
-} from '../InstrumentDescriptor.ts';
+} from "../InstrumentDescriptor.ts";
 
 /**
  * Internal interface.
@@ -40,7 +40,7 @@ export abstract class MetricStorage {
   abstract collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
-    collectionTime: HrTime
+    collectionTime: HrTime,
   ): Maybe<MetricData>;
 
   getInstrumentDescriptor(): Readonly<InstrumentDescriptor> {
@@ -55,7 +55,7 @@ export abstract class MetricStorage {
         description: description,
         valueType: this._instrumentDescriptor.valueType,
         unit: this._instrumentDescriptor.unit,
-      }
+      },
     );
   }
 }

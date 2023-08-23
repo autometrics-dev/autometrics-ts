@@ -14,25 +14,30 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
-import { globalErrorHandler } from '@opentelemetry/core';
+import { diag } from "../../opentelemetry-api/mod.ts";
+import { globalErrorHandler } from "../../opentelemetry-core/mod.ts";
 import {
   Aggregation,
   AggregationTemporality,
   MetricReader,
-} from '@opentelemetry/sdk-metrics';
-import { createServer, IncomingMessage, Server, ServerResponse } from 'node:http';
-import { ExporterConfig } from './export/types.ts';
-import { PrometheusSerializer } from './PrometheusSerializer.ts';
+} from "../../opentelemetry-sdk-metrics/mod.ts";
+import {
+  createServer,
+  IncomingMessage,
+  Server,
+  ServerResponse,
+} from "node:http";
+import { ExporterConfig } from "./export/types.ts";
+import { PrometheusSerializer } from "./PrometheusSerializer.ts";
 /** Node.js v8.x compat */
-import { URL } from 'node:url';
+import { URL } from "node:url";
 
 export class PrometheusExporter extends MetricReader {
   static readonly DEFAULT_OPTIONS = {
     host: undefined,
     port: 9464,
-    endpoint: '/metrics',
-    prefix: '',
+    endpoint: "/metrics",
+    prefix: "",
     appendTimestamp: false,
   };
 
@@ -56,11 +61,11 @@ export class PrometheusExporter extends MetricReader {
    */
   constructor(
     config: ExporterConfig = {},
-    callback: (error: Error | void) => void = () => {}
+    callback: (error: Error | void) => void = () => {},
   ) {
     super({
-      aggregationSelector: _instrumentType => Aggregation.Default(),
-      aggregationTemporalitySelector: _instrumentType =>
+      aggregationSelector: (_instrumentType) => Aggregation.Default(),
+      aggregationTemporalitySelector: (_instrumentType) =>
         AggregationTemporality.CUMULATIVE,
     });
     this._host =
@@ -73,23 +78,23 @@ export class PrometheusExporter extends MetricReader {
       PrometheusExporter.DEFAULT_OPTIONS.port;
     this._prefix = config.prefix || PrometheusExporter.DEFAULT_OPTIONS.prefix;
     this._appendTimestamp =
-      typeof config.appendTimestamp === 'boolean'
+      typeof config.appendTimestamp === "boolean"
         ? config.appendTimestamp
         : PrometheusExporter.DEFAULT_OPTIONS.appendTimestamp;
     // unref to prevent prometheus exporter from holding the process open on exit
     this._server = createServer(this._requestHandler).unref();
     this._serializer = new PrometheusSerializer(
       this._prefix,
-      this._appendTimestamp
+      this._appendTimestamp,
     );
 
     this._baseUrl = `http://${this._host}:${this._port}/`;
     this._endpoint = (
       config.endpoint || PrometheusExporter.DEFAULT_OPTIONS.endpoint
-    ).replace(/^([^/])/, '/$1');
+    ).replace(/^([^/])/, "/$1");
 
     if (config.preventServerStart !== true) {
-      this.startServer().then(callback, err => {
+      this.startServer().then(callback, (err) => {
         diag.error(err);
         callback(err);
       });
@@ -115,18 +120,18 @@ export class PrometheusExporter extends MetricReader {
   stopServer(): Promise<void> {
     if (!this._server) {
       diag.debug(
-        'Prometheus stopServer() was called but server was never started.'
+        "Prometheus stopServer() was called but server was never started.",
       );
       return Promise.resolve();
     } else {
-      return new Promise(resolve => {
-        this._server.close(err => {
+      return new Promise((resolve) => {
+        this._server.close((err) => {
           if (!err) {
-            diag.debug('Prometheus exporter was stopped');
+            diag.debug("Prometheus exporter was stopped");
           } else {
             if (
               (err as unknown as { code: string }).code !==
-              'ERR_SERVER_NOT_RUNNING'
+              "ERR_SERVER_NOT_RUNNING"
             ) {
               globalErrorHandler(err);
             }
@@ -142,7 +147,7 @@ export class PrometheusExporter extends MetricReader {
    */
   startServer(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._server.once('error', reject);
+      this._server.once("error", reject);
       this._server.listen(
         {
           port: this._port,
@@ -150,10 +155,10 @@ export class PrometheusExporter extends MetricReader {
         },
         () => {
           diag.debug(
-            `Prometheus exporter server started: ${this._host}:${this._port}/${this._endpoint}`
+            `Prometheus exporter server started: ${this._host}:${this._port}/${this._endpoint}`,
           );
           resolve();
-        }
+        },
       );
     });
   }
@@ -165,7 +170,7 @@ export class PrometheusExporter extends MetricReader {
    */
   public getMetricsRequestHandler(
     _request: IncomingMessage,
-    response: ServerResponse
+    response: ServerResponse,
   ): void {
     this._exportMetrics(response);
   }
@@ -179,7 +184,7 @@ export class PrometheusExporter extends MetricReader {
    */
   private _requestHandler = (
     request: IncomingMessage,
-    response: ServerResponse
+    response: ServerResponse,
   ) => {
     if (
       request.url != null &&
@@ -196,21 +201,21 @@ export class PrometheusExporter extends MetricReader {
    */
   private _exportMetrics = (response: ServerResponse) => {
     response.statusCode = 200;
-    response.setHeader('content-type', 'text/plain');
+    response.setHeader("content-type", "text/plain");
     this.collect().then(
-      collectionResult => {
+      (collectionResult) => {
         const { resourceMetrics, errors } = collectionResult;
         if (errors.length) {
           diag.error(
-            'PrometheusExporter: metrics collection errors',
-            ...errors
+            "PrometheusExporter: metrics collection errors",
+            ...errors,
           );
         }
         response.end(this._serializer.serialize(resourceMetrics));
       },
-      err => {
+      (err) => {
         response.end(`# failed to export metrics: ${err}`);
-      }
+      },
     );
   };
 

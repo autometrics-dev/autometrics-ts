@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { Context, MetricAttributes } from '@opentelemetry/api';
+import type {
+  MetricAttributes,
+  Context,
+} from "../../../opentelemetry-api/mod.ts";
 
 /**
  * The {@link AttributesProcessor} is responsible for customizing which
@@ -31,7 +34,7 @@ export abstract class AttributesProcessor {
    */
   abstract process(
     incoming: MetricAttributes,
-    context?: Context
+    context?: Context,
   ): MetricAttributes;
 
   static Noop() {
@@ -57,12 +60,12 @@ export class FilteringAttributesProcessor extends AttributesProcessor {
   process(incoming: MetricAttributes, _context: Context): MetricAttributes {
     const filteredAttributes: MetricAttributes = {};
     Object.keys(incoming)
-      .filter(attributeName =>
-        this._allowedAttributeNames.includes(attributeName)
+      .filter((attributeName) =>
+        this._allowedAttributeNames.includes(attributeName),
       )
       .forEach(
-        attributeName =>
-          (filteredAttributes[attributeName] = incoming[attributeName])
+        (attributeName) =>
+          (filteredAttributes[attributeName] = incoming[attributeName]),
       );
     return filteredAttributes;
   }

@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-import { diag, SpanAttributeValue, SpanAttributes } from '@opentelemetry/api';
+import {
+  diag,
+  SpanAttributeValue,
+  SpanAttributes,
+} from "../../../opentelemetry-api/mod.ts";
 
 export function sanitizeAttributes(attributes: unknown): SpanAttributes {
   const out: SpanAttributes = {};
 
-  if (typeof attributes !== 'object' || attributes == null) {
+  if (typeof attributes !== "object" || attributes == null) {
     return out;
   }
 
@@ -43,7 +47,7 @@ export function sanitizeAttributes(attributes: unknown): SpanAttributes {
 }
 
 export function isAttributeKey(key: unknown): key is string {
-  return typeof key === 'string' && key.length > 0;
+  return typeof key === "string" && key.length > 0;
 }
 
 export function isAttributeValue(val: unknown): val is SpanAttributeValue {
@@ -86,9 +90,9 @@ function isHomogeneousAttributeValueArray(arr: unknown[]): boolean {
 
 function isValidPrimitiveAttributeValue(val: unknown): boolean {
   switch (typeof val) {
-    case 'number':
-    case 'boolean':
-    case 'string':
+    case "number":
+    case "boolean":
+    case "string":
       return true;
   }
 

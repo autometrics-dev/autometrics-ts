@@ -20,7 +20,7 @@ import {
   TextMapPropagator,
   diag,
   TextMapSetter,
-} from '@opentelemetry/api';
+} from "../../../opentelemetry-api/mod.ts";
 
 /** Configuration object for composite propagator */
 export interface CompositePropagatorConfig {
@@ -49,9 +49,9 @@ export class CompositePropagator implements TextMapPropagator {
       new Set(
         this._propagators
           // older propagators may not have fields function, null check to be sure
-          .map(p => (typeof p.fields === 'function' ? p.fields() : []))
-          .reduce((x, y) => x.concat(y), [])
-      )
+          .map((p) => (typeof p.fields === "function" ? p.fields() : []))
+          .reduce((x, y) => x.concat(y), []),
+      ),
     );
   }
 
@@ -70,7 +70,7 @@ export class CompositePropagator implements TextMapPropagator {
         propagator.inject(context, carrier, setter);
       } catch (err) {
         diag.warn(
-          `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
+          `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`,
         );
       }
     }
@@ -91,7 +91,7 @@ export class CompositePropagator implements TextMapPropagator {
         return propagator.extract(ctx, carrier, getter);
       } catch (err) {
         diag.warn(
-          `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
+          `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`,
         );
       }
       return ctx;

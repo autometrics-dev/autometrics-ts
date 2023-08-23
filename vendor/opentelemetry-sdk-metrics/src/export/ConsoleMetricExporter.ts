@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
-import { InstrumentType } from '../InstrumentDescriptor.ts';
-import { AggregationTemporality } from './AggregationTemporality.ts';
-import { ResourceMetrics } from './MetricData.ts';
-import { PushMetricExporter } from './MetricExporter.ts';
+import {
+  ExportResult,
+  ExportResultCode,
+} from "../../../opentelemetry-core/mod.ts";
+import { InstrumentType } from "../InstrumentDescriptor.ts";
+import { AggregationTemporality } from "./AggregationTemporality.ts";
+import { ResourceMetrics } from "./MetricData.ts";
+import { PushMetricExporter } from "./MetricExporter.ts";
 import {
   AggregationTemporalitySelector,
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
-} from './AggregationSelector.ts';
+} from "./AggregationSelector.ts";
 
 interface ConsoleMetricExporterOptions {
   temporalitySelector?: AggregationTemporalitySelector;
@@ -39,7 +42,7 @@ export class ConsoleMetricExporter implements PushMetricExporter {
 
   export(
     metrics: ResourceMetrics,
-    resultCallback: (result: ExportResult) => void
+    resultCallback: (result: ExportResult) => void,
   ): void {
     if (this._shutdown) {
       // If the exporter is shutting down, by spec, we need to return FAILED as export result
@@ -55,7 +58,7 @@ export class ConsoleMetricExporter implements PushMetricExporter {
   }
 
   selectAggregationTemporality(
-    _instrumentType: InstrumentType
+    _instrumentType: InstrumentType,
   ): AggregationTemporality {
     return this._temporalitySelector(_instrumentType);
   }
@@ -67,7 +70,7 @@ export class ConsoleMetricExporter implements PushMetricExporter {
 
   private static _sendMetrics(
     metrics: ResourceMetrics,
-    done: (result: ExportResult) => void
+    done: (result: ExportResult) => void,
   ): void {
     for (const scopeMetrics of metrics.scopeMetrics) {
       for (const metric of scopeMetrics.metrics) {

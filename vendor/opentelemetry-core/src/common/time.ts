@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import { otperformance as performance } from '../platform/index.ts';
-import { TimeOriginLegacy } from './types.ts';
+import * as api from "../../../opentelemetry-api/mod.ts";
+import { otperformance as performance } from "../platform/index.ts";
+import { TimeOriginLegacy } from "./types.ts";
 
 const NANOSECOND_DIGITS = 9;
 const NANOSECOND_DIGITS_IN_MILLIS = 6;
@@ -38,7 +38,7 @@ export function millisToHrTime(epochMillis: number): api.HrTime {
 
 export function getTimeOrigin(): number {
   let timeOrigin = performance.timeOrigin;
-  if (typeof timeOrigin !== 'number') {
+  if (typeof timeOrigin !== "number") {
     const perf: TimeOriginLegacy = performance as unknown as TimeOriginLegacy;
     timeOrigin = perf.timing && perf.timing.fetchStart;
   }
@@ -52,7 +52,7 @@ export function getTimeOrigin(): number {
 export function hrTime(performanceNow?: number): api.HrTime {
   const timeOrigin = millisToHrTime(getTimeOrigin());
   const now = millisToHrTime(
-    typeof performanceNow === 'number' ? performanceNow : performance.now()
+    typeof performanceNow === "number" ? performanceNow : performance.now(),
   );
 
   return addHrTimes(timeOrigin, now);
@@ -67,7 +67,7 @@ export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
   // process.hrtime
   if (isTimeInputHrTime(time)) {
     return time as api.HrTime;
-  } else if (typeof time === 'number') {
+  } else if (typeof time === "number") {
     // Must be a performance.now() if it's smaller than process start time.
     if (time < getTimeOrigin()) {
       return hrTime(time);
@@ -78,7 +78,7 @@ export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
   } else if (time instanceof Date) {
     return millisToHrTime(time.getTime());
   } else {
-    throw TypeError('Invalid input type');
+    throw TypeError("Invalid input type");
   }
 }
 
@@ -89,7 +89,7 @@ export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
  */
 export function hrTimeDuration(
   startTime: api.HrTime,
-  endTime: api.HrTime
+  endTime: api.HrTime,
 ): api.HrTime {
   let seconds = endTime[0] - startTime[0];
   let nanos = endTime[1] - startTime[1];
@@ -110,10 +110,10 @@ export function hrTimeDuration(
  */
 export function hrTimeToTimeStamp(time: api.HrTime): string {
   const precision = NANOSECOND_DIGITS;
-  const tmp = `${'0'.repeat(precision)}${time[1]}Z`;
+  const tmp = `${"0".repeat(precision)}${time[1]}Z`;
   const nanoString = tmp.substr(tmp.length - precision - 1);
   const date = new Date(time[0] * 1000).toISOString();
-  return date.replace('000Z', nanoString);
+  return date.replace("000Z", nanoString);
 }
 
 /**
@@ -148,8 +148,8 @@ export function isTimeInputHrTime(value: unknown): value is api.HrTime {
   return (
     Array.isArray(value) &&
     value.length === 2 &&
-    typeof value[0] === 'number' &&
-    typeof value[1] === 'number'
+    typeof value[0] === "number" &&
+    typeof value[1] === "number"
   );
 }
 
@@ -158,11 +158,11 @@ export function isTimeInputHrTime(value: unknown): value is api.HrTime {
  * @param value
  */
 export function isTimeInput(
-  value: unknown
+  value: unknown,
 ): value is api.HrTime | number | Date {
   return (
     isTimeInputHrTime(value) ||
-    typeof value === 'number' ||
+    typeof value === "number" ||
     value instanceof Date
   );
 }

@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
-import { AttributeHashMap } from './HashMap.ts';
+import type {
+  MetricAttributes,
+  Context,
+  HrTime,
+} from "../../../opentelemetry-api/mod.ts";
+import { AttributeHashMap } from "./HashMap.ts";
 
 /**
  * Internal interface. Stores measurements and allows synchronous writes of
@@ -29,7 +33,7 @@ export interface WritableMetricStorage {
     value: number,
     attributes: MetricAttributes,
     context: Context,
-    recordTime: HrTime
+    recordTime: HrTime,
   ): void;
 }
 

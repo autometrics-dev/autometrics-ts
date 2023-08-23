@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
-import { getEnv } from '@opentelemetry/core';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { Resource } from '../Resource.ts';
-import { DetectorSync, ResourceAttributes } from '../types.ts';
-import { ResourceDetectionConfig } from '../config.ts';
-import { IResource } from '../IResource.ts';
+import { diag } from "../../../opentelemetry-api/mod.ts";
+import { getEnv } from "../../../opentelemetry-core/mod.ts";
+import { SemanticResourceAttributes } from "../../../opentelemetry-semantic-conventions/mod.ts";
+import { Resource } from "../Resource.ts";
+import { DetectorSync, ResourceAttributes } from "../types.ts";
+import { ResourceDetectionConfig } from "../config.ts";
+import { IResource } from "../IResource.ts";
 
 /**
  * EnvDetectorSync can be used to detect the presence of and create a Resource
@@ -31,16 +31,14 @@ class EnvDetectorSync implements DetectorSync {
   private readonly _MAX_LENGTH = 255;
 
   // OTEL_RESOURCE_ATTRIBUTES is a comma-separated list of attributes.
-  private readonly _COMMA_SEPARATOR = ',';
+  private readonly _COMMA_SEPARATOR = ",";
 
   // OTEL_RESOURCE_ATTRIBUTES contains key value pair separated by '='.
-  private readonly _LABEL_KEY_VALUE_SPLITTER = '=';
+  private readonly _LABEL_KEY_VALUE_SPLITTER = "=";
 
-  private readonly _ERROR_MESSAGE_INVALID_CHARS =
-    `should be a ASCII string with a length greater than 0 and not exceed ${this._MAX_LENGTH} characters.`;
+  private readonly _ERROR_MESSAGE_INVALID_CHARS = `should be a ASCII string with a length greater than 0 and not exceed ${this._MAX_LENGTH} characters.`;
 
-  private readonly _ERROR_MESSAGE_INVALID_VALUE =
-    `should be a ASCII string with a length not exceed ${this._MAX_LENGTH} characters.`;
+  private readonly _ERROR_MESSAGE_INVALID_VALUE = `should be a ASCII string with a length not exceed ${this._MAX_LENGTH} characters.`;
 
   /**
    * Returns a {@link Resource} populated with attributes from the
@@ -87,19 +85,19 @@ class EnvDetectorSync implements DetectorSync {
    * @returns The sanitized resource attributes.
    */
   private _parseResourceAttributes(
-    rawEnvAttributes?: string
+    rawEnvAttributes?: string,
   ): ResourceAttributes {
     if (!rawEnvAttributes) return {};
 
     const attributes: ResourceAttributes = {};
     const rawAttributes: string[] = rawEnvAttributes.split(
       this._COMMA_SEPARATOR,
-      -1
+      -1,
     );
     for (const rawAttribute of rawAttributes) {
       const keyValuePair: string[] = rawAttribute.split(
         this._LABEL_KEY_VALUE_SPLITTER,
-        -1
+        -1,
       );
       if (keyValuePair.length !== 2) {
         continue;
@@ -107,7 +105,7 @@ class EnvDetectorSync implements DetectorSync {
       let [key, value] = keyValuePair;
       // Leading and trailing whitespaces are trimmed.
       key = key.trim();
-      value = value.trim().split(/^"|"$/).join('');
+      value = value.trim().split(/^"|"$/).join("");
       if (!this._isValidAndNotEmpty(key)) {
         throw new Error(`Attribute key ${this._ERROR_MESSAGE_INVALID_CHARS}`);
       }

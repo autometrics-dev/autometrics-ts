@@ -20,19 +20,22 @@ import {
   Aggregator,
   AggregatorKind,
   ExponentialHistogram,
-} from './types.ts';
+} from "./types.ts";
 import {
   DataPointType,
   ExponentialHistogramMetricData,
-} from '../export/MetricData.ts';
-import { diag, HrTime } from '@opentelemetry/api';
-import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor.ts';
-import { Maybe } from '../utils.ts';
-import { AggregationTemporality } from '../export/AggregationTemporality.ts';
-import { Buckets } from './exponential-histogram/Buckets.ts';
-import { getMapping } from './exponential-histogram/mapping/getMapping.ts';
-import { Mapping } from './exponential-histogram/mapping/types.ts';
-import { nextGreaterSquare } from './exponential-histogram/util.ts';
+} from "../export/MetricData.ts";
+import { diag, HrTime } from "../../../opentelemetry-api/mod.ts";
+import {
+  InstrumentDescriptor,
+  InstrumentType,
+} from "../InstrumentDescriptor.ts";
+import { Maybe } from "../utils.ts";
+import { AggregationTemporality } from "../export/AggregationTemporality.ts";
+import { Buckets } from "./exponential-histogram/Buckets.ts";
+import { getMapping } from "./exponential-histogram/mapping/getMapping.ts";
+import { Mapping } from "./exponential-histogram/mapping/types.ts";
+import { nextGreaterSquare } from "./exponential-histogram/util.ts";
 
 /**
  * Internal value type for ExponentialHistogramAggregation.
@@ -71,7 +74,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     private _max = Number.NEGATIVE_INFINITY,
     private _positive = new Buckets(),
     private _negative = new Buckets(),
-    private _mapping: Mapping = getMapping(MAX_SCALE)
+    private _mapping: Mapping = getMapping(MAX_SCALE),
   ) {
     if (this._maxSize < MIN_MAX_SIZE) {
       diag.warn(`Exponential Histogram Max Size set to ${this._maxSize}, \
@@ -277,7 +280,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
       this._max,
       this.positive.clone(),
       this.negative.clone(),
-      this._mapping
+      this._mapping,
     );
   }
 
@@ -333,7 +336,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   private _incrementIndexBy(
     buckets: Buckets,
     index: number,
-    increment: number
+    increment: number,
   ) {
     if (increment === 0) {
       // nothing to do for a zero increment, can happen during a merge operation
@@ -420,17 +423,17 @@ export class ExponentialHistogramAccumulation implements Accumulation {
 
     const highLowPos = HighLow.combine(
       this._highLowAtScale(this.positive, this.scale, minScale),
-      this._highLowAtScale(other.positive, other.scale, minScale)
+      this._highLowAtScale(other.positive, other.scale, minScale),
     );
 
     const highLowNeg = HighLow.combine(
       this._highLowAtScale(this.negative, this.scale, minScale),
-      this._highLowAtScale(other.negative, other.scale, minScale)
+      this._highLowAtScale(other.negative, other.scale, minScale),
     );
 
     return Math.min(
       minScale - this._changeScale(highLowPos.high, highLowPos.low),
-      minScale - this._changeScale(highLowNeg.high, highLowNeg.low)
+      minScale - this._changeScale(highLowNeg.high, highLowNeg.low),
     );
   }
 
@@ -440,7 +443,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
   private _highLowAtScale(
     buckets: Buckets,
     currentScale: number,
-    newScale: number
+    newScale: number,
   ): HighLow {
     if (buckets.length === 0) {
       return new HighLow(0, -1);
@@ -457,7 +460,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     ours: Buckets,
     other: ExponentialHistogramAccumulation,
     theirs: Buckets,
-    scale: number
+    scale: number,
   ) {
     const theirOffset = theirs.offset;
     const theirChange = other.scale - scale;
@@ -466,7 +469,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
       this._incrementIndexBy(
         ours,
         (theirOffset + i) >> theirChange,
-        theirs.at(i)
+        theirs.at(i),
       );
     }
   }
@@ -479,7 +482,7 @@ export class ExponentialHistogramAccumulation implements Accumulation {
     ours: Buckets,
     other: ExponentialHistogramAccumulation,
     theirs: Buckets,
-    scale: number
+    scale: number,
   ) {
     const theirOffset = theirs.offset;
     const theirChange = other.scale - scale;
@@ -514,14 +517,14 @@ export class ExponentialHistogramAggregator
    */
   constructor(
     readonly _maxSize: number,
-    private readonly _recordMinMax: boolean
+    private readonly _recordMinMax: boolean,
   ) {}
 
   createAccumulation(startTime: HrTime) {
     return new ExponentialHistogramAccumulation(
       startTime,
       this._maxSize,
-      this._recordMinMax
+      this._recordMinMax,
     );
   }
 
@@ -530,7 +533,7 @@ export class ExponentialHistogramAggregator
    */
   merge(
     previous: ExponentialHistogramAccumulation,
-    delta: ExponentialHistogramAccumulation
+    delta: ExponentialHistogramAccumulation,
   ): ExponentialHistogramAccumulation {
     const result = delta.clone();
     result.merge(previous);
@@ -543,7 +546,7 @@ export class ExponentialHistogramAggregator
    */
   diff(
     previous: ExponentialHistogramAccumulation,
-    current: ExponentialHistogramAccumulation
+    current: ExponentialHistogramAccumulation,
   ): ExponentialHistogramAccumulation {
     const result = current.clone();
     result.diff(previous);
@@ -555,7 +558,7 @@ export class ExponentialHistogramAggregator
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<ExponentialHistogramAccumulation>[],
-    endTime: HrTime
+    endTime: HrTime,
   ): Maybe<ExponentialHistogramMetricData> {
     return {
       descriptor,

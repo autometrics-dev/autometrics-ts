@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import * as api from "../../../opentelemetry-api/mod.ts";
 import {
   internal,
   ExportResultCode,
   globalErrorHandler,
   unrefTimer,
-} from '@opentelemetry/core';
-import { MetricReader } from './MetricReader.ts';
-import { PushMetricExporter } from './MetricExporter.ts';
-import { callWithTimeout, TimeoutError } from '../utils.ts';
-import { diag } from '@opentelemetry/api';
+} from "../../../opentelemetry-core/mod.ts";
+import { MetricReader } from "./MetricReader.ts";
+import { PushMetricExporter } from "./MetricExporter.ts";
+import { callWithTimeout, TimeoutError } from "../utils.ts";
+import { diag } from "../../../opentelemetry-api/mod.ts";
 
 export type PeriodicExportingMetricReaderOptions = {
   /**
@@ -55,7 +55,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
   constructor(options: PeriodicExportingMetricReaderOptions) {
     super({
       aggregationSelector: options.exporter.selectAggregation?.bind(
-        options.exporter
+        options.exporter,
       ),
       aggregationTemporalitySelector:
         options.exporter.selectAggregationTemporality?.bind(options.exporter),
@@ -65,14 +65,14 @@ export class PeriodicExportingMetricReader extends MetricReader {
       options.exportIntervalMillis !== undefined &&
       options.exportIntervalMillis <= 0
     ) {
-      throw Error('exportIntervalMillis must be greater than 0');
+      throw Error("exportIntervalMillis must be greater than 0");
     }
 
     if (
       options.exportTimeoutMillis !== undefined &&
       options.exportTimeoutMillis <= 0
     ) {
-      throw Error('exportTimeoutMillis must be greater than 0');
+      throw Error("exportTimeoutMillis must be greater than 0");
     }
 
     if (
@@ -81,7 +81,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       options.exportIntervalMillis < options.exportTimeoutMillis
     ) {
       throw Error(
-        'exportIntervalMillis must be greater than or equal to exportTimeoutMillis'
+        "exportIntervalMillis must be greater than or equal to exportTimeoutMillis",
       );
     }
 
@@ -96,8 +96,8 @@ export class PeriodicExportingMetricReader extends MetricReader {
     } catch (err) {
       if (err instanceof TimeoutError) {
         api.diag.error(
-          'Export took longer than %s milliseconds and timed out.',
-          this._exportTimeout
+          "Export took longer than %s milliseconds and timed out.",
+          this._exportTimeout,
         );
         return;
       }
@@ -113,8 +113,8 @@ export class PeriodicExportingMetricReader extends MetricReader {
 
     if (errors.length > 0) {
       api.diag.error(
-        'PeriodicExportingMetricReader: metrics collection errors',
-        ...errors
+        "PeriodicExportingMetricReader: metrics collection errors",
+        ...errors,
       );
     }
 
@@ -122,7 +122,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       const result = await internal._export(this._exporter, resourceMetrics);
       if (result.code !== ExportResultCode.SUCCESS) {
         throw new Error(
-          `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
+          `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`,
         );
       }
     };
@@ -131,8 +131,8 @@ export class PeriodicExportingMetricReader extends MetricReader {
     if (resourceMetrics.resource.asyncAttributesPending) {
       resourceMetrics.resource
         .waitForAsyncAttributes?.()
-        .then(doExport, err =>
-          diag.debug('Error while resolving async portion of resource: ', err)
+        .then(doExport, (err) =>
+          diag.debug("Error while resolving async portion of resource: ", err),
         );
     } else {
       await doExport();

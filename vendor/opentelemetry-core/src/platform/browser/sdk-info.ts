@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { VERSION } from '../../version.ts';
+import { VERSION } from "../../version.ts";
 import {
   TelemetrySdkLanguageValues,
   SemanticResourceAttributes,
-} from '@opentelemetry/semantic-conventions';
+} from "../../../../opentelemetry-semantic-conventions/mod.ts";
 
 /** Constants describing the SDK in use */
 export const SDK_INFO = {
-  [SemanticResourceAttributes.TELEMETRY_SDK_NAME]: 'opentelemetry',
-  [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'browser',
+  [SemanticResourceAttributes.TELEMETRY_SDK_NAME]: "opentelemetry",
+  [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: "browser",
   [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]:
     TelemetrySdkLanguageValues.WEBJS,
   [SemanticResourceAttributes.TELEMETRY_SDK_VERSION]: VERSION,

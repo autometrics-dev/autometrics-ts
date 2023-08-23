@@ -25,11 +25,11 @@ import {
   ObservableUpDownCounter,
   BatchObservableCallback,
   Observable,
-} from '@opentelemetry/api';
+} from "../../opentelemetry-api/mod.ts";
 import {
   createInstrumentDescriptor,
   InstrumentType,
-} from './InstrumentDescriptor.ts';
+} from "./InstrumentDescriptor.ts";
 import {
   CounterInstrument,
   HistogramInstrument,
@@ -37,8 +37,8 @@ import {
   ObservableGaugeInstrument,
   ObservableUpDownCounterInstrument,
   UpDownCounterInstrument,
-} from './Instruments.ts';
-import { MeterSharedState } from './state/MeterSharedState.ts';
+} from "./Instruments.ts";
+import { MeterSharedState } from "./state/MeterSharedState.ts";
 
 /**
  * This class implements the {@link IMeter} interface.
@@ -53,7 +53,7 @@ export class Meter implements IMeter {
     const descriptor = createInstrumentDescriptor(
       name,
       InstrumentType.HISTOGRAM,
-      options
+      options,
     );
     const storage = this._meterSharedState.registerMetricStorage(descriptor);
     return new HistogramInstrument(storage, descriptor);
@@ -66,7 +66,7 @@ export class Meter implements IMeter {
     const descriptor = createInstrumentDescriptor(
       name,
       InstrumentType.COUNTER,
-      options
+      options,
     );
     const storage = this._meterSharedState.registerMetricStorage(descriptor);
     return new CounterInstrument(storage, descriptor);
@@ -79,7 +79,7 @@ export class Meter implements IMeter {
     const descriptor = createInstrumentDescriptor(
       name,
       InstrumentType.UP_DOWN_COUNTER,
-      options
+      options,
     );
     const storage = this._meterSharedState.registerMetricStorage(descriptor);
     return new UpDownCounterInstrument(storage, descriptor);
@@ -90,19 +90,19 @@ export class Meter implements IMeter {
    */
   createObservableGauge(
     name: string,
-    options?: MetricOptions
+    options?: MetricOptions,
   ): ObservableGauge {
     const descriptor = createInstrumentDescriptor(
       name,
       InstrumentType.OBSERVABLE_GAUGE,
-      options
+      options,
     );
     const storages =
       this._meterSharedState.registerAsyncMetricStorage(descriptor);
     return new ObservableGaugeInstrument(
       descriptor,
       storages,
-      this._meterSharedState.observableRegistry
+      this._meterSharedState.observableRegistry,
     );
   }
 
@@ -111,19 +111,19 @@ export class Meter implements IMeter {
    */
   createObservableCounter(
     name: string,
-    options?: MetricOptions
+    options?: MetricOptions,
   ): ObservableCounter {
     const descriptor = createInstrumentDescriptor(
       name,
       InstrumentType.OBSERVABLE_COUNTER,
-      options
+      options,
     );
     const storages =
       this._meterSharedState.registerAsyncMetricStorage(descriptor);
     return new ObservableCounterInstrument(
       descriptor,
       storages,
-      this._meterSharedState.observableRegistry
+      this._meterSharedState.observableRegistry,
     );
   }
 
@@ -132,19 +132,19 @@ export class Meter implements IMeter {
    */
   createObservableUpDownCounter(
     name: string,
-    options?: MetricOptions
+    options?: MetricOptions,
   ): ObservableUpDownCounter {
     const descriptor = createInstrumentDescriptor(
       name,
       InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
-      options
+      options,
     );
     const storages =
       this._meterSharedState.registerAsyncMetricStorage(descriptor);
     return new ObservableUpDownCounterInstrument(
       descriptor,
       storages,
-      this._meterSharedState.observableRegistry
+      this._meterSharedState.observableRegistry,
     );
   }
 
@@ -153,11 +153,11 @@ export class Meter implements IMeter {
    */
   addBatchObservableCallback(
     callback: BatchObservableCallback,
-    observables: Observable[]
+    observables: Observable[],
   ) {
     this._meterSharedState.observableRegistry.addBatchCallback(
       callback,
-      observables
+      observables,
     );
   }
 
@@ -166,11 +166,11 @@ export class Meter implements IMeter {
    */
   removeBatchObservableCallback(
     callback: BatchObservableCallback,
-    observables: Observable[]
+    observables: Observable[],
   ) {
     this._meterSharedState.observableRegistry.removeBatchCallback(
       callback,
-      observables
+      observables,
     );
   }
 }

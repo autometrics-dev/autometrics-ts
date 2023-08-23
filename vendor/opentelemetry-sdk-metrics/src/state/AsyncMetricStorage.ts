@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
-import { Accumulation, Aggregator } from '../aggregator/types.ts';
-import { InstrumentDescriptor } from '../InstrumentDescriptor.ts';
-import { AttributesProcessor } from '../view/AttributesProcessor.ts';
-import { MetricStorage } from './MetricStorage.ts';
-import { MetricData } from '../export/MetricData.ts';
-import { DeltaMetricProcessor } from './DeltaMetricProcessor.ts';
-import { TemporalMetricProcessor } from './TemporalMetricProcessor.ts';
-import { Maybe } from '../utils.ts';
-import { MetricCollectorHandle } from './MetricCollector.ts';
-import { AttributeHashMap } from './HashMap.ts';
-import { AsyncWritableMetricStorage } from './WritableMetricStorage.ts';
+import { HrTime } from "../../../opentelemetry-api/mod.ts";
+import { Accumulation, Aggregator } from "../aggregator/types.ts";
+import { InstrumentDescriptor } from "../InstrumentDescriptor.ts";
+import { AttributesProcessor } from "../view/AttributesProcessor.ts";
+import { MetricStorage } from "./MetricStorage.ts";
+import { MetricData } from "../export/MetricData.ts";
+import { DeltaMetricProcessor } from "./DeltaMetricProcessor.ts";
+import { TemporalMetricProcessor } from "./TemporalMetricProcessor.ts";
+import { Maybe } from "../utils.ts";
+import { MetricCollectorHandle } from "./MetricCollector.ts";
+import { AttributeHashMap } from "./HashMap.ts";
+import { AsyncWritableMetricStorage } from "./WritableMetricStorage.ts";
 
 /**
  * Internal interface.
@@ -42,7 +42,7 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
   constructor(
     _instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
-    private _attributesProcessor: AttributesProcessor
+    private _attributesProcessor: AttributesProcessor,
   ) {
     super(_instrumentDescriptor);
     this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
@@ -67,7 +67,7 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
   collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
-    collectionTime: HrTime
+    collectionTime: HrTime,
   ): Maybe<MetricData> {
     const accumulations = this._deltaMetricStorage.collect();
 
@@ -76,7 +76,7 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>>
       collectors,
       this._instrumentDescriptor,
       accumulations,
-      collectionTime
+      collectionTime,
     );
   }
 }

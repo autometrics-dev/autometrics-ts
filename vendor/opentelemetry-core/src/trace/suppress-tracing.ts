@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { Context, createContextKey } from '@opentelemetry/api';
+import { Context, createContextKey } from "../../../opentelemetry-api/mod.ts";
 
 const SUPPRESS_TRACING_KEY = createContextKey(
-  'OpenTelemetry SDK Context Key SUPPRESS_TRACING'
+  "OpenTelemetry SDK Context Key SUPPRESS_TRACING",
 );
 
 export function suppressTracing(context: Context): Context {

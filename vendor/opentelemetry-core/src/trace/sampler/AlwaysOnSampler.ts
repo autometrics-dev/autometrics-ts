@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/api';
+import {
+  Sampler,
+  SamplingDecision,
+  SamplingResult,
+} from "../../../../opentelemetry-api/mod.ts";
 
 /**
  * @deprecated Use the one defined in @opentelemetry/sdk-trace-base instead.
@@ -28,6 +32,6 @@ export class AlwaysOnSampler implements Sampler {
   }
 
   toString(): string {
-    return 'AlwaysOnSampler';
+    return "AlwaysOnSampler";
   }
 }

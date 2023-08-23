@@ -20,8 +20,8 @@ import {
   isSpanContextValid,
   trace,
   MetricAttributes,
-} from '@opentelemetry/api';
-import { Exemplar } from './Exemplar.ts';
+} from "../../../opentelemetry-api/mod.ts";
+import { Exemplar } from "./Exemplar.ts";
 
 /**
  * An interface for an exemplar reservoir of samples.
@@ -32,7 +32,7 @@ export interface ExemplarReservoir {
     value: number,
     timestamp: HrTime,
     attributes: MetricAttributes,
-    ctx: Context
+    ctx: Context,
   ): void;
   /**
    * Returns accumulated Exemplars and also resets the reservoir
@@ -58,7 +58,7 @@ class ExemplarBucket {
     value: number,
     timestamp: HrTime,
     attributes: MetricAttributes,
-    ctx: Context
+    ctx: Context,
   ) {
     this.value = value;
     this.timestamp = timestamp;
@@ -75,7 +75,7 @@ class ExemplarBucket {
     if (!this._offered) return null;
     const currentAttributes = this.attributes;
     // filter attributes
-    Object.keys(pointAttributes).forEach(key => {
+    Object.keys(pointAttributes).forEach((key) => {
       if (pointAttributes[key] === currentAttributes[key]) {
         delete currentAttributes[key];
       }
@@ -115,7 +115,7 @@ export abstract class FixedSizeExemplarReservoirBase
     value: number,
     timestamp: HrTime,
     attributes: MetricAttributes,
-    ctx: Context
+    ctx: Context,
   ): void;
 
   maxSize(): number {
@@ -129,7 +129,7 @@ export abstract class FixedSizeExemplarReservoirBase
 
   collect(pointAttributes: MetricAttributes): Exemplar[] {
     const exemplars: Exemplar[] = [];
-    this._reservoirStorage.forEach(storageItem => {
+    this._reservoirStorage.forEach((storageItem) => {
       const res = storageItem.collect(pointAttributes);
       if (res !== null) {
         exemplars.push(res);

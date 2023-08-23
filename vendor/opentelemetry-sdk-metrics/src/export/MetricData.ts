@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { HrTime, MetricAttributes } from '@opentelemetry/api';
-import { InstrumentationScope } from '@opentelemetry/core';
-import { IResource } from '@opentelemetry/resources';
-import { InstrumentDescriptor } from '../InstrumentDescriptor.ts';
-import { AggregationTemporality } from './AggregationTemporality.ts';
-import { Histogram, ExponentialHistogram } from '../aggregator/types.ts';
+import { HrTime, MetricAttributes } from "../../../opentelemetry-api/mod.ts";
+import { InstrumentationScope } from "../../../opentelemetry-core/mod.ts";
+import { IResource } from "../../../opentelemetry-resources/mod.ts";
+import { InstrumentDescriptor } from "../InstrumentDescriptor.ts";
+import { AggregationTemporality } from "./AggregationTemporality.ts";
+import { Histogram, ExponentialHistogram } from "../aggregator/types.ts";
 
 /**
  * Basic metric data fields.

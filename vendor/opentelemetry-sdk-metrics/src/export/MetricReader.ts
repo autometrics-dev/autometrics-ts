@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import { AggregationTemporality } from './AggregationTemporality.ts';
-import { MetricProducer } from './MetricProducer.ts';
-import { CollectionResult } from './MetricData.ts';
-import { FlatMap, callWithTimeout } from '../utils.ts';
-import { InstrumentType } from '../InstrumentDescriptor.ts';
+import * as api from "../../../opentelemetry-api/mod.ts";
+import { AggregationTemporality } from "./AggregationTemporality.ts";
+import { MetricProducer } from "./MetricProducer.ts";
+import { CollectionResult } from "./MetricData.ts";
+import { FlatMap, callWithTimeout } from "../utils.ts";
+import { InstrumentType } from "../InstrumentDescriptor.ts";
 import {
   CollectionOptions,
   ForceFlushOptions,
   ShutdownOptions,
-} from '../types.ts';
-import { Aggregation } from '../view/Aggregation.ts';
+} from "../types.ts";
+import { Aggregation } from "../view/Aggregation.ts";
 import {
   AggregationSelector,
   AggregationTemporalitySelector,
   DEFAULT_AGGREGATION_SELECTOR,
   DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
-} from './AggregationSelector.ts';
+} from "./AggregationSelector.ts";
 
 export interface MetricReaderOptions {
   /**
@@ -91,7 +91,7 @@ export abstract class MetricReader {
   setMetricProducer(metricProducer: MetricProducer) {
     if (this._sdkMetricProducer) {
       throw new Error(
-        'MetricReader can not be bound to a MeterProvider again.'
+        "MetricReader can not be bound to a MeterProvider again.",
       );
     }
     this._sdkMetricProducer = metricProducer;
@@ -111,7 +111,7 @@ export abstract class MetricReader {
    * {@link InstrumentType} for this reader.
    */
   selectAggregationTemporality(
-    instrumentType: InstrumentType
+    instrumentType: InstrumentType,
   ): AggregationTemporality {
     return this._aggregationTemporalitySelector(instrumentType);
   }
@@ -146,12 +146,12 @@ export abstract class MetricReader {
    */
   async collect(options?: CollectionOptions): Promise<CollectionResult> {
     if (this._sdkMetricProducer === undefined) {
-      throw new Error('MetricReader is not bound to a MetricProducer');
+      throw new Error("MetricReader is not bound to a MetricProducer");
     }
 
     // Subsequent invocations to collect are not allowed. SDKs SHOULD return some failure for these calls.
     if (this._shutdown) {
-      throw new Error('MetricReader is shutdown');
+      throw new Error("MetricReader is shutdown");
     }
 
     const [sdkCollectionResults, ...additionalCollectionResults] =
@@ -159,24 +159,24 @@ export abstract class MetricReader {
         this._sdkMetricProducer.collect({
           timeoutMillis: options?.timeoutMillis,
         }),
-        ...this._metricProducers.map(producer =>
+        ...this._metricProducers.map((producer) =>
           producer.collect({
             timeoutMillis: options?.timeoutMillis,
-          })
+          }),
         ),
       ]);
 
     // Merge the results, keeping the SDK's Resource
     const errors = sdkCollectionResults.errors.concat(
-      FlatMap(additionalCollectionResults, result => result.errors)
+      FlatMap(additionalCollectionResults, (result) => result.errors),
     );
     const resource = sdkCollectionResults.resourceMetrics.resource;
     const scopeMetrics =
       sdkCollectionResults.resourceMetrics.scopeMetrics.concat(
         FlatMap(
           additionalCollectionResults,
-          result => result.resourceMetrics.scopeMetrics
-        )
+          (result) => result.resourceMetrics.scopeMetrics,
+        ),
       );
     return {
       resourceMetrics: {
@@ -196,7 +196,7 @@ export abstract class MetricReader {
   async shutdown(options?: ShutdownOptions): Promise<void> {
     // Do not call shutdown again if it has already been called.
     if (this._shutdown) {
-      api.diag.error('Cannot call shutdown twice.');
+      api.diag.error("Cannot call shutdown twice.");
       return;
     }
 
@@ -218,7 +218,7 @@ export abstract class MetricReader {
    */
   async forceFlush(options?: ForceFlushOptions): Promise<void> {
     if (this._shutdown) {
-      api.diag.warn('Cannot forceFlush on already shutdown MetricReader.');
+      api.diag.warn("Cannot forceFlush on already shutdown MetricReader.");
       return;
     }
 

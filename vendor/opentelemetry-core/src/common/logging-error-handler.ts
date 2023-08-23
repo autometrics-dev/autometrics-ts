@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { diag, Exception } from '@opentelemetry/api';
-import { ErrorHandler } from './types.ts';
+import { diag, Exception } from "../../../opentelemetry-api/mod.ts";
+import { ErrorHandler } from "./types.ts";
 
 /**
  * Returns a function that logs an error using the provided logger, or a
@@ -32,7 +32,7 @@ export function loggingErrorHandler(): ErrorHandler {
  * @param {Exception} ex
  */
 function stringifyException(ex: Exception | string): string {
-  if (typeof ex === 'string') {
+  if (typeof ex === "string") {
     return ex;
   } else {
     return JSON.stringify(flattenException(ex));
@@ -49,7 +49,7 @@ function flattenException(ex: Exception): Record<string, string> {
   let current = ex;
 
   while (current !== null) {
-    Object.getOwnPropertyNames(current).forEach(propertyName => {
+    Object.getOwnPropertyNames(current).forEach((propertyName) => {
       if (result[propertyName]) return;
       const value = current[propertyName as keyof typeof current];
       if (value) {

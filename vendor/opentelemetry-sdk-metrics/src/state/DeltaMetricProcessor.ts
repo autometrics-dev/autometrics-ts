@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
-import { Maybe } from '../utils.ts';
-import { Accumulation, Aggregator } from '../aggregator/types.ts';
-import { AttributeHashMap } from './HashMap.ts';
+import {
+  Context,
+  HrTime,
+  MetricAttributes,
+} from "../../../opentelemetry-api/mod.ts";
+import { Maybe } from "../utils.ts";
+import { Accumulation, Aggregator } from "../aggregator/types.ts";
+import { AttributeHashMap } from "./HashMap.ts";
 
 /**
  * Internal interface.
@@ -38,18 +42,18 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
     value: number,
     attributes: MetricAttributes,
     _context: Context,
-    collectionTime: HrTime
+    collectionTime: HrTime,
   ) {
     const accumulation = this._activeCollectionStorage.getOrDefault(
       attributes,
-      () => this._aggregator.createAccumulation(collectionTime)
+      () => this._aggregator.createAccumulation(collectionTime),
     );
     accumulation?.record(value);
   }
 
   batchCumulate(
     measurements: AttributeHashMap<number>,
-    collectionTime: HrTime
+    collectionTime: HrTime,
   ) {
     Array.from(measurements.entries()).forEach(
       ([attributes, value, hashCode]) => {
@@ -63,7 +67,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const previous = this._cumulativeMemoStorage.get(
             attributes,
-            hashCode
+            hashCode,
           )!;
           delta = this._aggregator.diff(previous, accumulation);
         }
@@ -73,7 +77,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const active = this._activeCollectionStorage.get(
             attributes,
-            hashCode
+            hashCode,
           )!;
           delta = this._aggregator.merge(active, delta);
         }
@@ -81,7 +85,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
         // Save the current record and the delta record.
         this._cumulativeMemoStorage.set(attributes, accumulation, hashCode);
         this._activeCollectionStorage.set(attributes, delta, hashCode);
-      }
+      },
     );
   }
 

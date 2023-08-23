@@ -28,29 +28,29 @@ import {
   ObservableCounter,
   ObservableGauge,
   ObservableUpDownCounter,
-} from '@opentelemetry/api';
-import { millisToHrTime } from '@opentelemetry/core';
-import { InstrumentDescriptor } from './InstrumentDescriptor.ts';
-import { ObservableRegistry } from './state/ObservableRegistry.ts';
+} from "../../opentelemetry-api/mod.ts";
+import { millisToHrTime } from "../../opentelemetry-core/mod.ts";
+import { InstrumentDescriptor } from "./InstrumentDescriptor.ts";
+import { ObservableRegistry } from "./state/ObservableRegistry.ts";
 import {
   AsyncWritableMetricStorage,
   WritableMetricStorage,
-} from './state/WritableMetricStorage.ts';
+} from "./state/WritableMetricStorage.ts";
 
 export class SyncInstrument {
   constructor(
     private _writableMetricStorage: WritableMetricStorage,
-    protected _descriptor: InstrumentDescriptor
+    protected _descriptor: InstrumentDescriptor,
   ) {}
 
   protected _record(
     value: number,
     attributes: MetricAttributes = {},
-    context: Context = contextApi.active()
+    context: Context = contextApi.active(),
   ) {
-    if (typeof value !== 'number') {
+    if (typeof value !== "number") {
       diag.warn(
-        `non-number value provided to metric ${this._descriptor.name}: ${value}`
+        `non-number value provided to metric ${this._descriptor.name}: ${value}`,
       );
       return;
     }
@@ -59,7 +59,7 @@ export class SyncInstrument {
       !Number.isInteger(value)
     ) {
       diag.warn(
-        `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`
+        `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`,
       );
       value = Math.trunc(value);
       // ignore non-finite values.
@@ -71,7 +71,7 @@ export class SyncInstrument {
       value,
       attributes,
       context,
-      millisToHrTime(Date.now())
+      millisToHrTime(Date.now()),
     );
   }
 }
@@ -101,7 +101,7 @@ export class CounterInstrument extends SyncInstrument implements Counter {
   add(value: number, attributes?: MetricAttributes, ctx?: Context): void {
     if (value < 0) {
       diag.warn(
-        `negative value provided to counter ${this._descriptor.name}: ${value}`
+        `negative value provided to counter ${this._descriptor.name}: ${value}`,
       );
       return;
     }
@@ -120,7 +120,7 @@ export class HistogramInstrument extends SyncInstrument implements Histogram {
   record(value: number, attributes?: MetricAttributes, ctx?: Context): void {
     if (value < 0) {
       diag.warn(
-        `negative value provided to histogram ${this._descriptor.name}: ${value}`
+        `negative value provided to histogram ${this._descriptor.name}: ${value}`,
       );
       return;
     }
@@ -137,7 +137,7 @@ export class ObservableInstrument implements Observable {
   constructor(
     descriptor: InstrumentDescriptor,
     metricStorages: AsyncWritableMetricStorage[],
-    private _observableRegistry: ObservableRegistry
+    private _observableRegistry: ObservableRegistry,
   ) {
     this._descriptor = descriptor;
     this._metricStorages = metricStorages;
@@ -169,7 +169,7 @@ export class ObservableUpDownCounterInstrument
   implements ObservableUpDownCounter {}
 
 export function isObservableInstrument(
-  it: unknown
+  it: unknown,
 ): it is ObservableInstrument {
   return it instanceof ObservableInstrument;
 }

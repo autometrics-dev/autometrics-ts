@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import { validateKey, validateValue } from '../internal/validators.ts';
+import * as api from "../../../opentelemetry-api/mod.ts";
+import { validateKey, validateValue } from "../internal/validators.ts";
 
 const MAX_TRACE_STATE_ITEMS = 32;
 const MAX_TRACE_STATE_LEN = 512;
-const LIST_MEMBERS_SEPARATOR = ',';
-const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
+const LIST_MEMBERS_SEPARATOR = ",";
+const LIST_MEMBER_KEY_VALUE_SPLITTER = "=";
 
 /**
  * TraceState must be a class and not a simple object type because of the spec
@@ -93,7 +93,7 @@ export class TraceState implements api.TraceState {
       this._internalState = new Map(
         Array.from(this._internalState.entries())
           .reverse() // Use reverse same as original tracestate parse chain
-          .slice(0, MAX_TRACE_STATE_ITEMS)
+          .slice(0, MAX_TRACE_STATE_ITEMS),
       );
     }
   }

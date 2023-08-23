@@ -20,13 +20,13 @@ import {
   Meter as IMeter,
   MeterOptions,
   createNoopMeter,
-} from '@opentelemetry/api';
-import { IResource, Resource } from '@opentelemetry/resources';
-import { MetricReader } from './export/MetricReader.ts';
-import { MeterProviderSharedState } from './state/MeterProviderSharedState.ts';
-import { MetricCollector } from './state/MetricCollector.ts';
-import { ForceFlushOptions, ShutdownOptions } from './types.ts';
-import { View } from './view/View.ts';
+} from "../../opentelemetry-api/mod.ts";
+import { IResource, Resource } from "../../opentelemetry-resources/mod.ts";
+import { MetricReader } from "./export/MetricReader.ts";
+import { MeterProviderSharedState } from "./state/MeterProviderSharedState.ts";
+import { MetricCollector } from "./state/MetricCollector.ts";
+import { ForceFlushOptions, ShutdownOptions } from "./types.ts";
+import { View } from "./view/View.ts";
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
@@ -46,7 +46,7 @@ export class MeterProvider implements IMeterProvider {
 
   constructor(options?: MeterProviderOptions) {
     const resource = Resource.default().merge(
-      options?.resource ?? Resource.empty()
+      options?.resource ?? Resource.empty(),
     );
     this._sharedState = new MeterProviderSharedState(resource);
     if (options?.views != null && options.views.length > 0) {
@@ -59,10 +59,10 @@ export class MeterProvider implements IMeterProvider {
   /**
    * Get a meter with the configuration of the MeterProvider.
    */
-  getMeter(name: string, version = '', options: MeterOptions = {}): IMeter {
+  getMeter(name: string, version = "", options: MeterOptions = {}): IMeter {
     // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meter-creation
     if (this._shutdown) {
-      diag.warn('A shutdown MeterProvider cannot provide a Meter');
+      diag.warn("A shutdown MeterProvider cannot provide a Meter");
       return createNoopMeter();
     }
 
@@ -93,16 +93,16 @@ export class MeterProvider implements IMeterProvider {
    */
   async shutdown(options?: ShutdownOptions): Promise<void> {
     if (this._shutdown) {
-      diag.warn('shutdown may only be called once per MeterProvider');
+      diag.warn("shutdown may only be called once per MeterProvider");
       return;
     }
 
     this._shutdown = true;
 
     await Promise.all(
-      this._sharedState.metricCollectors.map(collector => {
+      this._sharedState.metricCollectors.map((collector) => {
         return collector.shutdown(options);
-      })
+      }),
     );
   }
 
@@ -114,14 +114,14 @@ export class MeterProvider implements IMeterProvider {
   async forceFlush(options?: ForceFlushOptions): Promise<void> {
     // do not flush after shutdown
     if (this._shutdown) {
-      diag.warn('invalid attempt to force flush after MeterProvider shutdown');
+      diag.warn("invalid attempt to force flush after MeterProvider shutdown");
       return;
     }
 
     await Promise.all(
-      this._sharedState.metricCollectors.map(collector => {
+      this._sharedState.metricCollectors.map((collector) => {
         return collector.forceFlush(options);
-      })
+      }),
     );
   }
 }

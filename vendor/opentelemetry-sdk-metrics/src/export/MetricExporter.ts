@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { AggregationTemporality } from './AggregationTemporality.ts';
-import { ResourceMetrics } from './MetricData.ts';
-import { ExportResult } from '@opentelemetry/core';
-import { InstrumentType } from '../InstrumentDescriptor.ts';
-import { Aggregation } from '../view/Aggregation.ts';
+import { AggregationTemporality } from "./AggregationTemporality.ts";
+import { ResourceMetrics } from "./MetricData.ts";
+import { ExportResult } from "../../../opentelemetry-core/mod.ts";
+import { InstrumentType } from "../InstrumentDescriptor.ts";
+import { Aggregation } from "../view/Aggregation.ts";
 
 /**
  * An interface that allows different metric services to export recorded data
@@ -34,7 +34,7 @@ export interface PushMetricExporter {
    */
   export(
     metrics: ResourceMetrics,
-    resultCallback: (result: ExportResult) => void
+    resultCallback: (result: ExportResult) => void,
   ): void;
 
   /**
@@ -48,7 +48,7 @@ export interface PushMetricExporter {
    * {@link InstrumentType} for this exporter.
    */
   selectAggregationTemporality?(
-    instrumentType: InstrumentType
+    instrumentType: InstrumentType,
   ): AggregationTemporality;
 
   /**

@@ -19,7 +19,7 @@ import {
   SamplingDecision,
   SamplingResult,
   isValidTraceId,
-} from '@opentelemetry/api';
+} from "../../../../opentelemetry-api/mod.ts";
 
 /**
  * @deprecated Use the one defined in @opentelemetry/sdk-trace-base instead.
@@ -47,7 +47,7 @@ export class TraceIdRatioBasedSampler implements Sampler {
   }
 
   private _normalize(ratio: number): number {
-    if (typeof ratio !== 'number' || isNaN(ratio)) return 0;
+    if (typeof ratio !== "number" || isNaN(ratio)) return 0;
     return ratio >= 1 ? 1 : ratio <= 0 ? 0 : ratio;
   }
 

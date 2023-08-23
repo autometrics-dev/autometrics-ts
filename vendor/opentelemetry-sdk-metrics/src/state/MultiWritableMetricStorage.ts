@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
-import { WritableMetricStorage } from './WritableMetricStorage.ts';
+import {
+  Context,
+  HrTime,
+  MetricAttributes,
+} from "../../../opentelemetry-api/mod.ts";
+import { WritableMetricStorage } from "./WritableMetricStorage.ts";
 
 /**
  * Internal interface.
@@ -27,9 +31,9 @@ export class MultiMetricStorage implements WritableMetricStorage {
     value: number,
     attributes: MetricAttributes,
     context: Context,
-    recordTime: HrTime
+    recordTime: HrTime,
   ) {
-    this._backingStorages.forEach(it => {
+    this._backingStorages.forEach((it) => {
       it.record(value, attributes, context, recordTime);
     });
   }
