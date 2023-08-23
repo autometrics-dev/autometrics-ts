@@ -21,16 +21,8 @@ import {
   AggregationTemporality,
   MetricReader,
 } from "../../opentelemetry-sdk-metrics/mod.ts";
-import {
-  createServer,
-  IncomingMessage,
-  Server,
-  ServerResponse,
-} from "node:http";
 import { ExporterConfig } from "./export/types.ts";
 import { PrometheusSerializer } from "./PrometheusSerializer.ts";
-/** Node.js v8.x compat */
-import { URL } from "node:url";
 
 export class PrometheusExporter extends MetricReader {
   static readonly DEFAULT_OPTIONS = {
@@ -45,7 +37,8 @@ export class PrometheusExporter extends MetricReader {
   private readonly _port: number;
   private readonly _baseUrl: string;
   private readonly _endpoint: string;
-  private readonly _server: Server;
+  private _server?: Deno.Server;
+  private _serverAbort?: AbortController;
   private readonly _prefix?: string;
   private readonly _appendTimestamp: boolean;
   private _serializer: PrometheusSerializer;
@@ -81,8 +74,6 @@ export class PrometheusExporter extends MetricReader {
       typeof config.appendTimestamp === "boolean"
         ? config.appendTimestamp
         : PrometheusExporter.DEFAULT_OPTIONS.appendTimestamp;
-    // unref to prevent prometheus exporter from holding the process open on exit
-    this._server = createServer(this._requestHandler).unref();
     this._serializer = new PrometheusSerializer(
       this._prefix,
       this._appendTimestamp,
@@ -120,25 +111,16 @@ export class PrometheusExporter extends MetricReader {
   stopServer(): Promise<void> {
     if (!this._server) {
       diag.debug(
-        "Prometheus stopServer() was called but server was never started.",
+        "Prometheus stopServer() was called but server wasn't started.",
       );
       return Promise.resolve();
     } else {
-      return new Promise((resolve) => {
-        this._server.close((err) => {
-          if (!err) {
-            diag.debug("Prometheus exporter was stopped");
-          } else {
-            if (
-              (err as unknown as { code: string }).code !==
-              "ERR_SERVER_NOT_RUNNING"
-            ) {
-              globalErrorHandler(err);
-            }
-          }
-          resolve();
-        });
-      });
+      this._serverAbort?.abort();
+      return this._server.finished
+        .then(() => {
+          this._server = undefined;
+        })
+        .catch(globalErrorHandler);
     }
   }
 
@@ -147,32 +129,49 @@ export class PrometheusExporter extends MetricReader {
    */
   startServer(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._server.once("error", reject);
-      this._server.listen(
-        {
-          port: this._port,
-          host: this._host,
-        },
-        () => {
-          diag.debug(
-            `Prometheus exporter server started: ${this._host}:${this._port}/${this._endpoint}`,
-          );
-          resolve();
-        },
-      );
+      try {
+        this._serverAbort = new AbortController();
+        this._server = Deno.serve(
+          {
+            hostname: this._host,
+            port: this._port,
+            onListen: () => {
+              diag.debug(
+                `Prometheus exporter server started: ${this._host}:${this._port}/${this._endpoint}`,
+              );
+              resolve();
+            },
+            signal: this._serverAbort.signal,
+          },
+          this._requestHandler,
+        );
+        this._server.unref();
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 
   /**
-   * Request handler that responds with the current state of metrics
-   * @param _request Incoming HTTP request of server instance
-   * @param response HTTP response object used to response to request
+   * Creates a response for the current state of metrics.
    */
-  public getMetricsRequestHandler(
-    _request: IncomingMessage,
-    response: ServerResponse,
-  ): void {
-    this._exportMetrics(response);
+  public async getMetricsResponse(): Promise<Response> {
+    try {
+      const { resourceMetrics, errors } = await this.collect();
+      if (errors.length) {
+        diag.error("PrometheusExporter: metrics collection errors", ...errors);
+      }
+
+      return new Response(this._serializer.serialize(resourceMetrics), {
+        status: 200,
+        headers: { "content-type": "text/plain" },
+      });
+    } catch (error) {
+      return new Response(`# failed to export metrics: ${error}`, {
+        status: 500,
+        headers: { "content-type": "text/plain" },
+      });
+    }
   }
 
   /**
@@ -183,47 +182,22 @@ export class PrometheusExporter extends MetricReader {
    * @param response HTTP response object used to respond to request
    */
   private _requestHandler = (
-    request: IncomingMessage,
-    response: ServerResponse,
-  ) => {
+    request: Request,
+  ): Response | Promise<Response> => {
     if (
       request.url != null &&
       new URL(request.url, this._baseUrl).pathname === this._endpoint
     ) {
-      this._exportMetrics(response);
+      return this.getMetricsResponse();
     } else {
-      this._notFound(response);
+      return this._notFound();
     }
-  };
-
-  /**
-   * Responds to incoming message with current state of all metrics.
-   */
-  private _exportMetrics = (response: ServerResponse) => {
-    response.statusCode = 200;
-    response.setHeader("content-type", "text/plain");
-    this.collect().then(
-      (collectionResult) => {
-        const { resourceMetrics, errors } = collectionResult;
-        if (errors.length) {
-          diag.error(
-            "PrometheusExporter: metrics collection errors",
-            ...errors,
-          );
-        }
-        response.end(this._serializer.serialize(resourceMetrics));
-      },
-      (err) => {
-        response.end(`# failed to export metrics: ${err}`);
-      },
-    );
   };
 
   /**
    * Responds with 404 status code to all requests that do not match the configured endpoint.
    */
-  private _notFound = (response: ServerResponse) => {
-    response.statusCode = 404;
-    response.end();
-  };
+  private _notFound(): Response {
+    return new Response(null, { status: 404 });
+  }
 }
