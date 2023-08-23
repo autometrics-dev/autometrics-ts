@@ -51,24 +51,16 @@ for (const [dir, name] of Object.entries(packages)) {
     },
     mappings: {
       "./packages/lib/platform.deno.ts": "./packages/lib/platform.node.ts",
-      "./vendor/opentelemetry-api/mod.ts": {
+      "./packages/lib/vendor/opentelemetry-api/mod.ts": {
         name: "@opentelemetry/api",
         peerDependency: true,
         version: "^1.4.0",
       },
-      "./vendor/opentelemetry-core/mod.ts": {
-        name: "@opentelemetry/core",
-        version: "^1.15.0",
-      },
-      "./vendor/opentelemetry-exporter-prometheus/mod.ts": {
+      "./packages/lib/vendor/opentelemetry-exporter-prometheus/mod.ts": {
         name: "@opentelemetry/exporter-prometheus",
         version: "^0.41.0",
       },
-      "./vendor/opentelemetry-resources/mod.ts": {
-        name: "@opentelemetry/resources",
-        version: "^1.15.0",
-      },
-      "./vendor/opentelemetry-sdk-metrics/mod.ts": {
+      "./packages/lib/vendor/opentelemetry-sdk-metrics/mod.ts": {
         name: "@opentelemetry/sdk-metrics",
         version: "^1.15.0",
       },
@@ -83,7 +75,7 @@ for (const [dir, name] of Object.entries(packages)) {
       // steps to run after building and before running the tests
       Deno.copyFileSync("LICENSE", `${OUT_DIR}/${dir}/LICENSE`);
       Deno.copyFileSync(
-        `packages/${dir}/README.md`,
+        `packages/${dir}/README.node.md`,
         `${OUT_DIR}/${dir}/README.md`,
       );
     },

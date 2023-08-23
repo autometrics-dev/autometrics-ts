@@ -1,4 +1,4 @@
-import type { otelApi } from "./deps.ts";
+import type { UpDownCounter } from "./vendor/opentelemetry-api/mod.ts";
 
 import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants.ts";
 import { getBranch, getCommit, getVersion } from "./platform.deno.ts";
@@ -46,7 +46,7 @@ export type BuildInfo = {
  * @internal
  */
 export let buildInfo: BuildInfo = {};
-let buildInfoGauge: otelApi.UpDownCounter;
+let buildInfoGauge: UpDownCounter;
 
 /**
  * Records the build info for the application.

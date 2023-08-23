@@ -1,14 +1,18 @@
+import {
+  AggregationTemporality,
+  InMemoryMetricExporter,
+  PeriodicExportingMetricReader,
+} from "../vendor/opentelemetry-sdk-metrics/mod.ts";
 import { Autometrics, autometrics, init } from "../mod.ts";
 import { assertMatch, assertRejects } from "./deps.ts";
 import { collectAndSerialize } from "./util.ts";
 import { getMetricsProvider } from "../instrumentation.ts";
-import { otelSdkMetrics } from "../deps.ts";
 
 /*Deno.test("Autometrics integration test", async (t) => {
-  const exporter = new otelSdkMetrics.PeriodicExportingMetricReader({
+  const exporter = new PeriodicExportingMetricReader({
     // 0 - using delta aggregation temporality setting
     // to ensure data submitted to the gateway is accurate
-    exporter: new otelSdkMetrics.InMemoryMetricExporter(otelSdkMetrics.AggregationTemporality.DELTA),
+    exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
   });
 
   init({ exporter });
