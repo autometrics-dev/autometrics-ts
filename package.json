@@ -4,7 +4,9 @@
   "name": "autometrics-monorepo",
   "workspaces": [
     "packages/autometrics",
-    "packages/lib",
+    "packages/exporter-otlp-http",
+    "packages/exporter-prometheus",
+    "packages/exporter-push-gateway",
     "packages/parcel-transformer-autometrics",
     "packages/typescript-plugin"
   ],

@@ -1,11 +1,11 @@
 {
   "extends": "../../tsconfig.common.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "outDir": "dist/"
+    "module": "esnext",
+    "outDir": "./dist",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
   },
-  "include": [
-    "./src"
-  ]
+  "include": ["./src"],
+  "exclude": ["node_modules", "dist"]
 }

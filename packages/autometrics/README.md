@@ -1,38 +1,32 @@
-# `autometrics`
-
-This is the basic convenience package that bundles the wrapper library and
-OpenTelemetry dependencies.
+# `@autometrics/autometrics` 📈✨
 
 ## Documentation
 
-Full documentation for `autometrics` library can be found
+Full documentation for `@autometrics/autometrics` library can be found
 [here](https://github.com/autometrics-dev/autometrics-ts).
 
-## Installation
+## Installation: autometrics and peer dependencies
 
 ```shell
 # npm
-npm install autometrics
+npm install @autometrics/autometrics
 
 # yarn
-yarn add autometrics
+yarn add @autometrics/autometrics
 
 # pnpm
-pnpm add autometrics
+pnpm add @autometrics/autometrics
 ```
 
-## Usage
-
-1. Anywhere in your source code:
+## Basic example
 
 ```typescript
-import { autometrics } from "autometrics";
+import { autometrics } from "@autometrics/autometrics";
 
-async function createUserRaw(payload: User) {
+async function createUser(payload: User) {
   // ...
 }
 
-const createUser = autometrics(createUserRaw);
+const user = autometrics(createUser);
     // ^ instrumented function
 ```
-

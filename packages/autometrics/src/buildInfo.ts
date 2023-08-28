@@ -1,6 +1,6 @@
-import { getMeter } from "./instrumentation";
-import { getRuntime, Runtime } from "./utils";
 import { UpDownCounter } from "@opentelemetry/api";
+
+import { getRuntime, Runtime } from "./utils";
 import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants";
 
 /**
@@ -16,11 +16,13 @@ export type BuildInfo = {
    * environment variable: `AUTOMETRICS_VERSION` or `PACKAGE_VERSION`.
    */
   version?: string;
+
   /**
    * The current commit hash of the application. Should be set through an
    * environment variable: `AUTOMETRICS_COMMIT` or `COMMIT_SHA`.
    */
   commit?: string;
+
   /**
    * The current commit hash of the application. Should be set through an
    * environment variable: `AUTOMETRICS_BRANCH` or `BRANCH_NAME`.
@@ -44,7 +46,13 @@ export type BuildInfo = {
  *
  * @internal
  */
-export let buildInfo: BuildInfo = {};
+const buildInfo: BuildInfo = {
+  version: "",
+  commit: "",
+  branch: "",
+  clearmode: "",
+};
+
 let buildInfoGauge: UpDownCounter;
 
 /**
@@ -52,7 +60,13 @@ let buildInfoGauge: UpDownCounter;
  *
  * @internal
  */
-export function recordBuildInfo(buildInfo: BuildInfo) {
+export function recordBuildInfo(info: BuildInfo) {
+  for (const key of Object.keys(buildInfo)) {
+    if (key in info) {
+      buildInfo[key] = info[key];
+    }
+  }
+
   if (!buildInfoGauge) {
     buildInfoGauge = getMeter().createUpDownCounter(BUILD_INFO_NAME, {
       description: BUILD_INFO_DESCRIPTION,
@@ -63,26 +77,22 @@ export function recordBuildInfo(buildInfo: BuildInfo) {
 }
 
 /**
- * Sets the build info for the application.
+ * Initializes the build info for the application, if necessary.
  *
  * @internal
  */
-export function setBuildInfo() {
+export function initBuildInfo() {
   if (Object.keys(buildInfo).length > 0) {
-    return buildInfo;
+    return;
   }
 
   const runtime = getRuntime();
 
-  buildInfo = {
+  recordBuildInfo({
     version: getVersion(runtime),
     commit: getCommit(runtime),
     branch: getBranch(runtime),
-  };
-
-  recordBuildInfo(buildInfo);
-
-  return buildInfo;
+  });
 }
 
 /**

@@ -11,34 +11,38 @@ import {
   PeriodicExportingMetricReader,
   View,
 } from "@opentelemetry/sdk-metrics";
-import { BuildInfo, buildInfo, recordBuildInfo } from "./buildInfo";
-import { HISTOGRAM_NAME } from "./constants";
+import {
+  BuildInfo,
+  HISTOGRAM_NAME,
+  recordBuildInfo,
+} from "@autometrics/autometrics";
 
 let globalShouldEagerlyPush = false;
 let pushMetrics = () => {};
 let autometricsMeterProvider: MeterProvider;
 let exporter: MetricReader;
 
-type Exporter = MetricReader;
-
 /**
  * @group Initialization API
  */
-export type initOptions = {
+export type InitOptions = {
   /**
-   * A custom exporter to be used instead of the bundled Prometheus Exporter on port 9464
+   * The full URL (including http://) of the aggregating push gateway for
+   * metrics to be submitted to.
    */
-  exporter?: Exporter;
+  url: string;
+
   /**
-   * The full URL (including http://) of the aggregating push gateway for metrics to be submitted to.
-   */
-  pushGateway?: string;
-  /**
-   * Set a custom push interval in ms (default: 5000ms)
+   * The interval for pushing metrics, in milliseconds (default: 5000ms).
+   *
+   * Set to `0` to push eagerly without batching metrics. This may be useful for
+   * edge functions and some client-side scenarios.
    */
   pushInterval?: number;
+
   /**
-   * Optional build info to be added to the build_info metric (necessary for client-side applications).
+   * Optional build info to be added to the `build_info` metric (necessary for
+   * client-side applications).
    *
    * See {@link BuildInfo}
    */
@@ -46,47 +50,37 @@ export type initOptions = {
 };
 
 /**
- * Optional initialization function to set a custom exporter or push gateway for client-side applications.
- * Required if using autometrics in a client-side application. See {@link initOptions} for details.
+ * @param {InitOptions} options
  *
- * @param {initOptions} options
  * @group Initialization API
  */
-export function init(options: initOptions) {
-  logger("Using the user's Exporter configuration");
-  exporter = options.exporter;
-  // if a pushGateway is added we overwrite the exporter
-  if (options.pushGateway) {
-    // INVESTIGATE - Do we want a periodic exporter when we're pushing metrics eagerly?
-    exporter = new PeriodicExportingMetricReader({
-      // 0 - using delta aggregation temporality setting
-      // to ensure data submitted to the gateway is accurate
-      exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
-    });
-    // Make sure the provider is initialized and exporter is registered
-    getMetricsProvider();
+export function init({ url, pushInterval = 5000, buildInfo }: InitOptions) {
+  logger(`Exporting using the push gateway at ${url}`);
 
-    const interval = options.pushInterval ?? 5000;
-    pushMetrics = () => pushToGateway(options.pushGateway);
+  // INVESTIGATE - Do we want a periodic exporter when we're pushing metrics eagerly?
+  exporter = new PeriodicExportingMetricReader({
+    // 0 - using delta aggregation temporality setting
+    // to ensure data submitted to the gateway is accurate
+    exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
+  });
+  // Make sure the provider is initialized and exporter is registered
+  getMetricsProvider();
 
-    if (interval > 0) {
-      setInterval(pushMetrics, interval);
-    } else if (interval === 0) {
-      logger("Configuring autometrics to push metrics eagerly");
-      globalShouldEagerlyPush = true;
-    } else {
-      console.error("Invalid pushInterval, metrics will not be pushed");
-    }
+  pushMetrics = () => pushToGateway(url);
+
+  if (pushInterval > 0) {
+    setInterval(pushMetrics, pushInterval);
+  } else if (pushInterval === 0) {
+    logger("Configuring autometrics to push metrics eagerly");
+    globalShouldEagerlyPush = true;
+  } else {
+    console.error("Invalid pushInterval, metrics will not be pushed");
   }
 
   // buildInfo is added to init function only for client-side applications
   // if it is provided - we register it
-  if (options.buildInfo) {
+  if (buildInfo) {
     logger("Registering build info");
-    buildInfo.version = options.buildInfo?.version ?? "";
-    buildInfo.commit = options.buildInfo?.commit ?? "";
-    buildInfo.branch = options.buildInfo?.branch ?? "";
-    buildInfo.clearmode = options.buildInfo?.clearmode ?? "";
     recordBuildInfo(buildInfo); // record build info only after the exporter is initialized
   }
 }

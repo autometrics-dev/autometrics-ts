@@ -1,5 +1,6 @@
 import { Attributes } from "@opentelemetry/api";
-import { setBuildInfo } from "./buildInfo";
+
+import { initBuildInfo } from "./buildInfo";
 import {
   COUNTER_DESCRIPTION,
   COUNTER_NAME,
@@ -8,7 +9,6 @@ import {
   HISTOGRAM_DESCRIPTION,
   HISTOGRAM_NAME,
 } from "./constants";
-import { eagerlyPushMetricsIfConfigured, getMeter } from "./instrumentation";
 import type { Objective } from "./objectives";
 import {
   ALSInstance,
@@ -224,18 +224,20 @@ export function autometrics<F extends FunctionSig>(
     return fn;
   }
 
-  const counterObjectiveAttributes: Attributes = {};
-  const histogramObjectiveAttributes: Attributes = {};
+  // NOTE - Gravel Gateway will reject two metrics of the same name if one of
+  //        them has a subset of the attributes of the other. This means to be
+  //        able to support functions that have objectives, as well as functions
+  //        that default to setting the objective_* labels to the empty string.
+  const counterObjectiveAttributes: Attributes = {
+    objective_name: "",
+    objective_percentile: "",
+  };
 
-  // NOTE - Gravel Gateway will reject two metrics of the same name if one of them has a subset of the attributes of the other
-  //        This means to be able to support functions that have objectives, as well as functions that don't, we need to
-  //        default to setting the objective_* labels to the empty string.
-  histogramObjectiveAttributes.objective_name = "";
-  histogramObjectiveAttributes.objective_latency_threshold = "";
-  histogramObjectiveAttributes.objective_percentile = "";
-
-  counterObjectiveAttributes.objective_name = "";
-  counterObjectiveAttributes.objective_percentile = "";
+  const histogramObjectiveAttributes: Attributes = {
+    objective_name: "",
+    objective_latency_threshold: "",
+    objective_percentile: "",
+  };
 
   if (objective) {
     const { latency, name, successRate } = objective;
@@ -255,7 +257,7 @@ export function autometrics<F extends FunctionSig>(
   }
 
   const meter = getMeter();
-  setBuildInfo();
+  initBuildInfo();
   const counter = meter.createCounter(COUNTER_NAME, {
     description: COUNTER_DESCRIPTION,
   });
