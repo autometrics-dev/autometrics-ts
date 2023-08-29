@@ -31,7 +31,7 @@ Autometrics provides a wrapper function and decorator to instrument functions, c
 ## Example
 
 ```typescript
-import { autometrics } from "autometrics";
+import { autometrics } from "@autometrics/autometrics";
 
 const createUserWithMetrics = autometrics(async function createUser(payload: User) {
   // ...
@@ -47,17 +47,17 @@ createUserWithMetrics();
 1. **Install the library**
 
 ```bash
-npm install --save autometrics
+npm install @autometrics/autometrics
 # or
-yarn add --save autometrics
+yarn add @autometrics/autometrics
 # or
-pnpm add --save autometrics
+pnpm add @autometrics/autometrics
 ```
 
 2. **Instrument your code using the `autometrics` wrapper or `Autometrics` decorator**
 
 ```typescript
-import { autometrics } from "autometrics";
+import { autometrics } from "@autometrics/autometrics";
 
 const createUserWithMetrics = autometrics(async function createUser(payload: User) {
   // ...
@@ -67,7 +67,7 @@ createUserWithMetrics();
 ```
 
 ```typescript
-import { Autometrics } from "autometrics";
+import { Autometrics } from "@autometrics/autometrics";
 
 class User {
   @Autometrics()
@@ -130,6 +130,68 @@ Add the language service plugin to the `tsconfig.json` file:
 ## [Documentation](https://docs.autometrics.dev/typescript/quickstart)
 
 ## [API Reference](./packages/lib/reference/README.md)
+
+## Recipes
+
+### Server-side example with Prometheus
+
+#### Installation
+
+```shell
+npm install @autometrics/autometrics @autometrics/exporter-prometheus
+# or
+yarn add @autometrics/autometrics @autometrics/exporter-prometheus
+# or
+pnpm add @autometrics/autometrics @autometrics/exporter-prometheus
+```
+
+#### Usage
+
+1. Anywhere in your source code:
+
+```typescript
+import { autometrics } from "@autometrics/autometrics";
+import { init } from "@autometrics/exporter-prometheus";
+
+init(); // starts the webserver with the `/metrics` endpoint on port 4964
+
+async function createUserRaw(payload: User) {
+  // ...
+}
+
+const createUser = autometrics(createUserRaw);
+   // ^ instrumented function
+```
+
+### Recipe: Client-side example with the OpenTelemetry Collector
+
+#### Installation
+
+```shell
+npm install @autometrics/autometrics @autometrics/exporter-otlp-http
+# or
+yarn add @autometrics/autometrics @autometrics/exporter-otlp-http
+# or
+pnpm add @autometrics/autometrics @autometrics/exporter-otlp-http
+```
+
+#### Usage
+
+1. Anywhere in your source code:
+
+```typescript
+import { autometrics } from "@autometrics/autometrics";
+import { init } from "@autometrics/exporter-otlp-http";
+
+init({ url: "https://<your-otel-collector>" });
+
+async function createUserRaw(payload: User) {
+  // ...
+}
+
+const createUser = autometrics(createUserRaw);
+   // ^ instrumented function
+```
 
 ## Contributing
 

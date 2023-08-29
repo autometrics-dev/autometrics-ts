@@ -1,12 +1,14 @@
 import { UpDownCounter } from "@opentelemetry/api";
 
-import { getRuntime, Runtime } from "./utils";
 import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants";
+import { debug } from "./logger";
+import { getMeter } from "./exporter";
+import { getRuntime, Runtime } from "./utils";
 
 /**
- * BuildInfo is used to create the `build_info` metric that
- * helps to identify the version, commit, and branch of the
- * application, the metrics of which are being collected.
+ * BuildInfo is used to create the `build_info` metric that helps to identify
+ * the version, commit, and branch of the application of which the metrics are
+ * being collected.
  *
  * @group Initialization API
  */
@@ -33,8 +35,8 @@ export type BuildInfo = {
    * The "clearmode" label of the `build_info` metric.
    * This label is used when pushing to a Gravel Gateway
    *
-   * When pushing to a Gravel Gateway, it's recommended to use the "family" clearmode.
-   * See the Gravel Gateways documentation for more details.
+   * When pushing to a Gravel Gateway, it's recommended to use the "family"
+   * clearmode. See the Gravel Gateways documentation for more details.
    */
   clearmode?: "replace" | "aggregate" | "family" | "";
 };
@@ -46,12 +48,7 @@ export type BuildInfo = {
  *
  * @internal
  */
-const buildInfo: BuildInfo = {
-  version: "",
-  commit: "",
-  branch: "",
-  clearmode: "",
-};
+const buildInfo: BuildInfo = {};
 
 let buildInfoGauge: UpDownCounter;
 
@@ -61,11 +58,12 @@ let buildInfoGauge: UpDownCounter;
  * @internal
  */
 export function recordBuildInfo(info: BuildInfo) {
-  for (const key of Object.keys(buildInfo)) {
-    if (key in info) {
-      buildInfo[key] = info[key];
-    }
-  }
+  debug("Recording build info");
+
+  buildInfo.version = info.version ?? "";
+  buildInfo.commit = info.commit ?? "";
+  buildInfo.branch = info.branch ?? "";
+  buildInfo.clearmode = info.clearmode ?? "";
 
   if (!buildInfoGauge) {
     buildInfoGauge = getMeter().createUpDownCounter(BUILD_INFO_NAME, {
@@ -77,26 +75,7 @@ export function recordBuildInfo(info: BuildInfo) {
 }
 
 /**
- * Initializes the build info for the application, if necessary.
- *
- * @internal
- */
-export function initBuildInfo() {
-  if (Object.keys(buildInfo).length > 0) {
-    return;
-  }
-
-  const runtime = getRuntime();
-
-  recordBuildInfo({
-    version: getVersion(runtime),
-    commit: getCommit(runtime),
-    branch: getBranch(runtime),
-  });
-}
-
-/**
- * Gets the version of the application.
+ * Returns the version of the application, based on environment variables.
  *
  * @internal
  */
@@ -117,7 +96,8 @@ function getVersion(runtime: Runtime): string | undefined {
 }
 
 /**
- * Gets the commit hash of the current state of the application.
+ * Returns the commit hash of the current build of the application, based on
+ * environment variables.
  *
  * @internal
  */
@@ -133,7 +113,8 @@ function getCommit(runtime: Runtime) {
 }
 
 /**
- * Gets the current branch of the application.
+ * Returns the branch of the current build of the application, based on
+ * environment variables.
  *
  * @internal
  */

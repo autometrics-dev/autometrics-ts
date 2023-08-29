@@ -1,15 +1,5 @@
 import { Attributes } from "@opentelemetry/api";
 
-import { initBuildInfo } from "./buildInfo";
-import {
-  COUNTER_DESCRIPTION,
-  COUNTER_NAME,
-  GAUGE_DESCRIPTION,
-  GAUGE_NAME,
-  HISTOGRAM_DESCRIPTION,
-  HISTOGRAM_NAME,
-} from "./constants";
-import type { Objective } from "./objectives";
 import {
   ALSInstance,
   getALSCaller,
@@ -19,6 +9,17 @@ import {
   isObject,
   isPromise,
 } from "./utils";
+import {
+  COUNTER_DESCRIPTION,
+  COUNTER_NAME,
+  GAUGE_DESCRIPTION,
+  GAUGE_NAME,
+  HISTOGRAM_DESCRIPTION,
+  HISTOGRAM_NAME,
+} from "./constants";
+import { getMeter, metricsRecorded } from "./exporter";
+import type { Objective } from "./objectives";
+import { trace, warn } from "./logger";
 
 let asyncLocalStorage: ALSInstance | undefined;
 if (typeof window === "undefined") {
@@ -58,24 +59,29 @@ export type AutometricsOptions<F extends FunctionSig> = {
    * @group Wrapper and Decorator API
    */
   functionName?: string;
+
   /**
    * Name of the module (usually filename)
    * @group Wrapper and Decorator API
    */
   moduleName?: string;
+
   /**
    * Include this function's metrics in the specified objective or SLO.
    *
    * See the docs for {@link Objective} for details on how to create objectives.
    */
   objective?: Objective;
+
   /**
    * Pass this argument to track the number of concurrent calls to the function
    * (using a gauge).
+   *
    * This may be most useful for top-level functions such as the main HTTP
    * handler that passes requests off to other functions. (default: `false`)
    */
   trackConcurrency?: boolean;
+
   /**
    * A custom callback function that determines whether a function return should
    * be considered an error by Autometrics. This may be most useful in
@@ -95,6 +101,7 @@ export type AutometricsOptions<F extends FunctionSig> = {
    * ```
    */
   recordErrorIf?: ReportErrorCondition<F>;
+
   /**
    * A custom callback function that determines whether a function result
    * should be considered a success (regardless if it threw an error). This
@@ -105,16 +112,22 @@ export type AutometricsOptions<F extends FunctionSig> = {
 };
 
 /**
- * @internal
+ * Callback type used for the `recordErrorIf` option.
+ *
+ * If this function returns `true`, the given function result will be reported
+ * as a failure in your metrics.
  */
 export type ReportErrorCondition<F extends FunctionSig> = (
   result: Awaited<ReturnType<F>>,
 ) => boolean;
 
 /**
- * @internal
+ * Callback type used for the `recordSuccessIf` option.
+ *
+ * If this function returns `true`, the given error will still be reported as
+ * a success in your metrics.
  */
-export type ReportSuccessCondition = (result: Error) => boolean;
+export type ReportSuccessCondition = (error: unknown) => boolean;
 
 /**
  * Autometrics wrapper for **functions** (requests handlers or database methods)
@@ -173,55 +186,47 @@ export type ReportSuccessCondition = (result: Error) => boolean;
  * @group Wrapper and Decorator API
  */
 export function autometrics<F extends FunctionSig>(
-  functionOrOptions: F | AutometricsOptions<F>,
-  fnInput?: F,
+  fnInput: F,
+): AutometricsWrapper<F>;
+export function autometrics<F extends FunctionSig>(
+  options: AutometricsOptions<F>,
+  fnInput: F,
+): AutometricsWrapper<F>;
+export function autometrics<F extends FunctionSig>(
+  ...args: [F] | [AutometricsOptions<F>, F]
 ): AutometricsWrapper<F> {
-  let functionName: string;
-  let moduleName: string;
-  let fn: F;
+  let functionName: string | undefined;
+  let moduleName: string | undefined;
+  let fn: F | undefined;
   let objective: Objective | undefined;
   let trackConcurrency = false;
   let recordErrorIf: ReportErrorCondition<F> | undefined;
   let recordSuccessIf: ReportSuccessCondition | undefined;
 
-  if (typeof functionOrOptions === "function") {
-    fn = functionOrOptions;
+  const fnOrOptions = args[0];
+  const maybeFn = args[1];
+  if (typeof fnOrOptions === "function") {
+    fn = fnOrOptions;
     functionName = fn.name;
     moduleName = getModulePath();
-  } else {
-    fn = fnInput;
-    functionName =
-      "functionName" in functionOrOptions
-        ? functionOrOptions.functionName
-        : fn.name;
+  } else if (maybeFn) {
+    const options = fnOrOptions;
+    fn = maybeFn;
 
-    moduleName =
-      "moduleName" in functionOrOptions
-        ? functionOrOptions.moduleName
-        : getModulePath();
+    functionName = options.functionName ?? fn.name;
+    moduleName = options.moduleName ?? getModulePath();
 
-    if ("objective" in functionOrOptions) {
-      objective = functionOrOptions.objective;
-    }
-
-    if ("trackConcurrency" in functionOrOptions) {
-      trackConcurrency = functionOrOptions.trackConcurrency;
-    }
-
-    if ("recordErrorIf" in functionOrOptions) {
-      recordErrorIf = functionOrOptions.recordErrorIf;
-    }
-
-    if ("recordSuccessIf" in functionOrOptions) {
-      recordSuccessIf = functionOrOptions.recordSuccessIf;
-    }
+    objective = options.objective;
+    trackConcurrency = options.trackConcurrency ?? false;
+    recordErrorIf = options.recordErrorIf;
+    recordSuccessIf = options.recordSuccessIf;
   }
 
   if (!functionName) {
-    console.trace(
-      "Autometrics decorated function must have a name to successfully create a metric. Function will not be instrumented.",
+    warn(
+      "Decorated functions must have a name to successfully create a metric. Function will not be instrumented.",
     );
-    return fn;
+    return fn as F;
   }
 
   // NOTE - Gravel Gateway will reject two metrics of the same name if one of
@@ -257,7 +262,6 @@ export function autometrics<F extends FunctionSig>(
   }
 
   const meter = getMeter();
-  initBuildInfo();
   const counter = meter.createCounter(COUNTER_NAME, {
     description: COUNTER_DESCRIPTION,
   });
@@ -312,8 +316,7 @@ export function autometrics<F extends FunctionSig>(
         });
       }
 
-      // HACK - Experimental "eager pushing" support
-      eagerlyPushMetricsIfConfigured();
+      metricsRecorded();
     };
 
     const onError = () => {
@@ -342,8 +345,7 @@ export function autometrics<F extends FunctionSig>(
         });
       }
 
-      // HACK - Experimental "eager pushing" support
-      eagerlyPushMetricsIfConfigured();
+      metricsRecorded();
     };
 
     const recordSuccess = (returnValue: Awaited<ReturnType<F>>) => {
@@ -355,11 +357,11 @@ export function autometrics<F extends FunctionSig>(
         }
       } catch (callbackError) {
         onSuccess();
-        console.trace("Error in recordErrorIf function: ", callbackError);
+        trace("Error in recordErrorIf function: ", callbackError);
       }
     };
 
-    const recordError = (error: Error) => {
+    const recordError = (error: unknown) => {
       try {
         if (recordSuccessIf?.(error)) {
           onSuccess();
@@ -368,24 +370,27 @@ export function autometrics<F extends FunctionSig>(
         }
       } catch (callbackError) {
         onError();
-        console.trace("Error in recordSuccessIf function: ", callbackError);
+        trace("Error in recordSuccessIf function: ", callbackError);
       }
     };
 
-    function instrumentedFunction() {
+    function instrumentedFn() {
       try {
+        // @ts-ignore
         const returnValue: ReturnType<F> = fn.apply(this, params);
-        if (isPromise<ReturnType<F>>(returnValue)) {
+        if (isPromise(returnValue)) {
           return returnValue
-            .then((result: Awaited<ReturnType<typeof returnValue>>) => {
+            .then((result: Awaited<typeof returnValue>) => {
               recordSuccess(result);
               return result;
             })
-            .catch((error: Error) => {
+            .catch((error: unknown) => {
               recordError(error);
               throw error;
             });
         }
+
+        // @ts-ignore
         recordSuccess(returnValue);
         return returnValue;
       } catch (error) {
@@ -395,13 +400,10 @@ export function autometrics<F extends FunctionSig>(
     }
 
     if (asyncLocalStorage) {
-      return asyncLocalStorage.run(
-        { caller: functionName },
-        instrumentedFunction,
-      );
+      return asyncLocalStorage.run({ caller: functionName }, instrumentedFn);
     }
 
-    return instrumentedFunction();
+    return instrumentedFn();
   };
 }
 
@@ -443,7 +445,8 @@ type AutometricsDecoratorOptions<F> = F extends FunctionSig
  * ```
  * @example
  *
- * <caption>Method decorator that passes in an autometrics options object including SLO</caption>
+ * <caption>Method decorator that passes in an autometrics options object
+ * including SLO</caption>
  *
  * ```typescript
  * import {
@@ -511,17 +514,17 @@ export function Autometrics<T extends Function | Object>(
 /**
  * Decorator factory that returns a method decorator. Optionally accepts
  * an autometrics options object.
- * @param autometricsOptions
+ *
  * @internal
  */
 export function getAutometricsMethodDecorator(
   autometricsOptions?: AutometricsOptions<FunctionSig>,
 ) {
-  return function (
+  return (
     _target: Object,
     _propertyKey: string,
     descriptor: PropertyDescriptor,
-  ) {
+  ) => {
     const originalFunction = descriptor.value;
     const functionOrOptions = autometricsOptions ?? originalFunction;
     const functionInput = autometricsOptions ? originalFunction : undefined;
@@ -536,13 +539,13 @@ export function getAutometricsMethodDecorator(
  * Decorator factory that returns a class decorator that instruments all methods
  * of a class with autometrics. Optionally accepts an autometrics options
  * object.
- * @param autometricsOptions
+ *
  * @internal
  */
 export function getAutometricsClassDecorator(
   autometricsOptions?: AutometricsClassDecoratorOptions,
 ): ClassDecorator {
-  return function (classConstructor: Function) {
+  return (classConstructor: Function) => {
     const prototype = classConstructor.prototype;
     const propertyNames = Object.getOwnPropertyNames(prototype);
     const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);

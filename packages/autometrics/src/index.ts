@@ -1,4 +1,6 @@
 export * from "./buildInfo";
-export * from "./constants";
+export { registerExporter } from "./exporter";
+export * from "./histograms";
+export * as amLogger from "./logger";
 export * from "./objectives";
 export * from "./wrappers";

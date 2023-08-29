@@ -1,32 +1,74 @@
 # `@autometrics/autometrics` 📈✨
 
+This is the official TypeScript implementation for https://autometrics.dev/.
+
 ## Documentation
 
-Full documentation for `@autometrics/autometrics` library can be found
-[here](https://github.com/autometrics-dev/autometrics-ts).
+Full documentation for the `@autometrics/autometrics` library can be found
+here: https://github.com/autometrics-dev/autometrics-ts
 
-## Installation: autometrics and peer dependencies
+## Recipe: Server-side example with Prometheus
+
+### Installation
 
 ```shell
 # npm
-npm install @autometrics/autometrics
+npm install @autometrics/autometrics @autometrics/exporter-prometheus
 
 # yarn
-yarn add @autometrics/autometrics
+yarn add @autometrics/autometrics @autometrics/exporter-prometheus
 
 # pnpm
-pnpm add @autometrics/autometrics
+pnpm add @autometrics/autometrics @autometrics/exporter-prometheus
 ```
 
-## Basic example
+### Usage
+
+1. Anywhere in your source code:
 
 ```typescript
 import { autometrics } from "@autometrics/autometrics";
+import { init } from "@autometrics/exporter-prometheus";
 
-async function createUser(payload: User) {
+init(); // starts the webserver with the `/metrics` endpoint on port 4964
+
+async function createUserRaw(payload: User) {
   // ...
 }
 
-const user = autometrics(createUser);
-    // ^ instrumented function
+const createUser = autometrics(createUserRaw);
+   // ^ instrumented function
+```
+
+## Recipe: Client-side example with the OpenTelemetry Collector
+
+### Installation
+
+```shell
+# npm
+npm install @autometrics/autometrics @autometrics/exporter-otlp-http
+
+# yarn
+yarn add @autometrics/autometrics @autometrics/exporter-otlp-http
+
+# pnpm
+pnpm add @autometrics/autometrics @autometrics/exporter-otlp-http
+```
+
+### Usage
+
+1. Anywhere in your source code:
+
+```typescript
+import { autometrics } from "@autometrics/autometrics";
+import { init } from "@autometrics/exporter-otlp-http";
+
+init({ url: "https://<your-otel-collector>" });
+
+async function createUserRaw(payload: User) {
+  // ...
+}
+
+const createUser = autometrics(createUserRaw);
+   // ^ instrumented function
 ```

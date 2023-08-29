@@ -1,24 +1,30 @@
-# `autometrics`
+# `@autometrics/exporter-prometheus`
 
-This is the basic convenience package that bundles the wrapper library and
-OpenTelemetry dependencies.
+Export metrics by opening up a Prometheus scrape endpoint.
+
+This package will start a webserver on port 4964, by default, with a
+Prometheus-compatible `/metrics` endpoint.
+
+You should configure your Prometheus instance to scrape this endpoint. For
+instructions on how to do this, please refer to the Prometheus documentation:
+https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config
 
 ## Documentation
 
-Full documentation for `autometrics` library can be found
-[here](https://github.com/autometrics-dev/autometrics-ts).
+Full documentation for the `autometrics` library can be found here:
+https://github.com/autometrics-dev/autometrics-ts.
 
 ## Installation
 
 ```shell
 # npm
-npm install autometrics
+npm install @autometrics/autometrics @autometrics/exporter-prometheus
 
 # yarn
-yarn add autometrics
+yarn add @autometrics/autometrics @autometrics/exporter-prometheus
 
 # pnpm
-pnpm add autometrics
+pnpm add @autometrics/autometrics @autometrics/exporter-prometheus
 ```
 
 ## Usage
@@ -26,13 +32,16 @@ pnpm add autometrics
 1. Anywhere in your source code:
 
 ```typescript
-import { autometrics } from "autometrics";
+import { autometrics } from "@autometrics/autometrics";
+import { init } from "@autometrics/exporter-prometheus";
+
+init(); // starts the webserver with the `/metrics` endpoint on port 4964
 
 async function createUserRaw(payload: User) {
   // ...
 }
 
 const createUser = autometrics(createUserRaw);
-    // ^ instrumented function
+   // ^ instrumented function
 ```
 

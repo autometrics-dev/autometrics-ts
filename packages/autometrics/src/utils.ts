@@ -65,11 +65,11 @@ export function getModulePath(): string | undefined {
       if (call.name?.includes("__decorate")) return true;
     })?.file ?? stack[2]?.file;
 
-  const containsFileProtocol = wrappedFunctionPath.includes("file://");
+  const containsFileProtocol = wrappedFunctionPath?.includes("file://");
 
   // We split away everything up to the root directory of the project,
   // if the path contains file:// we need to remove it
-  return wrappedFunctionPath.replace(
+  return wrappedFunctionPath?.replace(
     containsFileProtocol ? `file://${rootDir}` : rootDir,
     "",
   );
@@ -93,13 +93,14 @@ export function getALSCaller(context?: ALSInstance) {
   }
 }
 
-export function isPromise<T extends Promise<void>>(val: unknown): val is T {
+export function isPromise(value: unknown): value is Promise<unknown> {
   return (
-    typeof val === "object" &&
-    "then" in val &&
-    typeof val.then === "function" &&
-    "catch" in val &&
-    typeof val.catch === "function"
+    typeof value === "object" &&
+    value != null &&
+    "then" in value &&
+    typeof value.then === "function" &&
+    "catch" in value &&
+    typeof value.catch === "function"
   );
 }
 

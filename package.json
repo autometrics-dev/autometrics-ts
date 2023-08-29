@@ -6,7 +6,7 @@
     "packages/autometrics",
     "packages/exporter-otlp-http",
     "packages/exporter-prometheus",
-    "packages/exporter-push-gateway",
+    "packages/exporter-prometheus-push-gateway",
     "packages/parcel-transformer-autometrics",
     "packages/typescript-plugin"
   ],

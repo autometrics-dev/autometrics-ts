@@ -1,8 +1,8 @@
 {
-  "name": "@autometrics/exporter-push-gateway",
+  "name": "@autometrics/exporter-prometheus-push-gateway",
   "version": "0.6.0",
   "type": "module",
-  "description": "Export metrics by pushing them to a gateway endpoint",
+  "description": "Export metrics by pushing them to a Prometheus-compatible gateway",
   "author": "Fiberplane <info@fiberplane.com>",
   "contributors": [
     "Laurynas Keturakis",
@@ -28,6 +28,10 @@
     "docs": "typedoc",
     "dev": "tsup --watch",
     "release": "npm publish"
+  },
+  "dependencies": {
+    "@opentelemetry/exporter-prometheus": ">=0.35.1",
+    "@opentelemetry/sdk-metrics": ">=1.9.0"
   },
   "devDependencies": {
     "@types/node": "^18.14.6",
