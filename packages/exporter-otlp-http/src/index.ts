@@ -34,6 +34,11 @@ export type InitOptions = {
   pushInterval?: number;
 
   /**
+   * The maximum amount of push requests that may be in-flight concurrently.
+   */
+  concurrencyLimit?: number;
+
+  /**
    * The timeout for pushing metrics, in milliseconds (default: `30_000ms`).
    */
   timeout?: number;
@@ -51,12 +56,18 @@ export function init({
   url,
   headers,
   pushInterval = 5_000,
+  concurrencyLimit,
   timeout = 30_000,
   buildInfo,
 }: InitOptions) {
   amLogger.info(`Exporter will push to the OLTP/HTTP endpoint at ${url}`);
 
-  const exporter = new OTLPMetricExporter({ url, headers, keepAlive: true });
+  const exporter = new OTLPMetricExporter({
+    url,
+    headers,
+    concurrencyLimit,
+    keepAlive: true,
+  });
 
   const meterProvider = new MeterProvider({
     views: [createDefaultHistogramView()],

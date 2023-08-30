@@ -1,11 +1,7 @@
 import {
-  AggregationTemporality,
-  InstrumentType,
   MeterProvider,
   MetricReader,
   PeriodicExportingMetricReader,
-  PushMetricExporter,
-  ResourceMetrics,
 } from "@opentelemetry/sdk-metrics";
 import {
   BuildInfo,
@@ -15,11 +11,9 @@ import {
   recordBuildInfo,
   registerExporter,
 } from "@autometrics/autometrics";
-import type { ExportResult } from "@opentelemetry/core";
 import { OnDemandMetricReader } from "@autometrics/on-demand-metric-reader";
-import { PrometheusSerializer } from "@opentelemetry/exporter-prometheus";
 
-const serializer = new PrometheusSerializer();
+import { PushGatewayExporter } from "./pushGatewayExporter";
 
 export type InitOptions = {
   /**
@@ -42,6 +36,11 @@ export type InitOptions = {
   pushInterval?: number;
 
   /**
+   * The maximum amount of push requests that may be in-flight concurrently.
+   */
+  concurrencyLimit?: number;
+
+  /**
    * The timeout for pushing metrics, in milliseconds (default: `30_000ms`).
    */
   timeout?: number;
@@ -62,6 +61,7 @@ export function init({
   url,
   headers,
   pushInterval = 5_000,
+  concurrencyLimit,
   timeout = 30_000,
   buildInfo,
 }: InitOptions) {
@@ -74,7 +74,7 @@ export function init({
 
   amLogger.info(`Exporter will push to the Prometheus push gateway at ${url}`);
 
-  const exporter = new PushGatewayExporter({ url, headers });
+  const exporter = new PushGatewayExporter({ url, headers, concurrencyLimit });
 
   const meterProvider = new MeterProvider({
     views: [createDefaultHistogramView()],
@@ -103,81 +103,12 @@ export function init({
   meterProvider.addMetricReader(metricReader);
 
   registerExporter({
-    getMeter: (name = "autometrics-otlp-http") => meterProvider.getMeter(name),
+    getMeter: (name = "autometrics-prometheus-push-gateway") =>
+      meterProvider.getMeter(name),
     metricsRecorded: shouldEagerlyPush
       ? () => metricReader.forceFlush()
       : undefined,
   });
 
   recordBuildInfo(buildInfo ?? createDefaultBuildInfo());
-}
-
-type PushGatewayExporterOptions = Pick<InitOptions, "url" | "headers">;
-
-class PushGatewayExporter implements PushMetricExporter {
-  private _shutdown = false;
-
-  constructor(private _options: PushGatewayExporterOptions) {}
-
-  export(
-    metrics: ResourceMetrics,
-    resultCallback: (result: ExportResult) => void,
-  ) {
-    // TODO
-  }
-
-  forceFlush(): Promise<void> {
-    throw new Error("Method not implemented.");
-  }
-
-  selectAggregationTemporality(
-    _instrumentType: InstrumentType,
-  ): AggregationTemporality {
-    return AggregationTemporality.DELTA;
-  }
-
-  shutdown(): Promise<void> {
-    this._shutdown = true;
-    return Promise.resolve();
-  }
-}
-
-// TODO - allow custom fetch function to be passed in
-// TODO - allow configuration of timeout for fetch
-async function pushToGateway(
-  metricReader: PeriodicExportingMetricReader,
-  url: string,
-  headers?: HeadersInit,
-) {
-  let serializedMetrics;
-  try {
-    const { resourceMetrics } = await metricReader.collect();
-    serializedMetrics = serializer.serialize(resourceMetrics);
-  } catch (error) {
-    amLogger.trace("Error collecting metrics for push: ", error);
-    return;
-  }
-
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      mode: "cors",
-      body: serializedMetrics,
-      headers,
-      keepalive: true,
-    });
-    if (!response.ok) {
-      amLogger.warn(`Error pushing metrics to gateway: ${response.statusText}`);
-    }
-  } catch (fetchError) {
-    amLogger.trace("Error pushing metrics to gateway: ", fetchError);
-  }
-
-  try {
-    // we flush the metrics at the end of the submission
-    // to ensure the data is not repeated
-    await metricReader.forceFlush();
-  } catch (error) {
-    amLogger.trace("Error flushing metrics after push: ", error);
-  }
 }
