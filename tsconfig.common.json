@@ -8,5 +8,5 @@
     "moduleResolution": "node",
     "strict": true
   },
-  "exclude": ["examples/**", "utils/**"]
+  "exclude": ["examples/**", "node_modules/**", "utils/**"]
 }

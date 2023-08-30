@@ -30,6 +30,7 @@
     "@opentelemetry/sdk-metrics": ">=1.15.0"
   },
   "devDependencies": {
+    "@types/node": "^18.14.6",
     "tsup": "^7.2.0",
     "typescript": "^5.0.4"
   }
