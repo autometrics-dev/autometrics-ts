@@ -75,6 +75,18 @@ export function recordBuildInfo(info: BuildInfo) {
 }
 
 /**
+ * Creates the default `BuildInfo` based on environment variables.
+ */
+export function createDefaultBuildInfo(): BuildInfo {
+  const runtime = getRuntime();
+  return {
+    version: getVersion(runtime),
+    commit: getCommit(runtime),
+    branch: getBranch(runtime),
+  };
+}
+
+/**
  * Returns the version of the application, based on environment variables.
  *
  * @internal

@@ -47,7 +47,7 @@ npx prisma generate
 7. Build and run the application
 
 ```shell
-npm run build && npm run start
+yarn build && yarn start
 ```
 
 The example should run and generate some sample traffic by itself

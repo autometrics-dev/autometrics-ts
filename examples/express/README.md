@@ -33,11 +33,11 @@ npm install
 4. Build and run the application
 
 ```shell
-npm run build
+yarn build
 ```
 
 ```shell
-npm run start
+yarn start
 ```
 
 The example should run and generate some sample traffic by itself

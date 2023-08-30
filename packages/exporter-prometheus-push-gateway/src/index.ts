@@ -7,6 +7,7 @@ import {
 import {
   BuildInfo,
   amLogger,
+  createDefaultBuildInfo,
   createDefaultHistogramView,
   recordBuildInfo,
   registerExporter,
@@ -23,12 +24,22 @@ export type InitOptions = {
   url: string;
 
   /**
+   * Optional headers to send along to the push gateway.
+   */
+  headers?: HeadersInit;
+
+  /**
    * The interval for pushing metrics, in milliseconds (default: 5000ms).
    *
-   * Set to `0` to push eagerly without batching metrics. This may be useful for
-   * edge functions and some client-side scenarios.
+   * Set to `0` to push eagerly without batching metrics. This is mainly useful
+   * for edge functions and some client-side scenarios.
    */
   pushInterval?: number;
+
+  /**
+   * The timeout for pushing metrics, in milliseconds (default: `30_000ms`).
+   */
+  timeout?: number;
 
   /**
    * Optional build info to be added to the `build_info` metric (necessary for
@@ -42,11 +53,17 @@ export type InitOptions = {
 /**
  * Initializes and registers the Push Gateway exporter for Autometrics.
  */
-export function init({ url, pushInterval = 5000, buildInfo }: InitOptions) {
-  amLogger.info(`Exporting using the Prometheus push gateway at ${url}`);
+export function init({
+  url,
+  headers,
+  pushInterval = 5_000,
+  timeout = 30_000,
+  buildInfo,
+}: InitOptions) {
+  amLogger.info(`Exporter will push to the Prometheus push gateway at ${url}`);
 
   // INVESTIGATE - Do we want a periodic exporter when we're pushing metrics eagerly?
-  const exporter = new PeriodicExportingMetricReader({
+  const metricReader = new PeriodicExportingMetricReader({
     // 0 - using delta aggregation temporality setting
     // to ensure data submitted to the gateway is accurate
     exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
@@ -56,16 +73,17 @@ export function init({ url, pushInterval = 5000, buildInfo }: InitOptions) {
     views: [createDefaultHistogramView()],
   });
 
-  meterProvider.addMetricReader(exporter);
+  meterProvider.addMetricReader(metricReader);
 
   function pushMetrics() {
     amLogger.debug("Pushing metrics to gateway");
-    pushToGateway(exporter, url);
+    pushToGateway(metricReader, url, headers);
   }
 
   const shouldEagerlyPush = pushInterval === 0;
 
   if (pushInterval > 0) {
+    // TODO - add a way to stop the push interval
     setInterval(pushMetrics, pushInterval);
   } else if (shouldEagerlyPush) {
     amLogger.debug("Configuring autometrics to push metrics eagerly");
@@ -82,18 +100,15 @@ export function init({ url, pushInterval = 5000, buildInfo }: InitOptions) {
     metricsRecorded: shouldEagerlyPush ? pushMetrics : undefined,
   });
 
-  if (buildInfo) {
-    recordBuildInfo(buildInfo);
-  }
+  recordBuildInfo(buildInfo ?? createDefaultBuildInfo());
 }
 
-// TODO - add a way to stop the push interval
-// TODO - improve error logging
 // TODO - allow custom fetch function to be passed in
 // TODO - allow configuration of timeout for fetch
 async function pushToGateway(
-  exporter: PeriodicExportingMetricReader,
+  metricReader: PeriodicExportingMetricReader,
   url: string,
+  headers?: HeadersInit,
 ) {
   if (typeof fetch === "undefined") {
     amLogger.warn(
@@ -104,8 +119,8 @@ async function pushToGateway(
 
   let serializedMetrics;
   try {
-    const exporterResult = await exporter.collect();
-    serializedMetrics = serializer.serialize(exporterResult.resourceMetrics);
+    const { resourceMetrics } = await metricReader.collect();
+    serializedMetrics = serializer.serialize(resourceMetrics);
   } catch (error) {
     amLogger.trace("Error collecting metrics for push: ", error);
     return;
@@ -116,6 +131,8 @@ async function pushToGateway(
       method: "POST",
       mode: "cors",
       body: serializedMetrics,
+      headers,
+      keepalive: true,
     });
     if (!response.ok) {
       amLogger.warn(`Error pushing metrics to gateway: ${response.statusText}`);
@@ -127,7 +144,7 @@ async function pushToGateway(
   try {
     // we flush the metrics at the end of the submission
     // to ensure the data is not repeated
-    await exporter.forceFlush();
+    await metricReader.forceFlush();
   } catch (error) {
     amLogger.trace("Error flushing metrics after push: ", error);
   }

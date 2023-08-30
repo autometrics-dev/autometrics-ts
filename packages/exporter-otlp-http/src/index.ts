@@ -1,18 +1,24 @@
 import {
+  MeterProvider,
+  MetricReader,
+  PeriodicExportingMetricReader,
+} from "@opentelemetry/sdk-metrics";
+import {
   BuildInfo,
   amLogger,
+  createDefaultBuildInfo,
   createDefaultHistogramView,
   recordBuildInfo,
   registerExporter,
 } from "@autometrics/autometrics";
-import { MeterProvider } from "@opentelemetry/sdk-metrics";
+import { OnDemandMetricReader } from "@autometrics/on-demand-metric-reader";
 import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
 
 export type InitOptions = {
   /**
-   * Optional build info to be added to the `build_info` metric.
+   * URL of the OpenTelemetry Collector to push metrics to.
    */
-  buildInfo?: BuildInfo;
+  url: string;
 
   /**
    * Optional headers to send along to the OTLP endpoint.
@@ -20,29 +26,70 @@ export type InitOptions = {
   headers?: Record<string, unknown>;
 
   /**
-   * URL of the OpenTelemetry Collector to push metrics to.
+   * The interval for pushing metrics, in milliseconds (default: `5_000ms`).
+   *
+   * Set to `0` to push eagerly without batching metrics. This is mainly useful
+   * for edge functions and some client-side scenarios.
    */
-  url: string;
+  pushInterval?: number;
+
+  /**
+   * The timeout for pushing metrics, in milliseconds (default: `30_000ms`).
+   */
+  timeout?: number;
+
+  /**
+   * Optional build info to be added to the `build_info` metric.
+   */
+  buildInfo?: BuildInfo;
 };
 
 /**
  * Initializes and registers the OTLP over HTTP exporter for Autometrics.
  */
-export function init({ buildInfo, url, headers }: InitOptions) {
-  amLogger.info(`Exporting using the OLTP/HTTP endpoint at ${url}`);
+export function init({
+  url,
+  headers,
+  pushInterval = 5_000,
+  timeout = 30_000,
+  buildInfo,
+}: InitOptions) {
+  amLogger.info(`Exporter will push to the OLTP/HTTP endpoint at ${url}`);
+
+  const exporter = new OTLPMetricExporter({ url, headers, keepAlive: true });
 
   const meterProvider = new MeterProvider({
     views: [createDefaultHistogramView()],
   });
 
-  const exporter = new OTLPMetricExporter({ url, headers });
+  const shouldEagerlyPush = pushInterval === 0;
+
+  let metricReader: MetricReader;
+  if (pushInterval > 0) {
+    metricReader = new PeriodicExportingMetricReader({
+      exporter,
+      exportIntervalMillis: pushInterval,
+      exportTimeoutMillis: timeout,
+    });
+  } else if (shouldEagerlyPush) {
+    amLogger.debug("Configuring Autometrics to push metrics eagerly");
+
+    metricReader = new OnDemandMetricReader({
+      exporter,
+      exportTimeoutMillis: timeout,
+    });
+  } else {
+    throw new Error(`Invalid pushInterval: ${pushInterval}`);
+  }
+
+  meterProvider.addMetricReader(metricReader);
 
   registerExporter({
-    getMeter: (name = "autometrics-prometheus") => meterProvider.getMeter(name),
+    getMeter: (name = "autometrics-otlp-http") => meterProvider.getMeter(name),
+    metricsRecorded: shouldEagerlyPush
+      ? () => metricReader.forceFlush()
+      : undefined,
   });
 
-  if (buildInfo) {
-    amLogger.debug("Registering build info");
-    recordBuildInfo(buildInfo);
-  }
+  recordBuildInfo(buildInfo ?? createDefaultBuildInfo());
 }

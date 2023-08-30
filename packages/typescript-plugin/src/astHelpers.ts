@@ -1,4 +1,3 @@
-import tsserver from "typescript/lib/tsserverlibrary";
 import type {
   Node,
   SourceFile,
@@ -50,7 +49,7 @@ export function isAutometricsWrappedOrDecorated(
   // decorator is applied to either a class method or its parent class
   const method = typechecker
     .getSymbolAtLocation(node)
-    ?.declarations.find((declaration) => ts.isMethodDeclaration(declaration));
+    ?.declarations?.find((declaration) => ts.isMethodDeclaration(declaration));
   if (!method) {
     return false;
   }
@@ -85,9 +84,9 @@ export function getNodeIdentifier(
   nodeType: NodeType,
   typechecker: TypeChecker,
   ts: Tsserver,
-): string {
+): string | undefined {
   if (nodeType === "function") {
-    const declaration = typechecker.getSymbolAtLocation(node).valueDeclaration;
+    const declaration = typechecker.getSymbolAtLocation(node)?.valueDeclaration;
 
     const type = typechecker
       .getTypeAtLocation(node)
@@ -102,8 +101,10 @@ export function getNodeIdentifier(
     // The first element in the wrapper function will always be the original
     // function
     if (
+      declaration &&
       type === "AutometricsWrapper" &&
       ts.isVariableDeclaration(declaration) &&
+      declaration.initializer &&
       ts.isCallExpression(declaration.initializer) &&
       ts.isIdentifier(declaration.initializer.arguments[0]) &&
       declaration.initializer.arguments[0]

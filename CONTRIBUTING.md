@@ -31,14 +31,14 @@ into the generated query templates.
 
 ```shell
 # in project root
-npm run dev:lib
+yarn dev:lib
 ```
 
 ##### TypeScript plugin
 
 ```shell
 # in project root
-npm run dev:plugin
+yarn dev:plugin
 ```
 
 #### Use examples

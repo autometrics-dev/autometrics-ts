@@ -52,6 +52,11 @@ export class TemporaryExporter implements Exporter, Meter {
     options?: MetricOptions,
   ): Counter<AttributesTypes> {
     if (!this._initTimer()) {
+      // @ts-ignore: `NoopCounterMetric` assumes `attributes` in the type
+      //             definition of its (no-op) `add()` method, even though the
+      //             `Counter` interface says they're optional. This is only an
+      //             issue when using TypeScript strict checking and can be
+      //             safely ignored.
       return new NoopCounterMetric();
     }
 
@@ -65,6 +70,11 @@ export class TemporaryExporter implements Exporter, Meter {
     options?: MetricOptions,
   ): Histogram<AttributesTypes> {
     if (!this._initTimer()) {
+      // @ts-ignore: `NoopHistogramMetric` assumes `attributes` in the type
+      //             definition of its (no-op) `record()` method, even though
+      //             the `Histogram` interface says they're optional. This is
+      //             only an issue when using TypeScript strict checking and can
+      //             be safely ignored.
       return new NoopHistogramMetric();
     }
 
@@ -78,6 +88,11 @@ export class TemporaryExporter implements Exporter, Meter {
     options?: MetricOptions,
   ): UpDownCounter<AttributesTypes> {
     if (!this._initTimer()) {
+      // @ts-ignore: `NoopCounterMetric` assumes `attributes` in the type
+      //             definition of its (no-op) `add()` method, even though the
+      //             `UpDownCounter` interface says they're optional. This is
+      //             only an issue when using TypeScript strict checking and can
+      //             be safely ignored.
       return new NoopCounterMetric();
     }
 
@@ -164,8 +179,8 @@ export class TemporaryExporter implements Exporter, Meter {
    * from the newly registered exporter.
    *
    * Existing counters, histograms and observables will forward new metrics to
-   * their newly created counterparts, as consumers might be holding on to the
-   * instances created by the temporary exporter.
+   * their newly created counterparts, because consumers might be holding on to
+   * the instances created by the temporary exporter.
    *
    * @internal
    */
@@ -228,7 +243,7 @@ export class TemporaryExporter implements Exporter, Meter {
    *
    * @internal
    */
-  private _timer: ReturnType<typeof setTimeout> | false;
+  private _timer: ReturnType<typeof setTimeout> | false | undefined;
 
   /**
    * Initializes the timer after which the temporary exporter will stop
@@ -247,7 +262,8 @@ export class TemporaryExporter implements Exporter, Meter {
 
       this._timer = false;
       warn(
-        "No metrics exporter was registered within 1 second. Metrics collection disabled.",
+        "No metrics exporter was registered within 1 second. " +
+          "Metrics collection disabled.",
       );
     }, 1000);
 

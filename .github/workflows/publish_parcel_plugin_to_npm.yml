@@ -1,4 +1,4 @@
-name: Publish Parcel transformer plugin package to NPMJS
+name: Publish Parcel transformer plugin package to NPM
 on:
   push:
     tags:
@@ -16,16 +16,13 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Setup the project
-        run: npm ci
-
-      - name: Install rome cli tools
-        run: npm install @rometools/cli-linux-x64
+        run: yarn --immutable
 
       - name: Run linter and format checker
-        run: npm run lint
+        run: yarn lint
 
       - name: Run unit tests
-        run: npm run test
+        run: yarn test
 
   publish:
     runs-on: ubuntu-latest
@@ -39,10 +36,11 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           scope: "@autometrics"
 
-      - run: npm ci
+      - run: yarn --immutable
 
-      - run: npm run build --workspace=@autometrics/parcel-transformer-autometrics
-      - run: npm run release --workspace=@autometrics/parcel-transformer-autometrics
+      - run: yarn build --workspace=@autometrics/parcel-transformer-autometrics
+
+      - run: yarn release --workspace=@autometrics/parcel-transformer-autometrics
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

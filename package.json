@@ -1,36 +1,41 @@
 {
   "private": true,
-  "type": "module",
   "name": "autometrics-monorepo",
+  "packageManager": "yarn@3.5.0",
   "workspaces": [
     "packages/autometrics",
     "packages/exporter-otlp-http",
     "packages/exporter-prometheus",
     "packages/exporter-prometheus-push-gateway",
+    "packages/on-demand-metric-reader",
     "packages/parcel-transformer-autometrics",
     "packages/typescript-plugin"
   ],
-  "main": "index.js",
   "scripts": {
-    "build:main": "npm run build --workspace=autometrics",
-    "dev:main": "npm run dev --workspace=autometrics",
-    "clean:main": "npm run clean --workspace=autometrics",
-    "build:lib": "npm run build --workspace=@autometrics/autometrics",
-    "dev:lib": "npm run dev --workspace=@autometrics/autometrics",
-    "clean:lib": "npm run clean --workspace=@autometrics/autometrics",
-    "build:typescript-plugin": "npm run build --workspace=@autometrics/typescript-plugin",
-    "dev:typescript-plugin": "npm run dev --workspace=@autometrics/typescript-plugin",
-    "clean:typescript-plugin": "npm run clean --workspace=@autometrics/typescript-plugin",
-    "build:parcel-plugin": "npm run build --workspace=@autometrics/parcel-transformer-autometrics",
-    "dev:parcel-plugin": "npm dev build --workspace=@autometrics/parcel-transformer-autometrics",
-    "clean:parcel-plugin": "npm clean build --workspace=@autometrics/parcel-transformer-autometrics",
-    "build": "npm run build --workspaces",
+    "build:main": "yarn build --workspace=autometrics",
+    "dev:main": "yarn dev --workspace=autometrics",
+    "clean:main": "yarn clean --workspace=autometrics",
+    "build:lib": "yarn build --workspace=@autometrics/autometrics",
+    "dev:lib": "yarn dev --workspace=@autometrics/autometrics",
+    "clean:lib": "yarn clean --workspace=@autometrics/autometrics",
+    "build:typescript-plugin": "yarn build --workspace=@autometrics/typescript-plugin",
+    "dev:typescript-plugin": "yarn dev --workspace=@autometrics/typescript-plugin",
+    "clean:typescript-plugin": "yarn clean --workspace=@autometrics/typescript-plugin",
+    "build:parcel-plugin": "yarn build --workspace=@autometrics/parcel-transformer-autometrics",
+    "dev:parcel-plugin": "yarn dev --workspace=@autometrics/parcel-transformer-autometrics",
+    "clean:parcel-plugin": "yarn clean --workspace=@autometrics/parcel-transformer-autometrics",
+    "build": "yarn workspaces foreach -pt run build",
+    "lint": "rome ci packages/**/src",
     "test": "vitest",
-    "lint": "rome ci packages/**/src"
+    "type-check": "yarn workspaces foreach -p run type-check"
   },
   "devDependencies": {
+    "@parcel/profiler": "^2.9.0",
+    "@parcel/types": "^2.9.0",
     "documentation": "^14.0.2",
     "rome": "^12.0.0",
+    "tsup": "^7.2.0",
+    "typescript": "^5.0.4",
     "vitest": "^0.30.1"
   }
 }

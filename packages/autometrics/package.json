@@ -26,19 +26,20 @@
     "build": "tsup",
     "docs": "typedoc",
     "dev": "tsup --watch",
-    "release": "npm publish"
+    "release": "npm publish",
+    "type-check": "tsc -p tsconfig.json"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.3.0",
-    "@opentelemetry/sdk-metrics": ">=1.9.0"
+    "@opentelemetry/sdk-metrics": ">=1.15.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
     "@types/node": "^18.11.18",
     "express": "^4.18.2",
     "tsup": "^7.2.0",
-    "typedoc": "^0.24.7",
-    "typedoc-plugin-markdown": "^3.15.3",
-    "typescript": "^4.9.4"
+    "typedoc": "^0.25.0",
+    "typedoc-plugin-markdown": "^3.16.0",
+    "typescript": "^5.0.4"
   }
 }

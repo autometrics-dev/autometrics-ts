@@ -3,7 +3,6 @@ import {
   EmitHint,
   NewLineKind,
   Node,
-  PropertyAssignment,
   ScriptTarget,
   TransformationContext,
   TransformerFactory,
@@ -20,6 +19,7 @@ import {
   NodeFactory,
   ObjectLiteralExpression,
   isVariableDeclaration,
+  ObjectLiteralElementLike,
 } from "typescript";
 
 let moduleName: string;
@@ -29,6 +29,7 @@ const transformerFactory: TransformerFactory<Node> = (
   const { factory } = context;
   return (rootNode) => {
     function visit(node: Node): Node {
+      // rome-ignore lint/style/noParameterAssign: it is what it is
       node = visitEachChild(node, visit, context);
 
       if (
@@ -41,7 +42,10 @@ const transformerFactory: TransformerFactory<Node> = (
       ) {
         const [functionOrOptions, maybeFunction] = node.initializer.arguments;
         if (isFunctionExpression(functionOrOptions)) {
-          const functionName = functionOrOptions.name.escapedText.toString();
+          const functionName = functionOrOptions.name?.escapedText.toString();
+          if (!functionName) {
+            return node;
+          }
 
           const autometricsOptions = factory.createObjectLiteralExpression([
             factory.createPropertyAssignment(
@@ -72,7 +76,10 @@ const transformerFactory: TransformerFactory<Node> = (
           isObjectLiteralExpression(functionOrOptions) &&
           isFunctionExpression(maybeFunction)
         ) {
-          const functionName = maybeFunction.name.escapedText.toString();
+          const functionName = maybeFunction.name?.escapedText.toString();
+          if (!functionName) {
+            return node;
+          }
 
           let autometricsOptions = addObjectPropertyIfMissing(
             factory,
@@ -111,7 +118,10 @@ const transformerFactory: TransformerFactory<Node> = (
       ) {
         const [functionOrOptions, maybeFunction] = node.expression.arguments;
         if (isFunctionExpression(functionOrOptions)) {
-          const functionName = functionOrOptions.name.escapedText.toString();
+          const functionName = functionOrOptions.name?.escapedText.toString();
+          if (!functionName) {
+            return node;
+          }
 
           const autometricsOptions = factory.createObjectLiteralExpression([
             factory.createPropertyAssignment(
@@ -142,7 +152,10 @@ const transformerFactory: TransformerFactory<Node> = (
           isObjectLiteralExpression(functionOrOptions) &&
           isFunctionExpression(maybeFunction)
         ) {
-          const functionName = maybeFunction.name.escapedText.toString();
+          const functionName = maybeFunction.name?.escapedText.toString();
+          if (!functionName) {
+            return node;
+          }
 
           let autometricsOptions = addObjectPropertyIfMissing(
             factory,
@@ -187,8 +200,10 @@ function addObjectPropertyIfMissing(
 ) {
   if (
     !options.properties.some(
-      (node: PropertyAssignment) =>
-        "escapedText" in node.name && node.name.escapedText === key,
+      (node: ObjectLiteralElementLike) =>
+        node.name &&
+        "escapedText" in node.name &&
+        node.name.escapedText === key,
     )
   ) {
     return factory.updateObjectLiteralExpression(options, [

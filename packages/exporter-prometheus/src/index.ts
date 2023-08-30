@@ -1,6 +1,7 @@
 import {
   BuildInfo,
   amLogger,
+  createDefaultBuildInfo,
   createDefaultHistogramView,
   recordBuildInfo,
   registerExporter,
@@ -39,8 +40,5 @@ export function init({ buildInfo, port }: InitOptions) {
     getMeter: (name = "autometrics-prometheus") => meterProvider.getMeter(name),
   });
 
-  if (buildInfo) {
-    amLogger.debug("Registering build info");
-    recordBuildInfo(buildInfo);
-  }
+  recordBuildInfo(buildInfo ?? createDefaultBuildInfo());
 }

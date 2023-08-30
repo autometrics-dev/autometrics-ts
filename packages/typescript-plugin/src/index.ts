@@ -1,4 +1,4 @@
-import type { QuickInfo, server } from "typescript/lib/tsserverlibrary";
+import ts, { server } from "typescript/lib/tsserverlibrary";
 
 import {
   getNodeAtCursor,
@@ -37,61 +37,63 @@ function init(modules: { typescript: Tsserver }) {
     const proxy = getProxy(languageService);
 
     proxy.getQuickInfoAtPosition = (filename, position) => {
-      const typechecker = languageService.getProgram().getTypeChecker();
-      const prior: ts.QuickInfo = languageService.getQuickInfoAtPosition(
-        filename,
-        position,
-      );
+      const typechecker = languageService.getProgram()?.getTypeChecker();
+      const sourceFile = languageService.getProgram()?.getSourceFile(filename);
+      const prior: ts.QuickInfo | undefined =
+        languageService.getQuickInfoAtPosition(filename, position);
 
-      if (!prior) {
+      if (!prior || !sourceFile || !typechecker) {
         return;
       }
 
-      const docsOutputFormat = pluginConfig.docsOutputFormat || "prometheus";
-
-      const sourceFile = languageService.getProgram().getSourceFile(filename);
       const nodeAtCursor = getNodeAtCursor(sourceFile, position, ts);
+      if (!nodeAtCursor) {
+        return prior;
+      }
+
       const nodeType = getNodeType(nodeAtCursor, typechecker, ts);
+      if (!nodeType) {
+        return prior;
+      }
+
       const autometrics = isAutometricsWrappedOrDecorated(
         nodeAtCursor,
         typechecker,
         ts,
       );
-
-      // If either autometrics checker return early
-      if (!autometrics) {
-        return prior;
-      }
-
       const nodeIdentifier = getNodeIdentifier(
         nodeAtCursor,
         nodeType,
         typechecker,
         ts,
       );
+      if (!autometrics || !nodeIdentifier) {
+        return prior;
+      }
 
       // The output of this plugin will
       // be an html comment containing a the name of the function in a special format
       // that the vscode extension can parse.
+      const docsOutputFormat = pluginConfig.docsOutputFormat || "prometheus";
       if (docsOutputFormat === "vscode") {
         const preamble = {
           kind: "string",
           text: `\n\n<!-- autometrics_fn: ${nodeIdentifier} -->\n`,
         };
         const { documentation } = prior;
-        const enrichedDocumentation = documentation.concat(
+        const enrichedDocumentation = documentation?.concat(
           preamble,
           documentation,
         );
 
-        return <ts.QuickInfo>{
+        return {
           ...prior,
           documentation: enrichedDocumentation,
         };
       }
 
       const prometheusBase = pluginConfig.prometheusUrl;
-      log(prometheusBase);
+      log(prometheusBase ?? "<no Prometheus URL set>");
 
       const requestRate = createRequestRateQuery("function", nodeIdentifier);
       const requestRateUrl = makePrometheusUrl(requestRate, prometheusBase);
@@ -181,13 +183,13 @@ function init(modules: { typescript: Tsserver }) {
         text: `\n\n## Autometrics\n\nView the live metrics for the \`${nodeIdentifier}\` function:\n `,
       };
       const { documentation } = prior;
-      const enrichedDocumentation = documentation.concat(
+      const enrichedDocumentation = documentation?.concat(
         preamble,
         documentation,
         queries,
       );
 
-      return <QuickInfo>{
+      return {
         ...prior,
         documentation: enrichedDocumentation,
       };
