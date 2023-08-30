@@ -133,6 +133,10 @@ Add the language service plugin to the `tsconfig.json` file:
 
 ## Recipes
 
+Below are two recipes for using Autometrics in a server-side setup and a
+client-side setup. If you would like to see examples with specific frameworks,
+please have a look at the [examples/](examples/) directory.
+
 ### Server-side example with Prometheus
 
 #### Installation

@@ -1,6 +1,7 @@
 ## Express + Autometrics example
 
-Simple Express API instrumented with Autometrics
+Simple Express API instrumented with Autometrics and using the Prometheus
+exporter.
 
 ### Running the example
 
@@ -17,11 +18,11 @@ brew install prometheus
 2. Run Prometheus from the root of the repo
 
 ```shell
-prometheus --config.file=$(pwd)/examples/util/prometheus.yml
+prometheus --config.file=$(pwd)/examples/config/prometheus.yml
 ```
 
 Flag `--config.file` must point to the `prometheus.yml` configuration file
-(example provided in the `util/` directory)
+(example provided in the `config/` directory)
 
 3. Install the dependencies
 

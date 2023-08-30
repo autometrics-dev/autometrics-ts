@@ -9,12 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "autometrics": "^0.6.0",
+    "@autometrics/autometrics": "file:../../packages/autometrics",
+    "@autometrics/exporter-otlp-http": "file:../../packages/exporter-otlp-http",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@autometrics/typescript-plugin": "^0.5.4",
+    "@autometrics/typescript-plugin": "file:../../packages/typescript-plugin",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",

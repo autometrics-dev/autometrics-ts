@@ -10,13 +10,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@autometrics/autometrics": "^0.6.0",
-    "@opentelemetry/exporter-prometheus": "^0.35.1",
+    "@autometrics/autometrics": "file:../../packages/autometrics",
+    "@autometrics/exporter-prometheus": "file:../../packages/exporter-prometheus",
     "@prisma/client": "^4.10.1",
     "fastify": "^4.13.0"
   },
   "devDependencies": {
-    "@autometrics/typescript-plugin": "^0.5.4",
+    "@autometrics/typescript-plugin": "file:../../packages/typescript-plugin",
     "@types/node": "^18.13.0",
     "prisma": "^4.10.1",
     "typescript": "^4.9.5"

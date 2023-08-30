@@ -1,6 +1,5 @@
-import {
-  autometrics,
-} from "@autometrics/autometrics";
+import { autometrics } from "@autometrics/autometrics";
+import { init } from "@autometrics/exporter-prometheus";
 import express from "express";
 import { API_SLO } from "./database.js";
 import {
@@ -10,6 +9,8 @@ import {
   handleGetUsers,
 } from "./routes.js";
 import { delay, generateRandomTraffic } from "./util.js";
+
+init(); // opens the `/metrics` endpoint on port 4964
 
 const app = express();
 

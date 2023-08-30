@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { autometrics, init } from "@autometrics/autometrics";
+import { autometrics } from "@autometrics/autometrics";
+import { init } from "@autometrics/exporter-otlp-http";
 import "./App.css";
 
 // In order for Prometheus to succesfully get your client-side app metrics, you
-// will need to push them to an aggregating push gateway. For more info, see:
-// https://github.com/autometrics-dev/autometrics-ts#using-wrappers-in-the-browser
+// will need to push them to either a Prometheus-compatible aggregating push
+// gateway, or an OpenTelemetry Collector. Here, we choose to push to an Otel
+// Collector using OTLP over HTTP. (The `faas-experiment/` example uses a
+// Prometheus push gateway instead.)
 init({
-  pushGateway: "http://0.0.0.0:8080/metrics",
+  url: "http://0.0.0.0:8080/metrics",
   buildInfo: {
     version: import.meta.env.VITE_AUTOMETRICS_VERSION,
     commit: import.meta.env.VITE_AUTOMETRICS_COMMIT,

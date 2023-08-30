@@ -1,11 +1,9 @@
-import {
-  fastify,
-  FastifyReply,
-  FastifyRequest,
-  RouteShorthandOptions,
-} from "fastify";
+import { fastify, FastifyReply, FastifyRequest } from "fastify";
 import { autometrics } from "@autometrics/autometrics";
+import { init } from "@autometrics/exporter-prometheus";
 import { PrismaClient } from "@prisma/client";
+
+init(); // opens the `/metrics` endpoint on port 4964
 
 const port = 8080;
 const server = fastify();
@@ -29,9 +27,7 @@ async function handleGetAllTulips(req: FastifyRequest, res: FastifyReply) {
 }
 
 // Example internal function calling a database instrumented with autometrics
-const createTulip = autometrics(async function createTulip(
-  tulip: Tulip,
-) {
+const createTulip = autometrics(async function createTulip(tulip: Tulip) {
   return prisma.tulip.create({
     data: tulip,
   });
@@ -103,4 +99,3 @@ async function generateRandomTraffic() {
 // We delay firing the sample traffic 1s to ensure
 // Prometheus can pick up the newly registered metrics
 setTimeout(() => generateRandomTraffic(), 1000);
-
