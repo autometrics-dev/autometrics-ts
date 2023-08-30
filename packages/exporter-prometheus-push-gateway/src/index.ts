@@ -1,8 +1,11 @@
 import {
   AggregationTemporality,
-  InMemoryMetricExporter,
+  InstrumentType,
   MeterProvider,
+  MetricReader,
   PeriodicExportingMetricReader,
+  PushMetricExporter,
+  ResourceMetrics,
 } from "@opentelemetry/sdk-metrics";
 import {
   BuildInfo,
@@ -12,6 +15,8 @@ import {
   recordBuildInfo,
   registerExporter,
 } from "@autometrics/autometrics";
+import type { ExportResult } from "@opentelemetry/core";
+import { OnDemandMetricReader } from "@autometrics/on-demand-metric-reader";
 import { PrometheusSerializer } from "@opentelemetry/exporter-prometheus";
 
 const serializer = new PrometheusSerializer();
@@ -60,47 +65,81 @@ export function init({
   timeout = 30_000,
   buildInfo,
 }: InitOptions) {
+  if (typeof fetch === "undefined") {
+    amLogger.warn(
+      "Fetch is undefined, cannot push metrics to gateway. Consider adding a global polyfill.",
+    );
+    return;
+  }
+
   amLogger.info(`Exporter will push to the Prometheus push gateway at ${url}`);
 
-  // INVESTIGATE - Do we want a periodic exporter when we're pushing metrics eagerly?
-  const metricReader = new PeriodicExportingMetricReader({
-    // 0 - using delta aggregation temporality setting
-    // to ensure data submitted to the gateway is accurate
-    exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
-  });
+  const exporter = new PushGatewayExporter({ url, headers });
 
   const meterProvider = new MeterProvider({
     views: [createDefaultHistogramView()],
   });
 
-  meterProvider.addMetricReader(metricReader);
-
-  function pushMetrics() {
-    amLogger.debug("Pushing metrics to gateway");
-    pushToGateway(metricReader, url, headers);
-  }
-
   const shouldEagerlyPush = pushInterval === 0;
 
+  let metricReader: MetricReader;
   if (pushInterval > 0) {
-    // TODO - add a way to stop the push interval
-    setInterval(pushMetrics, pushInterval);
+    metricReader = new PeriodicExportingMetricReader({
+      exporter,
+      exportIntervalMillis: pushInterval,
+      exportTimeoutMillis: timeout,
+    });
   } else if (shouldEagerlyPush) {
-    amLogger.debug("Configuring autometrics to push metrics eagerly");
+    amLogger.debug("Configuring Autometrics to push metrics eagerly");
+
+    metricReader = new OnDemandMetricReader({
+      exporter,
+      exportTimeoutMillis: timeout,
+    });
   } else {
-    amLogger.trace(
-      "Invalid pushInterval, metrics will not be pushed",
-      pushInterval,
-    );
+    throw new Error(`Invalid pushInterval: ${pushInterval}`);
   }
 
+  meterProvider.addMetricReader(metricReader);
+
   registerExporter({
-    getMeter: (name = "autometrics-push-gateway") =>
-      meterProvider.getMeter(name),
-    metricsRecorded: shouldEagerlyPush ? pushMetrics : undefined,
+    getMeter: (name = "autometrics-otlp-http") => meterProvider.getMeter(name),
+    metricsRecorded: shouldEagerlyPush
+      ? () => metricReader.forceFlush()
+      : undefined,
   });
 
   recordBuildInfo(buildInfo ?? createDefaultBuildInfo());
+}
+
+type PushGatewayExporterOptions = Pick<InitOptions, "url" | "headers">;
+
+class PushGatewayExporter implements PushMetricExporter {
+  private _shutdown = false;
+
+  constructor(private _options: PushGatewayExporterOptions) {}
+
+  export(
+    metrics: ResourceMetrics,
+    resultCallback: (result: ExportResult) => void,
+  ) {
+    // TODO
+  }
+
+  forceFlush(): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
+  selectAggregationTemporality(
+    _instrumentType: InstrumentType,
+  ): AggregationTemporality {
+    return AggregationTemporality.DELTA;
+  }
+
+  shutdown(): Promise<void> {
+    this._shutdown = true;
+    return Promise.resolve();
+  }
 }
 
 // TODO - allow custom fetch function to be passed in
@@ -110,13 +149,6 @@ async function pushToGateway(
   url: string,
   headers?: HeadersInit,
 ) {
-  if (typeof fetch === "undefined") {
-    amLogger.warn(
-      "Fetch is undefined, cannot push metrics to gateway. Consider adding a global polyfill.",
-    );
-    return;
-  }
-
   let serializedMetrics;
   try {
     const { resourceMetrics } = await metricReader.collect();
