@@ -2,11 +2,9 @@ import {
   BuildInfo,
   amLogger,
   createDefaultBuildInfo,
-  createDefaultHistogramView,
   recordBuildInfo,
   registerExporter,
 } from "@autometrics/autometrics";
-import { MeterProvider } from "@opentelemetry/sdk-metrics";
 import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
 
 export type InitOptions = {
@@ -30,15 +28,7 @@ export type InitOptions = {
 export function init({ buildInfo, port }: InitOptions) {
   amLogger.info(`Opening a Prometheus scrape endpoint at port ${port}`);
 
-  const meterProvider = new MeterProvider({
-    views: [createDefaultHistogramView()],
-  });
-
-  meterProvider.addMetricReader(new PrometheusExporter({ port }));
-
-  registerExporter({
-    getMeter: (name = "autometrics-prometheus") => meterProvider.getMeter(name),
-  });
+  registerExporter({ metricReader: new PrometheusExporter({ port }) });
 
   recordBuildInfo(buildInfo ?? createDefaultBuildInfo());
 }

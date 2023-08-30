@@ -1,23 +1,18 @@
 import {
-  MeterProvider,
-  MetricReader,
-  PeriodicExportingMetricReader,
-} from "@opentelemetry/sdk-metrics";
-import {
   BuildInfo,
   amLogger,
   createDefaultBuildInfo,
-  createDefaultHistogramView,
   recordBuildInfo,
   registerExporter,
 } from "@autometrics/autometrics";
 import { OnDemandMetricReader } from "@autometrics/on-demand-metric-reader";
+import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 
 import { PushGatewayExporter } from "./pushGatewayExporter";
 
 export type InitOptions = {
   /**
-   * The full URL (including http://) of the aggregating push gateway for
+   * The full URL (including https://) of the aggregating push gateway for
    * metrics to be submitted to.
    */
   url: string;
@@ -46,10 +41,7 @@ export type InitOptions = {
   timeout?: number;
 
   /**
-   * Optional build info to be added to the `build_info` metric (necessary for
-   * client-side applications).
-   *
-   * See {@link BuildInfo}
+   * Optional build info to be added to the `build_info` metric.
    */
   buildInfo?: BuildInfo;
 };
@@ -76,39 +68,29 @@ export function init({
 
   const exporter = new PushGatewayExporter({ url, headers, concurrencyLimit });
 
-  const meterProvider = new MeterProvider({
-    views: [createDefaultHistogramView()],
-  });
-
-  const shouldEagerlyPush = pushInterval === 0;
-
-  let metricReader: MetricReader;
   if (pushInterval > 0) {
-    metricReader = new PeriodicExportingMetricReader({
-      exporter,
-      exportIntervalMillis: pushInterval,
-      exportTimeoutMillis: timeout,
+    registerExporter({
+      metricReader: new PeriodicExportingMetricReader({
+        exporter,
+        exportIntervalMillis: pushInterval,
+        exportTimeoutMillis: timeout,
+      }),
     });
-  } else if (shouldEagerlyPush) {
+  } else if (pushInterval === 0) {
     amLogger.debug("Configuring Autometrics to push metrics eagerly");
 
-    metricReader = new OnDemandMetricReader({
+    const metricReader = new OnDemandMetricReader({
       exporter,
       exportTimeoutMillis: timeout,
+    });
+
+    registerExporter({
+      metricReader,
+      metricsRecorded: () => metricReader.forceFlush(),
     });
   } else {
     throw new Error(`Invalid pushInterval: ${pushInterval}`);
   }
-
-  meterProvider.addMetricReader(metricReader);
-
-  registerExporter({
-    getMeter: (name = "autometrics-prometheus-push-gateway") =>
-      meterProvider.getMeter(name),
-    metricsRecorded: shouldEagerlyPush
-      ? () => metricReader.forceFlush()
-      : undefined,
-  });
 
   recordBuildInfo(buildInfo ?? createDefaultBuildInfo());
 }

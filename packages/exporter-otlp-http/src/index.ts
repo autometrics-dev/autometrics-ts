@@ -1,18 +1,13 @@
 import {
-  MeterProvider,
-  MetricReader,
-  PeriodicExportingMetricReader,
-} from "@opentelemetry/sdk-metrics";
-import {
   BuildInfo,
   amLogger,
   createDefaultBuildInfo,
-  createDefaultHistogramView,
   recordBuildInfo,
   registerExporter,
 } from "@autometrics/autometrics";
 import { OnDemandMetricReader } from "@autometrics/on-demand-metric-reader";
 import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
+import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 
 export type InitOptions = {
   /**
@@ -69,38 +64,29 @@ export function init({
     keepAlive: true,
   });
 
-  const meterProvider = new MeterProvider({
-    views: [createDefaultHistogramView()],
-  });
-
-  const shouldEagerlyPush = pushInterval === 0;
-
-  let metricReader: MetricReader;
   if (pushInterval > 0) {
-    metricReader = new PeriodicExportingMetricReader({
-      exporter,
-      exportIntervalMillis: pushInterval,
-      exportTimeoutMillis: timeout,
+    registerExporter({
+      metricReader: new PeriodicExportingMetricReader({
+        exporter,
+        exportIntervalMillis: pushInterval,
+        exportTimeoutMillis: timeout,
+      }),
     });
-  } else if (shouldEagerlyPush) {
+  } else if (pushInterval === 0) {
     amLogger.debug("Configuring Autometrics to push metrics eagerly");
 
-    metricReader = new OnDemandMetricReader({
+    const metricReader = new OnDemandMetricReader({
       exporter,
       exportTimeoutMillis: timeout,
+    });
+
+    registerExporter({
+      metricReader,
+      metricsRecorded: () => metricReader.forceFlush(),
     });
   } else {
     throw new Error(`Invalid pushInterval: ${pushInterval}`);
   }
-
-  meterProvider.addMetricReader(metricReader);
-
-  registerExporter({
-    getMeter: (name = "autometrics-otlp-http") => meterProvider.getMeter(name),
-    metricsRecorded: shouldEagerlyPush
-      ? () => metricReader.forceFlush()
-      : undefined,
-  });
 
   recordBuildInfo(buildInfo ?? createDefaultBuildInfo());
 }

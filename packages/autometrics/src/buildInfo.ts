@@ -2,7 +2,7 @@ import { UpDownCounter } from "@opentelemetry/api";
 
 import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants";
 import { debug } from "./logger";
-import { getMeter } from "./exporter";
+import { getMeter } from "./instrumentation";
 import { getRuntime, Runtime } from "./utils";
 
 /**

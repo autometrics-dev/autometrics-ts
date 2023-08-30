@@ -17,7 +17,7 @@ import {
   HISTOGRAM_DESCRIPTION,
   HISTOGRAM_NAME,
 } from "./constants";
-import { getMeter, metricsRecorded } from "./exporter";
+import { getMeter, metricsRecorded } from "./instrumentation";
 import type { Objective } from "./objectives";
 import { trace, warn } from "./logger";
 
