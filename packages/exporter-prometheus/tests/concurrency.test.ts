@@ -1,28 +1,26 @@
 import {
+  AggregationTemporality,
   InMemoryMetricExporter,
   PeriodicExportingMetricReader,
 } from "@opentelemetry/sdk-metrics";
 import { afterEach, beforeAll, describe, expect, test } from "vitest";
-import { autometrics, init } from "../src";
-import { getMetricsProvider } from "../src/instrumentation";
+import { autometrics, registerExporter } from "@autometrics/autometrics";
+
 import { collectAndSerialize } from "./util";
 
-let exporter: PeriodicExportingMetricReader;
+let metricReader: PeriodicExportingMetricReader;
 
 describe("Autometrics concurrency tests", () => {
   beforeAll(async () => {
-    exporter = new PeriodicExportingMetricReader({
-      // 0 - using delta aggregation temporality setting
-      // to ensure data submitted to the gateway is accurate
-      exporter: new InMemoryMetricExporter(0),
+    metricReader = new PeriodicExportingMetricReader({
+      exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
     });
 
-    init({ exporter });
-    getMetricsProvider();
+    registerExporter({ metricReader });
   });
 
   afterEach(async () => {
-    await exporter.forceFlush();
+    await metricReader.forceFlush();
   });
 
   test("increases and decreases the concurrency gauge", async () => {
@@ -42,7 +40,7 @@ describe("Autometrics concurrency tests", () => {
     const concurrencyCountFinishedMetric =
       /function_calls_concurrent\{\S*function="sleep"\S*\} 1/gm;
 
-    const serialized = await collectAndSerialize(exporter);
+    const serialized = await collectAndSerialize(metricReader);
 
     expect(serialized).toMatch(concurrencyCountFinishedMetric);
   });

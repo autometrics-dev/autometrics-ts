@@ -1,42 +1,37 @@
 import {
+  AggregationTemporality,
   PeriodicExportingMetricReader,
   InMemoryMetricExporter,
 } from "@opentelemetry/sdk-metrics";
 import { afterEach, beforeAll, describe, expect, test } from "vitest";
 import {
   autometrics,
-  init,
   ObjectiveLatency,
   ObjectivePercentile,
-} from "../src";
-import { getMetricsProvider } from "../src/instrumentation";
+  registerExporter,
+} from "@autometrics/autometrics";
+
 import { collectAndSerialize } from "./util";
 
-let exporter: PeriodicExportingMetricReader;
+let metricReader: PeriodicExportingMetricReader;
 
 describe("Autometrics objectives test", () => {
   beforeAll(async () => {
-    exporter = new PeriodicExportingMetricReader({
-      // 0 - using delta aggregation temporality setting
-      // to ensure data submitted to the gateway is accurate
-      exporter: new InMemoryMetricExporter(0),
+    metricReader = new PeriodicExportingMetricReader({
+      exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
     });
 
-    init({ exporter });
-    getMetricsProvider();
+    registerExporter({ metricReader });
   });
 
   afterEach(async () => {
-    await exporter.forceFlush();
+    await metricReader.forceFlush();
   });
 
   test("success rate", async () => {
     const successRateFn = autometrics(
       {
-        objective: {
-          name: "test",
-          successRate: ObjectivePercentile.P99,
-        },
+        objective: { name: "test", successRate: ObjectivePercentile.P99 },
       },
       function successRate() {},
     );
@@ -47,7 +42,7 @@ describe("Autometrics objectives test", () => {
     const callCountMetric =
       /function_calls_total\{\S*function="successRate"\S*objective_name="test",objective_percentile="99"\S*\} 2/gm;
 
-    const serialized = await collectAndSerialize(exporter);
+    const serialized = await collectAndSerialize(metricReader);
 
     expect(serialized).toMatch(callCountMetric);
   });
@@ -69,7 +64,7 @@ describe("Autometrics objectives test", () => {
     const durationMetric =
       /function_calls_duration_bucket\{\S*function="latency"\S*objective_name="test",objective_latency_threshold="0.1",objective_percentile="99.9"\S*\} 2/gm;
 
-    const serialized = await collectAndSerialize(exporter);
+    const serialized = await collectAndSerialize(metricReader);
 
     expect(serialized).toMatch(durationMetric);
   });
@@ -95,7 +90,7 @@ describe("Autometrics objectives test", () => {
     const durationMetric =
       /function_calls_duration_bucket\{\S*function="combinedObjective"\S*objective_name="test",objective_latency_threshold="0.1",objective_percentile="99.9"\S*\} 2/gm;
 
-    const serialized = await collectAndSerialize(exporter);
+    const serialized = await collectAndSerialize(metricReader);
 
     expect(serialized).toMatch(callCountMetric);
     expect(serialized).toMatch(durationMetric);

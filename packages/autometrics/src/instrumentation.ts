@@ -11,7 +11,7 @@ const meterProvider = new MeterProvider({
  * Registered listeners that should be notified when `metricsRecorded()` is
  * called.
  */
-let registeredMetricsRecordedListeners: Array<() => void>;
+const registeredMetricsRecordedListeners: Array<() => void> = [];
 
 /**
  * Options for registering an Autometrics exporter.

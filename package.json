@@ -21,14 +21,11 @@
     "lint": "rome ci packages/**/src",
     "test": "vitest",
     "type-check": "yarn workspaces foreach -p --verbose run type-check",
-
     "build:main": "yarn workspaces foreach -pt --verbose --include=\"@autometrics/autometrics\" --include=\"@autometrics/exporter-*\" run build",
     "dev:main": "yarn workspaces foreach -pt --verbose --include=\"@autometrics/autometrics\" --include=\"@autometrics/exporter-*\" run dev",
-
     "build:typescript-plugin": "cd packages/typescript-plugin && yarn build",
     "dev:typescript-plugin": "cd packages/typescript-plugin && yarn dev",
     "clean:typescript-plugin": "cd packages/typescript-plugin && yarn clean",
-
     "build:parcel-plugin": "cd packages/parcel-transformer-autometrics && yarn clean",
     "dev:parcel-plugin": "cd packages/parcel-transformer-autometrics && yarn clean",
     "clean:parcel-plugin": "cd packages/parcel-transformer-autometrics && yarn clean"

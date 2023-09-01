@@ -4,8 +4,8 @@ import {
   AggregationTemporality,
 } from "@opentelemetry/sdk-metrics";
 import { afterEach, beforeAll, describe, expect, test } from "vitest";
-import { init } from "../src";
-import { getMetricsProvider } from "../src/instrumentation";
+import { recordBuildInfo, registerExporter } from "@autometrics/autometrics";
+
 import { collectAndSerialize } from "./util";
 
 const buildInfo = {
@@ -14,28 +14,28 @@ const buildInfo = {
   branch: "main",
 };
 
-let exporter: PeriodicExportingMetricReader;
+let metricReader: PeriodicExportingMetricReader;
 
 describe("Autometrics build info tests", () => {
-  beforeAll(async () => {
-    exporter = new PeriodicExportingMetricReader({
+  beforeAll(() => {
+    metricReader = new PeriodicExportingMetricReader({
       exporter: new InMemoryMetricExporter(AggregationTemporality.DELTA),
     });
 
-    init({ buildInfo, exporter });
+    registerExporter({ metricReader });
 
-    getMetricsProvider();
+    recordBuildInfo(buildInfo);
   });
 
   afterEach(async () => {
-    await exporter.forceFlush();
+    await metricReader.forceFlush();
   });
 
   test("build info is recorded", async () => {
     const buildInfoMetric =
       /build_info{version="1.0.0",commit="123456789",branch="main",clearmode=""}/gm;
 
-    const serialized = await collectAndSerialize(exporter);
+    const serialized = await collectAndSerialize(metricReader);
 
     expect(serialized).toMatch(buildInfoMetric);
   });

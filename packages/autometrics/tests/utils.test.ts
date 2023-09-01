@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+
 import { getModulePath } from "../src/utils";
 
 // the existing getModulePath function is a hack that parses the stack trace

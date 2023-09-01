@@ -1,9 +1,13 @@
-import { autometrics } from "../src";
+import { autometrics } from "@autometrics/autometrics";
 import { describe, test, expect, beforeAll } from "vitest";
 import express from "express";
 
+import { init } from "../src";
+
 describe("Autometrics wrapper for functions", () => {
   beforeAll(() => {
+    init();
+
     const app = express();
     const port = 8080;
 
