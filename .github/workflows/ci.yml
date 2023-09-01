@@ -2,8 +2,6 @@ name: CI
 on:
   push:
     branches: ["*"]
-  pull_request:
-    branches: [main]
 
 jobs:
   test:
@@ -17,6 +15,9 @@ jobs:
 
       - name: Run linter and format checker
         run: yarn lint
+
+      - name: Create a build
+        run: yarn build
 
       - name: Run unit tests
         run: yarn test
