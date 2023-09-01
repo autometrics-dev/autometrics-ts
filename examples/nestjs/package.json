@@ -13,8 +13,8 @@
     "start:prod": "node dist/main"
   },
   "dependencies": {
-    "@autometrics/autometrics": "../../packages/autometrics",
-    "@autometrics/exporter-prometheus": "../../packages/exporter-prometheus",
+    "@autometrics/autometrics": "^0.6.0",
+    "@autometrics/exporter-prometheus": "^0.6.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
@@ -22,7 +22,7 @@
     "rxjs": "^7.2.0"
   },
   "devDependencies": {
-    "@autometrics/typescript-plugin": "../../packages/typescript-plugin",
+    "@autometrics/typescript-plugin": "^0.5.4",
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",

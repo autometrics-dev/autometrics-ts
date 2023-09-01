@@ -78,70 +78,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@autometrics/autometrics@file:../../packages/autometrics::locator=express-example%40workspace%3Aexamples%2Fexpress":
-  version: 0.6.0
-  resolution: "@autometrics/autometrics@file:../../packages/autometrics#../../packages/autometrics::hash=ea0d1f&locator=express-example%40workspace%3Aexamples%2Fexpress"
-  dependencies:
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-  checksum: a4fc95fb3ed0f12dcbf2f76316cc6fdde6c0a29ac1931f6d694b65febd3a1bcd7d6e3d8fc55bf10d38b3ace33432fb7e32fcb6ec348a58b4f75ff6e50c50e3b5
-  languageName: node
-  linkType: hard
-
-"@autometrics/autometrics@file:../../packages/autometrics::locator=faas-experimental-example%40workspace%3Aexamples%2Ffaas-experimental":
-  version: 0.6.0
-  resolution: "@autometrics/autometrics@file:../../packages/autometrics#../../packages/autometrics::hash=ea0d1f&locator=faas-experimental-example%40workspace%3Aexamples%2Ffaas-experimental"
-  dependencies:
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-  checksum: a4fc95fb3ed0f12dcbf2f76316cc6fdde6c0a29ac1931f6d694b65febd3a1bcd7d6e3d8fc55bf10d38b3ace33432fb7e32fcb6ec348a58b4f75ff6e50c50e3b5
-  languageName: node
-  linkType: hard
-
-"@autometrics/autometrics@file:../../packages/autometrics::locator=fastify-example%40workspace%3Aexamples%2Ffastify":
-  version: 0.6.0
-  resolution: "@autometrics/autometrics@file:../../packages/autometrics#../../packages/autometrics::hash=ea0d1f&locator=fastify-example%40workspace%3Aexamples%2Ffastify"
-  dependencies:
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-  checksum: a4fc95fb3ed0f12dcbf2f76316cc6fdde6c0a29ac1931f6d694b65febd3a1bcd7d6e3d8fc55bf10d38b3ace33432fb7e32fcb6ec348a58b4f75ff6e50c50e3b5
-  languageName: node
-  linkType: hard
-
-"@autometrics/autometrics@file:../../packages/autometrics::locator=nestjs-example%40workspace%3Aexamples%2Fnestjs":
-  version: 0.6.0
-  resolution: "@autometrics/autometrics@file:../../packages/autometrics#../../packages/autometrics::hash=ea0d1f&locator=nestjs-example%40workspace%3Aexamples%2Fnestjs"
-  dependencies:
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-  checksum: a4fc95fb3ed0f12dcbf2f76316cc6fdde6c0a29ac1931f6d694b65febd3a1bcd7d6e3d8fc55bf10d38b3ace33432fb7e32fcb6ec348a58b4f75ff6e50c50e3b5
-  languageName: node
-  linkType: hard
-
-"@autometrics/autometrics@file:../../packages/autometrics::locator=react-app-example%40workspace%3Aexamples%2Freact-app":
-  version: 0.6.0
-  resolution: "@autometrics/autometrics@file:../../packages/autometrics#../../packages/autometrics::hash=ea0d1f&locator=react-app-example%40workspace%3Aexamples%2Freact-app"
-  dependencies:
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-  checksum: a4fc95fb3ed0f12dcbf2f76316cc6fdde6c0a29ac1931f6d694b65febd3a1bcd7d6e3d8fc55bf10d38b3ace33432fb7e32fcb6ec348a58b4f75ff6e50c50e3b5
-  languageName: node
-  linkType: hard
-
-"@autometrics/exporter-otlp-http@file:../../packages/exporter-otlp-http::locator=react-app-example%40workspace%3Aexamples%2Freact-app":
-  version: 0.6.0
-  resolution: "@autometrics/exporter-otlp-http@file:../../packages/exporter-otlp-http#../../packages/exporter-otlp-http::hash=38716e&locator=react-app-example%40workspace%3Aexamples%2Freact-app"
-  dependencies:
-    "@autometrics/autometrics": ^0.6.0
-    "@autometrics/on-demand-metric-reader": ^0.1.0
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/exporter-metrics-otlp-http": ^0.41.0
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-  checksum: 4278c1cb045b06acd3806eade3fa8ec1c868155a440d3e72dd7ddffe27e7305f0d49c2734f8655e956d20e34363a2c3479a2389e5bab7f00435ca670e04b9e47
-  languageName: node
-  linkType: hard
-
-"@autometrics/exporter-otlp-http@workspace:packages/exporter-otlp-http":
+"@autometrics/exporter-otlp-http@^0.6.0, @autometrics/exporter-otlp-http@workspace:packages/exporter-otlp-http":
   version: 0.0.0-use.local
   resolution: "@autometrics/exporter-otlp-http@workspace:packages/exporter-otlp-http"
   dependencies:
@@ -156,21 +93,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@autometrics/exporter-prometheus-push-gateway@file:../../packages/exporter-prometheus-push-gateway::locator=faas-experimental-example%40workspace%3Aexamples%2Ffaas-experimental":
-  version: 0.6.0
-  resolution: "@autometrics/exporter-prometheus-push-gateway@file:../../packages/exporter-prometheus-push-gateway#../../packages/exporter-prometheus-push-gateway::hash=ee9a67&locator=faas-experimental-example%40workspace%3Aexamples%2Ffaas-experimental"
-  dependencies:
-    "@autometrics/autometrics": ^0.6.0
-    "@autometrics/on-demand-metric-reader": ^0.1.0
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/core": ^1.15.2
-    "@opentelemetry/exporter-prometheus": ">=0.35.1"
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-  checksum: c620917b042b6c1e6a50341f359236be2dea6a30960ea8d325c0c1360fd29b3b533f3033dc0fdce07ebea042f4578a0724078b032d341f0bb2d8387f75d212fa
-  languageName: node
-  linkType: hard
-
-"@autometrics/exporter-prometheus-push-gateway@workspace:packages/exporter-prometheus-push-gateway":
+"@autometrics/exporter-prometheus-push-gateway@^0.6.0, @autometrics/exporter-prometheus-push-gateway@workspace:packages/exporter-prometheus-push-gateway":
   version: 0.0.0-use.local
   resolution: "@autometrics/exporter-prometheus-push-gateway@workspace:packages/exporter-prometheus-push-gateway"
   dependencies:
@@ -186,46 +109,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@autometrics/exporter-prometheus@file:../../packages/exporter-prometheus::locator=express-example%40workspace%3Aexamples%2Fexpress":
-  version: 0.6.0
-  resolution: "@autometrics/exporter-prometheus@file:../../packages/exporter-prometheus#../../packages/exporter-prometheus::hash=69cb40&locator=express-example%40workspace%3Aexamples%2Fexpress"
-  dependencies:
-    "@autometrics/autometrics": ^0.6.0
-    "@autometrics/on-demand-metric-reader": ^0.1.0
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/exporter-prometheus": ">=0.41.2"
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-  checksum: c7a15a47b859162c4243d52f9055b249d80198c55af68da9c0a86609bd08d316eac8aa86b872fec351c19af6b70c0752f9717523df32775ee49990309a8ab092
-  languageName: node
-  linkType: hard
-
-"@autometrics/exporter-prometheus@file:../../packages/exporter-prometheus::locator=fastify-example%40workspace%3Aexamples%2Ffastify":
-  version: 0.6.0
-  resolution: "@autometrics/exporter-prometheus@file:../../packages/exporter-prometheus#../../packages/exporter-prometheus::hash=69cb40&locator=fastify-example%40workspace%3Aexamples%2Ffastify"
-  dependencies:
-    "@autometrics/autometrics": ^0.6.0
-    "@autometrics/on-demand-metric-reader": ^0.1.0
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/exporter-prometheus": ">=0.41.2"
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-  checksum: c7a15a47b859162c4243d52f9055b249d80198c55af68da9c0a86609bd08d316eac8aa86b872fec351c19af6b70c0752f9717523df32775ee49990309a8ab092
-  languageName: node
-  linkType: hard
-
-"@autometrics/exporter-prometheus@file:../../packages/exporter-prometheus::locator=nestjs-example%40workspace%3Aexamples%2Fnestjs":
-  version: 0.6.0
-  resolution: "@autometrics/exporter-prometheus@file:../../packages/exporter-prometheus#../../packages/exporter-prometheus::hash=69cb40&locator=nestjs-example%40workspace%3Aexamples%2Fnestjs"
-  dependencies:
-    "@autometrics/autometrics": ^0.6.0
-    "@autometrics/on-demand-metric-reader": ^0.1.0
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/exporter-prometheus": ">=0.41.2"
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-  checksum: c7a15a47b859162c4243d52f9055b249d80198c55af68da9c0a86609bd08d316eac8aa86b872fec351c19af6b70c0752f9717523df32775ee49990309a8ab092
-  languageName: node
-  linkType: hard
-
-"@autometrics/exporter-prometheus@workspace:packages/exporter-prometheus":
+"@autometrics/exporter-prometheus@^0.6.0, @autometrics/exporter-prometheus@workspace:packages/exporter-prometheus":
   version: 0.0.0-use.local
   resolution: "@autometrics/exporter-prometheus@workspace:packages/exporter-prometheus"
   dependencies:
@@ -265,42 +149,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@autometrics/typescript-plugin@file:../../packages/typescript-plugin::locator=express-example%40workspace%3Aexamples%2Fexpress":
-  version: 0.5.4
-  resolution: "@autometrics/typescript-plugin@file:../../packages/typescript-plugin#../../packages/typescript-plugin::hash=5ef752&locator=express-example%40workspace%3Aexamples%2Fexpress"
-  checksum: fb23000effa0d44ddcf106cd4ebc3b1897722aa62925b821efa93b0bce55cefedede4e9f2ea7dded5287267eaed467cc823e611cdb6b81d1659769dbd5c81535
-  languageName: node
-  linkType: hard
-
-"@autometrics/typescript-plugin@file:../../packages/typescript-plugin::locator=faas-experimental-example%40workspace%3Aexamples%2Ffaas-experimental":
-  version: 0.5.4
-  resolution: "@autometrics/typescript-plugin@file:../../packages/typescript-plugin#../../packages/typescript-plugin::hash=5ef752&locator=faas-experimental-example%40workspace%3Aexamples%2Ffaas-experimental"
-  checksum: fb23000effa0d44ddcf106cd4ebc3b1897722aa62925b821efa93b0bce55cefedede4e9f2ea7dded5287267eaed467cc823e611cdb6b81d1659769dbd5c81535
-  languageName: node
-  linkType: hard
-
-"@autometrics/typescript-plugin@file:../../packages/typescript-plugin::locator=fastify-example%40workspace%3Aexamples%2Ffastify":
-  version: 0.5.4
-  resolution: "@autometrics/typescript-plugin@file:../../packages/typescript-plugin#../../packages/typescript-plugin::hash=5ef752&locator=fastify-example%40workspace%3Aexamples%2Ffastify"
-  checksum: fb23000effa0d44ddcf106cd4ebc3b1897722aa62925b821efa93b0bce55cefedede4e9f2ea7dded5287267eaed467cc823e611cdb6b81d1659769dbd5c81535
-  languageName: node
-  linkType: hard
-
-"@autometrics/typescript-plugin@file:../../packages/typescript-plugin::locator=nestjs-example%40workspace%3Aexamples%2Fnestjs":
-  version: 0.5.4
-  resolution: "@autometrics/typescript-plugin@file:../../packages/typescript-plugin#../../packages/typescript-plugin::hash=5ef752&locator=nestjs-example%40workspace%3Aexamples%2Fnestjs"
-  checksum: fb23000effa0d44ddcf106cd4ebc3b1897722aa62925b821efa93b0bce55cefedede4e9f2ea7dded5287267eaed467cc823e611cdb6b81d1659769dbd5c81535
-  languageName: node
-  linkType: hard
-
-"@autometrics/typescript-plugin@file:../../packages/typescript-plugin::locator=react-app-example%40workspace%3Aexamples%2Freact-app":
-  version: 0.5.4
-  resolution: "@autometrics/typescript-plugin@file:../../packages/typescript-plugin#../../packages/typescript-plugin::hash=5ef752&locator=react-app-example%40workspace%3Aexamples%2Freact-app"
-  checksum: fb23000effa0d44ddcf106cd4ebc3b1897722aa62925b821efa93b0bce55cefedede4e9f2ea7dded5287267eaed467cc823e611cdb6b81d1659769dbd5c81535
-  languageName: node
-  linkType: hard
-
-"@autometrics/typescript-plugin@workspace:packages/typescript-plugin":
+"@autometrics/typescript-plugin@^0.5.4, @autometrics/typescript-plugin@workspace:packages/typescript-plugin":
   version: 0.0.0-use.local
   resolution: "@autometrics/typescript-plugin@workspace:packages/typescript-plugin"
   dependencies:
@@ -3524,9 +3373,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "express-example@workspace:examples/express"
   dependencies:
-    "@autometrics/autometrics": ../../packages/autometrics
-    "@autometrics/exporter-prometheus": ../../packages/exporter-prometheus
-    "@autometrics/typescript-plugin": ../../packages/typescript-plugin
+    "@autometrics/autometrics": ^0.6.0
+    "@autometrics/exporter-prometheus": ^0.6.0
+    "@autometrics/typescript-plugin": ^0.5.4
     "@types/express": ^4.17.16
     "@types/node": ^18.11.18
     express: ^4.18.2
@@ -3589,9 +3438,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "faas-experimental-example@workspace:examples/faas-experimental"
   dependencies:
-    "@autometrics/autometrics": ../../packages/autometrics
-    "@autometrics/exporter-prometheus-push-gateway": ../../packages/exporter-prometheus-push-gateway
-    "@autometrics/typescript-plugin": ../../packages/typescript-plugin
+    "@autometrics/autometrics": ^0.6.0
+    "@autometrics/exporter-prometheus-push-gateway": ^0.6.0
+    "@autometrics/typescript-plugin": ^0.5.4
     node-fetch: ^3.3.1
     tsx: ^3.12.7
     typescript: ^4.9.4
@@ -3687,9 +3536,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fastify-example@workspace:examples/fastify"
   dependencies:
-    "@autometrics/autometrics": ../../packages/autometrics
-    "@autometrics/exporter-prometheus": ../../packages/exporter-prometheus
-    "@autometrics/typescript-plugin": ../../packages/typescript-plugin
+    "@autometrics/autometrics": ^0.6.0
+    "@autometrics/exporter-prometheus": ^0.6.0
+    "@autometrics/typescript-plugin": ^0.5.4
     "@prisma/client": ^5.2.0
     "@types/node": ^18.13.0
     fastify: ^4.13.0
@@ -5209,9 +5058,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "nestjs-example@workspace:examples/nestjs"
   dependencies:
-    "@autometrics/autometrics": ../../packages/autometrics
-    "@autometrics/exporter-prometheus": ../../packages/exporter-prometheus
-    "@autometrics/typescript-plugin": ../../packages/typescript-plugin
+    "@autometrics/autometrics": ^0.6.0
+    "@autometrics/exporter-prometheus": ^0.6.0
+    "@autometrics/typescript-plugin": ^0.5.4
     "@nestjs/cli": ^9.0.0
     "@nestjs/common": ^9.0.0
     "@nestjs/core": ^9.0.0
@@ -5846,9 +5695,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-app-example@workspace:examples/react-app"
   dependencies:
-    "@autometrics/autometrics": ../../packages/autometrics
-    "@autometrics/exporter-otlp-http": ../../packages/exporter-otlp-http
-    "@autometrics/typescript-plugin": ../../packages/typescript-plugin
+    "@autometrics/autometrics": ^0.6.0
+    "@autometrics/exporter-otlp-http": ^0.6.0
+    "@autometrics/typescript-plugin": ^0.5.4
     "@types/react": ^18.0.27
     "@types/react-dom": ^18.0.10
     "@vitejs/plugin-react": ^3.1.0
