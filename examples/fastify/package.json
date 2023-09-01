@@ -10,15 +10,15 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@autometrics/autometrics": "file:../../packages/autometrics",
-    "@autometrics/exporter-prometheus": "file:../../packages/exporter-prometheus",
-    "@prisma/client": "^4.10.1",
+    "@autometrics/autometrics": "../../packages/autometrics",
+    "@autometrics/exporter-prometheus": "../../packages/exporter-prometheus",
+    "@prisma/client": "^5.2.0",
     "fastify": "^4.13.0"
   },
   "devDependencies": {
-    "@autometrics/typescript-plugin": "file:../../packages/typescript-plugin",
+    "@autometrics/typescript-plugin": "../../packages/typescript-plugin",
     "@types/node": "^18.13.0",
-    "prisma": "^4.10.1",
+    "prisma": "^5.2.0",
     "typescript": "^4.9.5"
   }
 }

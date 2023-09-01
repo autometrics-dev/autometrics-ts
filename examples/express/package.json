@@ -1,5 +1,5 @@
 {
-  "name": "sample-express",
+  "name": "express-example",
   "version": "1.0.0",
   "type": "module",
   "description": "Sample express app",
@@ -10,14 +10,14 @@
   "keywords": [],
   "license": "ISC",
   "devDependencies": {
-    "@autometrics/typescript-plugin": "file:../../packages/typescript-plugin",
+    "@autometrics/typescript-plugin": "../../packages/typescript-plugin",
     "@types/express": "^4.17.16",
     "@types/node": "^18.11.18",
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@autometrics/autometrics": "file:../../packages/autometrics",
-    "@autometrics/exporter-prometheus": "file:../../packages/exporter-prometheus",
+    "@autometrics/autometrics": "../../packages/autometrics",
+    "@autometrics/exporter-prometheus": "../../packages/exporter-prometheus",
     "express": "^4.18.2",
     "node-fetch": "^3.3.1"
   }

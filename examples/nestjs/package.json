@@ -1,5 +1,5 @@
 {
-  "name": "nestjs",
+  "name": "nestjs-example",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -13,8 +13,8 @@
     "start:prod": "node dist/main"
   },
   "dependencies": {
-    "@autometrics/autometrics": "file:../../packages/autometrics",
-    "@autometrics/exporter-prometheus": "file:../../packages/exporter-prometheus",
+    "@autometrics/autometrics": "../../packages/autometrics",
+    "@autometrics/exporter-prometheus": "../../packages/exporter-prometheus",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
@@ -22,7 +22,7 @@
     "rxjs": "^7.2.0"
   },
   "devDependencies": {
-    "@autometrics/typescript-plugin": "file:../../packages/typescript-plugin",
+    "@autometrics/typescript-plugin": "../../packages/typescript-plugin",
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",

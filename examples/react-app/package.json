@@ -1,5 +1,5 @@
 {
-  "name": "react-app",
+  "name": "react-app-example",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,13 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@autometrics/autometrics": "file:../../packages/autometrics",
-    "@autometrics/exporter-otlp-http": "file:../../packages/exporter-otlp-http",
+    "@autometrics/autometrics": "../../packages/autometrics",
+    "@autometrics/exporter-otlp-http": "../../packages/exporter-otlp-http",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@autometrics/typescript-plugin": "file:../../packages/typescript-plugin",
+    "@autometrics/typescript-plugin": "../../packages/typescript-plugin",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",

@@ -29,5 +29,10 @@
   "dependencies": {
     "@parcel/plugin": "^2.9.0",
     "typescript": ">=5.0.4"
+  },
+  "devDependencies": {
+    "@parcel/types": "^2.9.3",
+    "@types/node": "^20.5.7",
+    "vitest": "^0.34.3"
   }
 }
