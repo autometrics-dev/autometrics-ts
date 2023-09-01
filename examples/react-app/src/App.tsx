@@ -9,7 +9,7 @@ import "./App.css";
 // Collector using OTLP over HTTP. (The `faas-experiment/` example uses a
 // Prometheus push gateway instead.)
 init({
-  url: "http://0.0.0.0:8080/metrics",
+  url: "/metrics",
   buildInfo: {
     version: import.meta.env.VITE_AUTOMETRICS_VERSION,
     commit: import.meta.env.VITE_AUTOMETRICS_COMMIT,
@@ -67,7 +67,7 @@ function App() {
       <h1>Post getter</h1>
 
       <div className="card">
-        <button onClick={handleClick}>
+        <button onClick={handleClick} type="button">
           Get {post ? "new " : ""}random post
         </button>
 

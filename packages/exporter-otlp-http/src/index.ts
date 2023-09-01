@@ -21,7 +21,7 @@ export type InitOptions = {
   headers?: Record<string, unknown>;
 
   /**
-   * The interval for pushing metrics, in milliseconds (default: `5_000ms`).
+   * The interval for pushing metrics, in milliseconds (default: `5000ms`).
    *
    * Set to `0` to push eagerly without batching metrics. This is mainly useful
    * for edge functions and some client-side scenarios.
@@ -34,7 +34,7 @@ export type InitOptions = {
   concurrencyLimit?: number;
 
   /**
-   * The timeout for pushing metrics, in milliseconds (default: `30_000ms`).
+   * The timeout for pushing metrics, in milliseconds (default: `1000ms`).
    */
   timeout?: number;
 
@@ -50,9 +50,9 @@ export type InitOptions = {
 export function init({
   url,
   headers,
-  pushInterval = 5_000,
+  pushInterval = 5000,
   concurrencyLimit,
-  timeout = 30_000,
+  timeout = 1000,
   buildInfo,
 }: InitOptions) {
   amLogger.info(`Exporter will push to the OLTP/HTTP endpoint at ${url}`);

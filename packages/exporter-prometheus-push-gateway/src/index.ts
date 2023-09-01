@@ -36,7 +36,7 @@ export type InitOptions = {
   concurrencyLimit?: number;
 
   /**
-   * The timeout for pushing metrics, in milliseconds (default: `30_000ms`).
+   * The timeout for pushing metrics, in milliseconds (default: `1000ms`).
    */
   timeout?: number;
 
@@ -52,9 +52,9 @@ export type InitOptions = {
 export function init({
   url,
   headers,
-  pushInterval = 5_000,
+  pushInterval = 5000,
   concurrencyLimit,
-  timeout = 30_000,
+  timeout = 1000,
   buildInfo,
 }: InitOptions) {
   if (typeof fetch === "undefined") {
