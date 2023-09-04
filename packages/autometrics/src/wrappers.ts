@@ -232,7 +232,8 @@ export function autometrics<F extends FunctionSig>(
   // NOTE - Gravel Gateway will reject two metrics of the same name if one of
   //        them has a subset of the attributes of the other. This means to be
   //        able to support functions that have objectives, as well as functions
-  //        that default to setting the objective_* labels to the empty string.
+  //        that do not have objectives, we need to default to setting the objective_*
+  //        labels to the empty string.
   const counterObjectiveAttributes: Attributes = {
     objective_name: "",
     objective_percentile: "",
