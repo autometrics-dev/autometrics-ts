@@ -6,13 +6,16 @@ import "./App.css";
 // In order for Prometheus to succesfully get your client-side app metrics, you
 // will need to push them to either a Prometheus-compatible aggregating push
 // gateway, or an OpenTelemetry Collector. Here, we choose to push to an Otel
-// Collector using OTLP over HTTP. (The `faas-experiment/` example uses a
+// Collector using OTLP over HTTP. (The `faas-experimental/` example uses a
 // Prometheus push gateway instead.)
 init({
   // A proxy configured in `vite.config.ts` forwards the `/metrics` endpoint
   // to the Otel Collector.
-  url: "/metrics",
-  pushInterval: 0,
+  url: "https://wercker.fmp.fiberplane.dev/otel/http/v1/metrics",
+  // Uncomment the next line to push "eagerly" instead of in batches. Eager
+  // pushing may generate more traffic, but reduces chances of missing metrics
+  // when the user closes their tab.
+  //pushInterval: 0,
   buildInfo: {
     version: import.meta.env.VITE_AUTOMETRICS_VERSION,
     commit: import.meta.env.VITE_AUTOMETRICS_COMMIT,

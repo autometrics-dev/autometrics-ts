@@ -2,12 +2,12 @@
 
 ## Development workflow
 
-The project uses as `npm` as the package manager.
+The project uses `yarn` as the package manager.
 
 ```shell
 git clone git@github.com:autometrics-dev/autometrics-ts.git
 cd autometrics-ts
-npm install
+yarn
 ```
 
 ### Overview
@@ -40,36 +40,6 @@ yarn dev:lib
 # in project root
 yarn dev:plugin
 ```
-
-#### Use examples
-
-Use the examples in `examples/` to test your changes. You will need to reinstall
-autometrics packages to use the local development ones to see the changes
-reflected.
-
-Example with the `express` app:
-
-1. Remove the official npm released autometrics packages
-
-```shell
-npm uninstall @autometrics/autometrics @autometrics/typescript-plugin
-```
-
-2. Install local versions of autometrics
-
-```shell
-# from examples/express
-npm install ../../packages/autometrics/
-npm install -D ../../packages/typescript-plugin/
-```
-
-Now every time you will save and rebuild any of the packages they will update in
-your example repo automatically (you won't need to re-run `npm install`)
-
-Open the `express` app with your editor, e.g.: VSCode - `code examples/express/`
-
-This is now your "lab" environment for testing out how the library or the plugin
-work and feel.
 
 #### Debugging TypeScript plugin
 

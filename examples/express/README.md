@@ -27,7 +27,7 @@ Flag `--config.file` must point to the `prometheus.yml` configuration file
 3. Install the dependencies
 
 ```shell
-npm install
+yarn
 ```
 
 4. Build and run the application

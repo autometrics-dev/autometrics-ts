@@ -25,6 +25,8 @@ export type InitOptions = {
    *
    * Set to `0` to push eagerly without batching metrics. This is mainly useful
    * for edge functions and some client-side scenarios.
+   *
+   * Note the push interval may not be smaller than the `timeout`.
    */
   pushInterval?: number;
 
@@ -35,6 +37,8 @@ export type InitOptions = {
 
   /**
    * The timeout for pushing metrics, in milliseconds (default: `1000ms`).
+   *
+   * Note the timeout may not be larger than the `pushInterval`.
    */
   timeout?: number;
 

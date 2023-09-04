@@ -29,7 +29,7 @@ Flag `--config.file` must point to the `prometheus.yml` configuration file
 4. Install the dependencies
 
 ```shell
-npm install
+yarn
 ```
 
 5. Run the initial migration

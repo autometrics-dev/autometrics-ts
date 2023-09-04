@@ -9,7 +9,7 @@ To see Autometrics in action:
 
 0. Clone this repo and make sure your terminal is inside `examples/react-app/`.
 
-1. Install `am`.
+1. Install [`am`](https://github.com/autometrics-dev/am).
 
 Mac users can use Homebrew:
 
@@ -60,7 +60,8 @@ look something like:
 >   ➜  Local:   http://localhost:4173/
 
 6. Now you have two URLs, one for the example app where you can generate
-traffic, which you should then be able to see in the Explorer UI.
+traffic, which you should then be able to see in the Explorer UI. It may take up
+to 30 seconds for data to show up in the UI.
 
 Assuming the Explorer endpoint is exactly as shown above, this will be the
 direct URL to the function that is generating traffic from the example app:
