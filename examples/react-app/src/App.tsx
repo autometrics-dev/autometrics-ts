@@ -9,7 +9,10 @@ import "./App.css";
 // Collector using OTLP over HTTP. (The `faas-experiment/` example uses a
 // Prometheus push gateway instead.)
 init({
+  // A proxy configured in `vite.config.ts` forwards the `/metrics` endpoint
+  // to the Otel Collector.
   url: "/metrics",
+  pushInterval: 0,
   buildInfo: {
     version: import.meta.env.VITE_AUTOMETRICS_VERSION,
     commit: import.meta.env.VITE_AUTOMETRICS_COMMIT,
