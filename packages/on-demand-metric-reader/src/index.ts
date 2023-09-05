@@ -124,14 +124,7 @@ function callWithTimeout<T>(promise: Promise<T>, timeout: number): Promise<T> {
     }, timeout);
   });
 
-  return Promise.race([promise, timeoutPromise]).then(
-    (result) => {
-      clearTimeout(timeoutHandle);
-      return result;
-    },
-    (reason) => {
-      clearTimeout(timeoutHandle);
-      throw reason;
-    },
-  );
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    clearTimeout(timeoutHandle);
+  });
 }

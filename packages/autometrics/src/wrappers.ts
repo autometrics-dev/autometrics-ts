@@ -271,10 +271,12 @@ export function autometrics<F extends FunctionSig>(
     description: HISTOGRAM_DESCRIPTION,
     unit: "seconds",
   });
-  const gauge = meter.createUpDownCounter(GAUGE_NAME, {
-    description: GAUGE_DESCRIPTION,
-    valueType: ValueType.INT,
-  });
+  const concurrencyGauge = trackConcurrency
+    ? meter.createUpDownCounter(GAUGE_NAME, {
+        description: GAUGE_DESCRIPTION,
+        valueType: ValueType.INT,
+      })
+    : null;
   const caller = getALSCaller(asyncLocalStorage);
 
   counter.add(0, {
@@ -287,12 +289,10 @@ export function autometrics<F extends FunctionSig>(
 
   return function (...params) {
     const autometricsStart = performance.now();
-    if (trackConcurrency) {
-      gauge.add(1, {
-        function: functionName,
-        module: moduleName,
-      });
-    }
+    concurrencyGauge?.add(1, {
+      function: functionName,
+      module: moduleName,
+    });
 
     const onSuccess = () => {
       const autometricsDuration = (performance.now() - autometricsStart) / 1000;
@@ -312,12 +312,10 @@ export function autometrics<F extends FunctionSig>(
         ...histogramObjectiveAttributes,
       });
 
-      if (trackConcurrency) {
-        gauge.add(-1, {
-          function: functionName,
-          module: moduleName,
-        });
-      }
+      concurrencyGauge?.add(-1, {
+        function: functionName,
+        module: moduleName,
+      });
 
       metricsRecorded();
     };
@@ -340,13 +338,11 @@ export function autometrics<F extends FunctionSig>(
         ...histogramObjectiveAttributes,
       });
 
-      if (trackConcurrency) {
-        gauge.add(-1, {
-          function: functionName,
-          module: moduleName,
-          caller,
-        });
-      }
+      concurrencyGauge?.add(-1, {
+        function: functionName,
+        module: moduleName,
+        caller,
+      });
 
       metricsRecorded();
     };
