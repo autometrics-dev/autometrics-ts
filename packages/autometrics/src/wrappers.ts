@@ -1,4 +1,4 @@
-import { Attributes } from "@opentelemetry/api";
+import { Attributes, ValueType } from "@opentelemetry/api";
 
 import {
   ALSInstance,
@@ -265,6 +265,7 @@ export function autometrics<F extends FunctionSig>(
   const meter = getMeter();
   const counter = meter.createCounter(COUNTER_NAME, {
     description: COUNTER_DESCRIPTION,
+    valueType: ValueType.INT,
   });
   const histogram = meter.createHistogram(HISTOGRAM_NAME, {
     description: HISTOGRAM_DESCRIPTION,
@@ -272,6 +273,7 @@ export function autometrics<F extends FunctionSig>(
   });
   const gauge = meter.createUpDownCounter(GAUGE_NAME, {
     description: GAUGE_DESCRIPTION,
+    valueType: ValueType.INT,
   });
   const caller = getALSCaller(asyncLocalStorage);
 

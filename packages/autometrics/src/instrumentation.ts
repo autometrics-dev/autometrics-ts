@@ -7,6 +7,8 @@ const meterProvider = new MeterProvider({
   views: [createDefaultHistogramView()],
 });
 
+const meter = meterProvider.getMeter("autometrics");
+
 /**
  * Registered listeners that should be notified when `metricsRecorded()` is
  * called.
@@ -51,7 +53,7 @@ export function registerExporter({
  * @internal
  */
 export function getMeter(): Meter {
-  return meterProvider.getMeter("autometrics");
+  return meter;
 }
 
 /**

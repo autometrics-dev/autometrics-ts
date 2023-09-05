@@ -1,13 +1,20 @@
 import {
+  AggregationTemporality,
+  PeriodicExportingMetricReader,
+} from "@opentelemetry/sdk-metrics";
+import {
+  AggregationTemporalityPreference,
+  OTLPMetricExporter,
+} from "@opentelemetry/exporter-metrics-otlp-http";
+import {
   BuildInfo,
   amLogger,
   createDefaultBuildInfo,
   recordBuildInfo,
-  registerExporter,
 } from "@autometrics/autometrics";
 import { OnDemandMetricReader } from "@autometrics/on-demand-metric-reader";
-import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
-import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
+
+import { registerExporterInternal } from "./registerExporterInternal";
 
 export type InitOptions = {
   /**
@@ -43,6 +50,16 @@ export type InitOptions = {
   timeout?: number;
 
   /**
+   * The aggregation temporality preference.
+   *
+   * By default, we use `AggregationTemporality.CUMULATIVE`. You may wish to
+   * change this depending on the OpenTelemetry Collector you use.
+   */
+  temporalityPreference?:
+    | AggregationTemporalityPreference
+    | AggregationTemporality;
+
+  /**
    * Optional build info to be added to the `build_info` metric.
    */
   buildInfo?: BuildInfo;
@@ -57,19 +74,21 @@ export function init({
   pushInterval = 5000,
   concurrencyLimit,
   timeout = 1000,
+  temporalityPreference = AggregationTemporality.CUMULATIVE,
   buildInfo,
 }: InitOptions) {
-  amLogger.info(`Exporter will push to the OLTP/HTTP endpoint at ${url}`);
+  amLogger.info(`Exporter will push to the OTLP/HTTP endpoint at ${url}`);
 
   const exporter = new OTLPMetricExporter({
     url,
     headers,
     concurrencyLimit,
     keepAlive: true,
+    temporalityPreference,
   });
 
   if (pushInterval > 0) {
-    registerExporter({
+    registerExporterInternal({
       metricReader: new PeriodicExportingMetricReader({
         exporter,
         exportIntervalMillis: pushInterval,
@@ -84,7 +103,7 @@ export function init({
       exportTimeoutMillis: timeout,
     });
 
-    registerExporter({
+    registerExporterInternal({
       metricReader,
       metricsRecorded: () => metricReader.forceFlush(),
     });

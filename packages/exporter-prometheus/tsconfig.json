@@ -3,9 +3,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "outDir": "dist/",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "outDir": "dist/"
   },
   "include": [
     "./src"
