@@ -5691,9 +5691,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-app-example@workspace:examples/react-app":
+"react-app-example@workspace:examples/react-app-experimental":
   version: 0.0.0-use.local
-  resolution: "react-app-example@workspace:examples/react-app"
+  resolution: "react-app-example@workspace:examples/react-app-experimental"
   dependencies:
     "@autometrics/autometrics": ^0.6.0
     "@autometrics/exporter-otlp-http": ^0.6.0

@@ -7,7 +7,7 @@
     "examples/faas-experimental",
     "examples/fastify",
     "examples/nestjs",
-    "examples/react-app",
+    "examples/react-app-experimental",
     "packages/autometrics",
     "packages/exporter-otlp-http",
     "packages/exporter-prometheus",

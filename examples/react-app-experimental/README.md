@@ -3,6 +3,10 @@
 Simple React App instrumented with Autometrics and using the OpenTelemetry
 Collector.
 
+**Experimental:** This example is currently considered experimental because it
+submits to a collector which will need to perform metric aggregation, which is
+a work-in-progress: https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/4968
+
 ### Running the example
 
 To see Autometrics in action:
