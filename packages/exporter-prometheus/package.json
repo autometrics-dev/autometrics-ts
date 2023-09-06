@@ -1,6 +1,6 @@
 {
   "name": "@autometrics/exporter-prometheus",
-  "version": "0.6.0",
+  "version": "0.7.0-beta",
   "type": "module",
   "description": "Export metrics by opening up a Prometheus scrape endpoint",
   "author": "Fiberplane <info@fiberplane.com>",
