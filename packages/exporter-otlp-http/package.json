@@ -1,6 +1,6 @@
 {
   "name": "@autometrics/exporter-otlp-http",
-  "version": "0.7.0-beta",
+  "version": "0.7.0-beta4",
   "type": "module",
   "description": "Export metrics using OTLP over HTTP/JSON",
   "author": "Fiberplane <info@fiberplane.com>",
