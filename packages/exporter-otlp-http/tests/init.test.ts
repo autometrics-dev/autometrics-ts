@@ -1,6 +1,7 @@
-import { Autometrics } from "@autometrics/autometrics";
 import { describe, expect, test } from "vitest";
 
+import { Autometrics } from "@autometrics/autometrics";
+import { COUNTER_NAME } from "../../autometrics/src/constants";
 import { init } from "../src/index";
 import { metricReader } from "../src/registerExporterInternal";
 
@@ -16,131 +17,31 @@ describe("init test", () => {
     const foo = new Foo();
     foo.bar(); // one before
 
-    init({ url: "/metrics", pushInterval: 0 });
+    init({ url: "/metrics", pushInterval: 5000 });
 
     foo.bar(); // one after
 
     const collectionResult = await metricReader?.collect();
 
-    expect(
-      collectionResult?.resourceMetrics.scopeMetrics,
-    ).toMatchInlineSnapshot(`
-      [
-        {
-          "metrics": [
-            {
-              "aggregationTemporality": 1,
-              "dataPointType": 0,
-              "dataPoints": [
-                {
-                  "attributes": {
-                    "caller": undefined,
-                    "function": "bar",
-                    "module": "/packages/exporter-otlp-http/tests/init.test.ts",
-                    "objective_latency_threshold": "",
-                    "objective_name": "",
-                    "objective_percentile": "",
-                  },
-                  "endTime": [
-                    1693842584,
-                    627000000,
-                  ],
-                  "startTime": [
-                    1693842584,
-                    621000000,
-                  ],
-                  "value": {
-                    "buckets": {
-                      "boundaries": [
-                        0,
-                        0.005,
-                        0.01,
-                        0.025,
-                        0.05,
-                        0.075,
-                        0.1,
-                        0.25,
-                        0.5,
-                        0.75,
-                        1,
-                        2.5,
-                        5,
-                        7.5,
-                        10,
-                      ],
-                      "counts": [
-                        0,
-                        1,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                      ],
-                    },
-                    "count": 2,
-                    "max": 0.0007790059894323349,
-                    "min": 0.0007790059894323349,
-                    "sum": 0.0007790059894323349,
-                  },
-                },
-              ],
-              "descriptor": {
-                "description": "Autometrics histogram for tracking function call duration",
-                "name": "function.calls.duration",
-                "type": "HISTOGRAM",
-                "unit": "seconds",
-                "valueType": 1,
-              },
-            },
-            {
-              "aggregationTemporality": 1,
-              "dataPointType": 3,
-              "dataPoints": [
-                {
-                  "attributes": {
-                    "branch": "",
-                    "clearmode": "",
-                    "commit": "",
-                    "version": "",
-                  },
-                  "endTime": [
-                    1693842584,
-                    627000000,
-                  ],
-                  "startTime": [
-                    1693842584,
-                    627000000,
-                  ],
-                  "value": 1,
-                },
-              ],
-              "descriptor": {
-                "description": "Autometrics info metric for tracking software version and build details",
-                "name": "build_info",
-                "type": "UP_DOWN_COUNTER",
-                "unit": "",
-                "valueType": 1,
-              },
-              "isMonotonic": false,
-            },
-          ],
-          "scope": {
-            "name": "autometrics",
-            "schemaUrl": undefined,
-            "version": "",
-          },
-        },
-      ]
+    const counterMetric =
+      collectionResult?.resourceMetrics.scopeMetrics[0].metrics.find(
+        (metric) => metric.descriptor.name === COUNTER_NAME,
+      );
+
+    if (!counterMetric) {
+      throw new Error("Counter metric not recorded");
+    }
+
+    expect(counterMetric.dataPoints[0].value).toBe(2);
+    expect(counterMetric.dataPoints[0].attributes).toMatchInlineSnapshot(`
+      {
+        "caller": undefined,
+        "function": "bar",
+        "module": "/packages/exporter-otlp-http/tests/init.test.ts",
+        "objective_name": "",
+        "objective_percentile": "",
+        "result": "ok",
+      }
     `);
   });
 });

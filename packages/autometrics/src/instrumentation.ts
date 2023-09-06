@@ -1,13 +1,19 @@
 import type { Meter } from "@opentelemetry/api";
 import { MeterProvider, MetricReader } from "@opentelemetry/sdk-metrics";
 
+import { TemporaryMeter } from "./temporaryMeter";
 import { createDefaultHistogramView } from "./histograms";
 
 const meterProvider = new MeterProvider({
   views: [createDefaultHistogramView()],
 });
 
-const meter = meterProvider.getMeter("autometrics");
+// Due to https://github.com/open-telemetry/opentelemetry-js/issues/4112,
+// we cannot start collecting metrics in a meter created from our own
+// `MeterProvider` as long as no `MetricReader` is registered yet. To avoid
+// this, we track all metrics in a temporary meter instead, from which we will
+// handover over all the registered metrics
+let meter: Meter = new TemporaryMeter();
 
 /**
  * Registered listeners that should be notified when `metricsRecorded()` is
@@ -41,6 +47,12 @@ export function registerExporter({
   metricsRecorded,
 }: ExporterOptions) {
   meterProvider.addMetricReader(metricReader);
+
+  if (meter instanceof TemporaryMeter) {
+    const temporaryMeter = meter;
+    meter = meterProvider.getMeter("autometrics");
+    temporaryMeter.handover(meter);
+  }
 
   if (metricsRecorded) {
     registeredMetricsRecordedListeners.push(metricsRecorded);

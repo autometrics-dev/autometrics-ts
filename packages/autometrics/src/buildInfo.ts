@@ -1,4 +1,4 @@
-import { UpDownCounter } from "@opentelemetry/api";
+import type { UpDownCounter } from "@opentelemetry/api";
 
 import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants";
 import { debug } from "./logger";
