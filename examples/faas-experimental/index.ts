@@ -1,5 +1,6 @@
 /**
- * This example should illustrate how you would use autometrics in a FaaS environment.
+ * This example should illustrate how you would use autometrics in a FaaS
+ * environment.
  *
  * If you need an aggregation gateway locally, try:
  *
@@ -14,16 +15,19 @@
 // NOTE - For now we need a fetch polyfill in node.
 //        (Fetch will already be defined in the browser and in Deno.)
 import "./fetch-polyfill";
-import { init as initAutometrics, autometrics } from "@autometrics/autometrics";
+import { autometrics } from "@autometrics/autometrics";
+import { init } from "@autometrics/exporter-prometheus-push-gateway";
 
-initAutometrics({
-  // NOTE - The current default exporter does not play nicely with Prometheus Push Gateway,
-  //        You'll end up with the error: 
-  //          "pushed metrics are invalid or inconsistent with existing metrics: pushed metrics must not have timestamps"
+init({
+  // NOTE - The current default exporter does not play nicely with Prometheus
+  //        Push Gateway. You'll end up with the error:
   //
-  //        However, everything works fine with aggregation gateways
+  //          "pushed metrics are invalid or inconsistent with existing metrics:
+  //           pushed metrics must not have timestamps"
   //
-  pushGateway: "http://localhost:9092/metrics",
+  //        However, everything works fine with aggregation gateways.
+  //
+  url: "http://localhost:9092/metrics",
   pushInterval: 0,
 });
 

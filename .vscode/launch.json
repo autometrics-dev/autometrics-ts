@@ -31,7 +31,7 @@
         "examples/express",
         "examples/fastify",
         "examples/nestjs",
-        "examples/react-app",
+        "examples/react-app-experimental",
         "examples/svelte-app",
       ]
     }

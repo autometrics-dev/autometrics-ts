@@ -2,6 +2,8 @@
 
 ## [unreleased]
 
+- **Breaking change:** Split the exporters into separate packages. Users will
+  need to explicitly choose an exporter and call its `init()` function.
 - (_experimental_) Push metrics to gateway "eagerly" when pushInterval is set to 0
 - Log error when fetch is not defined in push context
 

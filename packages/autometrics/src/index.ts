@@ -1,4 +1,5 @@
-// This is a convenience package that re-exports all available
-// APIs in the @autometrics/autometrics package and also bundles
-// @opentelemetry dependencies
-export * from "@autometrics/autometrics";
+export * from "./buildInfo";
+export { registerExporter, ExporterOptions } from "./instrumentation";
+export * as amLogger from "./logger";
+export * from "./objectives";
+export * from "./wrappers";

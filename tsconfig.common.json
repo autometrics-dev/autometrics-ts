@@ -5,7 +5,10 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "strict": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
   },
-  "exclude": ["examples/**", "utils/**"]
+  "exclude": ["examples/**", "node_modules/**", "utils/**"]
 }

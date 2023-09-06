@@ -1,5 +1,5 @@
 {
-  "name": "nestjs",
+  "name": "nestjs-example",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@autometrics/autometrics": "^0.6.0",
+    "@autometrics/exporter-prometheus": "^0.6.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",

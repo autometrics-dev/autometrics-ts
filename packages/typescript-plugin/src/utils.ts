@@ -9,6 +9,7 @@ export function getProxy(languageService: ts.LanguageService) {
     keyof ts.LanguageService
   >) {
     const x = languageService[k];
+    // @ts-ignore
     proxy[k] = (...args: Array<{}>) => x.apply(languageService, args);
   }
 

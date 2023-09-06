@@ -1,4 +1,4 @@
-name: Publish TypeScript plugin package to NPMJS
+name: Publish TypeScript plugin package to NPM
 on:
   push:
     tags:
@@ -8,21 +8,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-      - uses: rome/setup-rome@v0.4
-        with:
-          version: latest
-
       - uses: actions/checkout@v3
 
       - name: Setup the project
-        run: npm ci
-
-      - name: Install rome cli tools
-        run: npm install @rometools/cli-linux-x64
+        run: yarn
 
       - name: Run linter and format checker
-        run: npm run lint
+        run: yarn lint
 
   publish:
     runs-on: ubuntu-latest
@@ -36,10 +28,11 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           scope: "@autometrics"
 
-      - run: npm ci
+      - run: yarn
 
-      - run: npm run build --workspace=@autometrics/typescript-plugin
-      - run: npm run release --workspace=@autometrics/typescript-plugin
+      - run: yarn build --workspace=@autometrics/typescript-plugin
+
+      - run: yarn release --workspace=@autometrics/typescript-plugin
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

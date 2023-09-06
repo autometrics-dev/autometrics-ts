@@ -1,5 +1,8 @@
 import { NestFactory } from "@nestjs/core";
+import { init } from "@autometrics/exporter-prometheus";
 import { AppModule } from "./app.module";
+
+init(); // opens the `/metrics` endpoint on port 4964
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,4 +21,3 @@ async function generateRandomTraffic() {
 // We delay firing the sample traffic 1s to ensure
 // Prometheus can pick up the newly registered metrics
 setTimeout(() => generateRandomTraffic(), 1000);
-

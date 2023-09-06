@@ -18,18 +18,18 @@ brew install prometheus
 2. Run Prometheus from the root of the repo
 
 ```shell
-prometheus --config.file=$(pwd)/examples/util/prometheus.yml
+prometheus --config.file=$(pwd)/examples/config/prometheus.yml
 ```
 
 Flag `--config.file` must point to the `prometheus.yml` configuration file
-(example provided in the `util/` directory)
+(example provided in the `config/` directory)
 
 3. Copy `.env.example` as `.env`
 
 4. Install the dependencies
 
 ```shell
-npm install
+yarn
 ```
 
 5. Run the initial migration
@@ -47,7 +47,7 @@ npx prisma generate
 7. Build and run the application
 
 ```shell
-npm run build && npm run start
+yarn build && yarn start
 ```
 
 The example should run and generate some sample traffic by itself
