@@ -12,7 +12,7 @@
     "Stephan Lagerwaard"
   ],
   "repository": {
-    "url": "https://github.com/autometrics-dev/autometrics-ts.git"
+    "url": "git+https://github.com/autometrics-dev/autometrics-ts.git"
   },
   "license": "MIT",
   "publishConfig": {
@@ -24,6 +24,7 @@
     "dev": "tsc --watch",
     "build": "tsc",
     "clean": "rm -rf dist/",
+    "prepublish": "yarn build",
     "release": "npm publish",
     "type-check": "tsc -p tsconfig.json"
   },

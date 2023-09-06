@@ -62,7 +62,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@autometrics/autometrics@^0.6.0, @autometrics/autometrics@workspace:packages/autometrics":
+"@autometrics/autometrics@0.7.0-beta5, @autometrics/autometrics@^0.7.0-beta5, @autometrics/autometrics@workspace:packages/autometrics":
   version: 0.0.0-use.local
   resolution: "@autometrics/autometrics@workspace:packages/autometrics"
   dependencies:
@@ -78,11 +78,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@autometrics/exporter-otlp-http@^0.6.0, @autometrics/exporter-otlp-http@workspace:packages/exporter-otlp-http":
+"@autometrics/autometrics@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "@autometrics/autometrics@npm:0.6.0"
+  peerDependencies:
+    "@opentelemetry/exporter-prometheus": ">=0.35.1"
+    "@opentelemetry/sdk-metrics": ">=1.9.0"
+  checksum: 79141cfd0997535fa5d9417e08f7f5ddc1afe5406e9f0fd218f8c2216e7cd9ed54713906d3250a8cc9af20dc0d0f54f395dca4b6b7a98298ea1639a66d016df1
+  languageName: node
+  linkType: hard
+
+"@autometrics/exporter-otlp-http@^0.7.0-beta5, @autometrics/exporter-otlp-http@workspace:packages/exporter-otlp-http":
   version: 0.0.0-use.local
   resolution: "@autometrics/exporter-otlp-http@workspace:packages/exporter-otlp-http"
   dependencies:
-    "@autometrics/autometrics": ^0.6.0
+    "@autometrics/autometrics": 0.7.0-beta5
     "@opentelemetry/api": ^1.3.0
     "@opentelemetry/exporter-metrics-otlp-http": ^0.41.0
     "@opentelemetry/sdk-metrics": ">=1.15.0"
@@ -92,11 +102,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@autometrics/exporter-prometheus-push-gateway@^0.6.0, @autometrics/exporter-prometheus-push-gateway@workspace:packages/exporter-prometheus-push-gateway":
+"@autometrics/exporter-prometheus-push-gateway@^0.7.0-beta5, @autometrics/exporter-prometheus-push-gateway@workspace:packages/exporter-prometheus-push-gateway":
   version: 0.0.0-use.local
   resolution: "@autometrics/exporter-prometheus-push-gateway@workspace:packages/exporter-prometheus-push-gateway"
   dependencies:
-    "@autometrics/autometrics": ^0.6.0
+    "@autometrics/autometrics": 0.7.0-beta5
     "@opentelemetry/api": ^1.3.0
     "@opentelemetry/core": ^1.15.2
     "@opentelemetry/exporter-prometheus": ">=0.35.1"
@@ -107,11 +117,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@autometrics/exporter-prometheus@^0.6.0, @autometrics/exporter-prometheus@workspace:packages/exporter-prometheus":
+"@autometrics/exporter-prometheus@^0.7.0-beta5, @autometrics/exporter-prometheus@workspace:packages/exporter-prometheus":
   version: 0.0.0-use.local
   resolution: "@autometrics/exporter-prometheus@workspace:packages/exporter-prometheus"
   dependencies:
-    "@autometrics/autometrics": ^0.6.0
+    "@autometrics/autometrics": 0.7.0-beta5
     "@opentelemetry/api": ^1.3.0
     "@opentelemetry/exporter-prometheus": ">=0.41.2"
     "@opentelemetry/sdk-metrics": ">=1.15.0"
@@ -133,7 +143,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@autometrics/typescript-plugin@^0.5.4, @autometrics/typescript-plugin@workspace:packages/typescript-plugin":
+"@autometrics/typescript-plugin@npm:^0.5.4":
+  version: 0.5.4
+  resolution: "@autometrics/typescript-plugin@npm:0.5.4"
+  checksum: df18888dcb824ac9ac0e0b00532a4026e49deb118b5ad0a44d9f063a71ac4b9c2fdcc82a831d981ca7d805a23c071616d0f20403ead801dadb8c9dfa74af108b
+  languageName: node
+  linkType: hard
+
+"@autometrics/typescript-plugin@workspace:packages/typescript-plugin":
   version: 0.0.0-use.local
   resolution: "@autometrics/typescript-plugin@workspace:packages/typescript-plugin"
   dependencies:
@@ -3358,7 +3375,7 @@ __metadata:
   resolution: "express-example@workspace:examples/express"
   dependencies:
     "@autometrics/autometrics": ^0.6.0
-    "@autometrics/exporter-prometheus": ^0.6.0
+    "@autometrics/exporter-prometheus": ^0.7.0-beta5
     "@autometrics/typescript-plugin": ^0.5.4
     "@types/express": ^4.17.16
     "@types/node": ^18.11.18
@@ -3423,7 +3440,7 @@ __metadata:
   resolution: "faas-experimental-example@workspace:examples/faas-experimental"
   dependencies:
     "@autometrics/autometrics": ^0.6.0
-    "@autometrics/exporter-prometheus-push-gateway": ^0.6.0
+    "@autometrics/exporter-prometheus-push-gateway": ^0.7.0-beta5
     "@autometrics/typescript-plugin": ^0.5.4
     node-fetch: ^3.3.1
     tsx: ^3.12.7
@@ -3521,7 +3538,7 @@ __metadata:
   resolution: "fastify-example@workspace:examples/fastify"
   dependencies:
     "@autometrics/autometrics": ^0.6.0
-    "@autometrics/exporter-prometheus": ^0.6.0
+    "@autometrics/exporter-prometheus": ^0.7.0-beta5
     "@autometrics/typescript-plugin": ^0.5.4
     "@prisma/client": ^5.2.0
     "@types/node": ^18.13.0
@@ -5042,8 +5059,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "nestjs-example@workspace:examples/nestjs"
   dependencies:
-    "@autometrics/autometrics": ^0.6.0
-    "@autometrics/exporter-prometheus": ^0.6.0
+    "@autometrics/autometrics": ^0.7.0-beta5
+    "@autometrics/exporter-prometheus": ^0.7.0-beta5
     "@autometrics/typescript-plugin": ^0.5.4
     "@nestjs/cli": ^9.0.0
     "@nestjs/common": ^9.0.0
@@ -5679,8 +5696,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "react-app-example@workspace:examples/react-app-experimental"
   dependencies:
-    "@autometrics/autometrics": ^0.6.0
-    "@autometrics/exporter-otlp-http": ^0.6.0
+    "@autometrics/autometrics": ^0.7.0-beta5
+    "@autometrics/exporter-otlp-http": ^0.7.0-beta5
     "@autometrics/typescript-plugin": ^0.5.4
     "@types/react": ^18.0.27
     "@types/react-dom": ^18.0.10
