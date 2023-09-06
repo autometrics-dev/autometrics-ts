@@ -13,8 +13,8 @@
     "start:prod": "node dist/main"
   },
   "dependencies": {
-    "@autometrics/autometrics": "^0.6.0",
-    "@autometrics/exporter-prometheus": "^0.6.0",
+    "@autometrics/autometrics": "^0.7.0-beta5",
+    "@autometrics/exporter-prometheus": "^0.7.0-beta5",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",

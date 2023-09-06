@@ -33,9 +33,8 @@ jobs:
 
       - run: yarn
 
-      - run: yarn build --workspace=@autometrics/parcel-transformer-autometrics
-
-      - run: yarn release --workspace=@autometrics/parcel-transformer-autometrics
+      - run: yarn release
+        working-directory: packages/parcel-transformer-autometrics
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
