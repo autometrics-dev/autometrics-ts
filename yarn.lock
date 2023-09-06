@@ -83,7 +83,6 @@ __metadata:
   resolution: "@autometrics/exporter-otlp-http@workspace:packages/exporter-otlp-http"
   dependencies:
     "@autometrics/autometrics": ^0.6.0
-    "@autometrics/on-demand-metric-reader": ^0.1.0
     "@opentelemetry/api": ^1.3.0
     "@opentelemetry/exporter-metrics-otlp-http": ^0.41.0
     "@opentelemetry/sdk-metrics": ">=1.15.0"
@@ -98,7 +97,6 @@ __metadata:
   resolution: "@autometrics/exporter-prometheus-push-gateway@workspace:packages/exporter-prometheus-push-gateway"
   dependencies:
     "@autometrics/autometrics": ^0.6.0
-    "@autometrics/on-demand-metric-reader": ^0.1.0
     "@opentelemetry/api": ^1.3.0
     "@opentelemetry/core": ^1.15.2
     "@opentelemetry/exporter-prometheus": ">=0.35.1"
@@ -114,22 +112,8 @@ __metadata:
   resolution: "@autometrics/exporter-prometheus@workspace:packages/exporter-prometheus"
   dependencies:
     "@autometrics/autometrics": ^0.6.0
-    "@autometrics/on-demand-metric-reader": ^0.1.0
     "@opentelemetry/api": ^1.3.0
     "@opentelemetry/exporter-prometheus": ">=0.41.2"
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-    "@types/node": ^18.14.6
-    tsup: ^7.2.0
-    typescript: ^5.0.4
-  languageName: unknown
-  linkType: soft
-
-"@autometrics/on-demand-metric-reader@^0.1.0, @autometrics/on-demand-metric-reader@workspace:packages/on-demand-metric-reader":
-  version: 0.0.0-use.local
-  resolution: "@autometrics/on-demand-metric-reader@workspace:packages/on-demand-metric-reader"
-  dependencies:
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/core": ^1.15.0
     "@opentelemetry/sdk-metrics": ">=1.15.0"
     "@types/node": ^18.14.6
     tsup: ^7.2.0
@@ -1050,7 +1034,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/core@npm:1.15.2, @opentelemetry/core@npm:^1.15.0, @opentelemetry/core@npm:^1.15.2":
+"@opentelemetry/core@npm:1.15.2, @opentelemetry/core@npm:^1.15.2":
   version: 1.15.2
   resolution: "@opentelemetry/core@npm:1.15.2"
   dependencies:
