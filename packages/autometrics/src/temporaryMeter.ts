@@ -70,7 +70,7 @@ export class TemporaryMeter implements Meter {
     }
 
     const counter = new TemporaryCounter(name, options);
-    this._createdUpDownCounters.push(counter);
+    this._createdCounters.push(counter);
     return counter;
   }
 
@@ -220,7 +220,7 @@ export class TemporaryMeter implements Meter {
 
     for (const counter of this._createdObservableUpDownCounters) {
       counter.forward(
-        meter.createObservableGauge(counter.name, counter.options),
+        meter.createObservableUpDownCounter(counter.name, counter.options),
       );
     }
 
