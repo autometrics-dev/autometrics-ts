@@ -2,9 +2,6 @@ import { describe, expect, test } from "vitest";
 
 import { TemporaryMeter } from "../src/temporaryMeter";
 
-// the existing getModulePath function is a hack that parses the stack trace
-// as string and extracts the module path from it. This test is to ensure that
-// the function works as expected
 describe("temporaryMeter test", () => {
   test("it disables itself after the timeout expires", async () => {
     const meter = new TemporaryMeter({ timeout: 50 });
