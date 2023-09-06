@@ -30,7 +30,7 @@ Autometrics provides a wrapper function and decorator to instrument functions, c
 
 ## Example
 
-```typescript
+```ts
 import { autometrics } from "@autometrics/autometrics";
 
 const createUserWithMetrics = autometrics(async function createUser(payload: User) {
@@ -42,21 +42,23 @@ createUserWithMetrics();
 
 ![AutometricsTS demo](./assets/autometrics-ts-demo.gif)
 
-## Quickstart
+## Quickstart with Node.js and Prometheus
+
+(See the [recipes](#recipes) below for other setup scenarios.)
 
 1. **Install the library**
 
-```bash
-npm install @autometrics/autometrics
+```sh
+npm install @autometrics/autometrics @autometrics/exporter-prometheus
 # or
-yarn add @autometrics/autometrics
+yarn add @autometrics/autometrics @autometrics/exporter-prometheus
 # or
-pnpm add @autometrics/autometrics
+pnpm add @autometrics/autometrics @autometrics/exporter-prometheus
 ```
 
 2. **Instrument your code using the `autometrics` wrapper or `Autometrics` decorator**
 
-```typescript
+```ts
 import { autometrics } from "@autometrics/autometrics";
 
 const createUserWithMetrics = autometrics(async function createUser(payload: User) {
@@ -66,7 +68,7 @@ const createUserWithMetrics = autometrics(async function createUser(payload: Use
 createUserWithMetrics();
 ```
 
-```typescript
+```ts
 import { Autometrics } from "@autometrics/autometrics";
 
 class User {
@@ -75,6 +77,17 @@ class User {
     // ...
   }
 }
+```
+
+3. **Call `init()` to set up a Prometheus scrape endpoint**
+
+This endpoint will serve to export the metrics from your application and allows
+them to be scraped by Prometheus.
+
+```ts
+import { init } from "@autometrics/exporter-prometheus";
+
+init(); // starts the webserver with the `/metrics` endpoint on port 4964
 ```
 
 3. **Run Prometheus locally to validate and preview the data**
@@ -133,15 +146,15 @@ Add the language service plugin to the `tsconfig.json` file:
 
 ## Recipes
 
-Below are two recipes for using Autometrics in a server-side setup and a
-client-side setup. If you would like to see examples with specific frameworks,
-please have a look at the [examples/](examples/) directory.
+Below are different recipes for using Autometrics with a server-side setup and
+edge/client-side setups. If you would like to see examples with specific
+frameworks, please have a look at the [examples/](examples/) directory.
 
 ### Server-side example with Prometheus
 
 #### Installation
 
-```shell
+```sh
 npm install @autometrics/autometrics @autometrics/exporter-prometheus
 # or
 yarn add @autometrics/autometrics @autometrics/exporter-prometheus
@@ -153,7 +166,7 @@ pnpm add @autometrics/autometrics @autometrics/exporter-prometheus
 
 1. Anywhere in your source code:
 
-```typescript
+```ts
 import { autometrics } from "@autometrics/autometrics";
 import { init } from "@autometrics/exporter-prometheus";
 
@@ -167,11 +180,41 @@ const createUser = autometrics(createUserRaw);
    // ^ instrumented function
 ```
 
-### Recipe: Client-side example with the OpenTelemetry Collector
+### Recipe: Edge/Client-side example with a Prometheus Push Gateway
 
 #### Installation
 
-```shell
+```sh
+npm install @autometrics/autometrics @autometrics/exporter-prometheus-push-gateway
+# or
+yarn add @autometrics/autometrics @autometrics/exporter-prometheus-push-gateway
+# or
+pnpm add @autometrics/autometrics @autometrics/exporter-prometheus-push-gateway
+```
+
+#### Usage
+
+1. Anywhere in your source code:
+
+```ts
+import { autometrics } from "@autometrics/autometrics";
+import { init } from "@autometrics/exporter-prometheus-push-gateway";
+
+init({ url: "https://<your-push-gateway>" });
+
+async function createUserRaw(payload: User) {
+  // ...
+}
+
+const createUser = autometrics(createUserRaw);
+   // ^ instrumented function
+```
+
+### Recipe: Edge/Client-side example with the OpenTelemetry Collector
+
+#### Installation
+
+```sh
 npm install @autometrics/autometrics @autometrics/exporter-otlp-http
 # or
 yarn add @autometrics/autometrics @autometrics/exporter-otlp-http
@@ -183,7 +226,7 @@ pnpm add @autometrics/autometrics @autometrics/exporter-otlp-http
 
 1. Anywhere in your source code:
 
-```typescript
+```ts
 import { autometrics } from "@autometrics/autometrics";
 import { init } from "@autometrics/exporter-otlp-http";
 
