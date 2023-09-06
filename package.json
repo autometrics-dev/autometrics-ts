@@ -12,7 +12,6 @@
     "packages/exporter-otlp-http",
     "packages/exporter-prometheus",
     "packages/exporter-prometheus-push-gateway",
-    "packages/on-demand-metric-reader",
     "packages/parcel-transformer-autometrics",
     "packages/typescript-plugin"
   ],

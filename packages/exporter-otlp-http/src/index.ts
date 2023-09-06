@@ -12,7 +12,6 @@ import {
   createDefaultBuildInfo,
   recordBuildInfo,
 } from "@autometrics/autometrics";
-import { OnDemandMetricReader } from "@autometrics/on-demand-metric-reader";
 
 import { registerExporterInternal } from "./registerExporterInternal";
 
@@ -33,7 +32,7 @@ export type InitOptions = {
    * Set to `0` to push eagerly without batching metrics. This is mainly useful
    * for edge functions and some client-side scenarios.
    *
-   * Note the push interval may not be smaller than the `timeout`.
+   * Note the push interval (if non-zero) may not be smaller than the `timeout`.
    */
   pushInterval?: number;
 
@@ -45,7 +44,7 @@ export type InitOptions = {
   /**
    * The timeout for pushing metrics, in milliseconds (default: `1000ms`).
    *
-   * Note the timeout may not be larger than the `pushInterval`.
+   * Note the timeout may not be larger than the `pushInterval` (if non-zero).
    */
   timeout?: number;
 
@@ -98,8 +97,9 @@ export function init({
   } else if (pushInterval === 0) {
     amLogger.debug("Configuring Autometrics to push metrics eagerly");
 
-    const metricReader = new OnDemandMetricReader({
+    const metricReader = new PeriodicExportingMetricReader({
       exporter,
+      exportIntervalMillis: Number.MAX_SAFE_INTEGER,
       exportTimeoutMillis: timeout,
     });
 
