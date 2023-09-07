@@ -3439,7 +3439,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "faas-experimental-example@workspace:examples/faas-experimental"
   dependencies:
-    "@autometrics/autometrics": ^0.6.0
+    "@autometrics/autometrics": ^0.7.0-beta5
     "@autometrics/exporter-prometheus-push-gateway": ^0.7.0-beta5
     "@autometrics/typescript-plugin": ^0.5.4
     node-fetch: ^3.3.1

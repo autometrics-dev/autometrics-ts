@@ -27,7 +27,7 @@ init({
   //
   //        However, everything works fine with aggregation gateways.
   //
-  url: "http://localhost:9092/metrics",
+  url: "http://localhost:8082/metrics",
   pushInterval: 0,
 });
 
