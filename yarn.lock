@@ -62,7 +62,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@autometrics/autometrics@0.7.0-beta5, @autometrics/autometrics@^0.7.0-beta5, @autometrics/autometrics@workspace:packages/autometrics":
+"@autometrics/autometrics@0.7.0-beta9, @autometrics/autometrics@^0.7.0-beta5, @autometrics/autometrics@workspace:packages/autometrics":
   version: 0.0.0-use.local
   resolution: "@autometrics/autometrics@workspace:packages/autometrics"
   dependencies:
@@ -78,6 +78,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@autometrics/autometrics@npm:0.7.0-beta5":
+  version: 0.7.0-beta5
+  resolution: "@autometrics/autometrics@npm:0.7.0-beta5"
+  dependencies:
+    "@opentelemetry/api": ^1.3.0
+    "@opentelemetry/sdk-metrics": ">=1.15.0"
+  checksum: 6516da4e6192bb6345f31d1e94efcdf6b22260ab782df830d83cfb97668e2dc306d7a1ee6504145287d2f2ed4915bf87081c1df56f95713015f4de90777c8415
+  languageName: node
+  linkType: hard
+
 "@autometrics/exporter-otlp-http@^0.7.0-beta5, @autometrics/exporter-otlp-http@workspace:packages/exporter-otlp-http":
   version: 0.0.0-use.local
   resolution: "@autometrics/exporter-otlp-http@workspace:packages/exporter-otlp-http"
@@ -92,11 +102,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@autometrics/exporter-prometheus-push-gateway@^0.7.0-beta5, @autometrics/exporter-prometheus-push-gateway@workspace:packages/exporter-prometheus-push-gateway":
+"@autometrics/exporter-prometheus-push-gateway@^0.7.0-beta6, @autometrics/exporter-prometheus-push-gateway@workspace:packages/exporter-prometheus-push-gateway":
   version: 0.0.0-use.local
   resolution: "@autometrics/exporter-prometheus-push-gateway@workspace:packages/exporter-prometheus-push-gateway"
   dependencies:
-    "@autometrics/autometrics": 0.7.0-beta5
+    "@autometrics/autometrics": 0.7.0-beta9
     "@opentelemetry/api": ^1.3.0
     "@opentelemetry/core": ^1.15.2
     "@opentelemetry/exporter-prometheus": ">=0.35.1"
@@ -3430,7 +3440,7 @@ __metadata:
   resolution: "faas-experimental-example@workspace:examples/faas-experimental"
   dependencies:
     "@autometrics/autometrics": ^0.7.0-beta5
-    "@autometrics/exporter-prometheus-push-gateway": ^0.7.0-beta5
+    "@autometrics/exporter-prometheus-push-gateway": ^0.7.0-beta6
     "@autometrics/typescript-plugin": ^0.5.4
     node-fetch: ^3.3.1
     tsx: ^3.12.7
