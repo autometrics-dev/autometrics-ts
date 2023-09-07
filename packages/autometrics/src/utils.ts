@@ -36,7 +36,9 @@ export function getModulePath(): string | undefined {
   const runtime = getRuntime();
   if (runtime === "browser") {
     rootDir = "";
-  } else if (runtime === "deno") {
+    // HACK - Deno Deploy does not have access to `Deno.cwd`, so we need to test for it
+    //@ts-ignore
+  } else if (runtime === "deno" && typeof Deno?.cwd === "function") {
     //@ts-ignore
     rootDir = Deno.cwd();
   } else if (runtime === "node") {
