@@ -36,15 +36,25 @@ export function getModulePath(): string | undefined {
   const runtime = getRuntime();
   if (runtime === "browser") {
     rootDir = "";
-    // HACK - Deno Deploy does not have access to `Deno.cwd`, so we need to test for it
     //@ts-ignore
   } else if (runtime === "deno" && typeof Deno?.cwd === "function") {
-    //@ts-ignore
-    rootDir = Deno.cwd();
-  } else if (runtime === "node") {
+    try {
+      // HACK - Deno Deploy does not necessarily have access to `Deno.cwd`, so we need to handle this case
+      //        Note that in such an event, `Deno.cwd` will still be defined as a function,
+      //        but it will throw an error when invoked
+      //@ts-ignore
+      rootDir = Deno.cwd();
+    } catch (_) {
+      rootDir = "";
+    }
+  } else if (runtime === "node" && typeof process?.cwd === "function") {
     // HACK: this assumes the entire app was run from the root directory of the
     // project
-    rootDir = process.cwd();
+    try {
+      rootDir = process.cwd();
+    } catch (_) {
+      rootDir = "";
+    }
   } else {
     rootDir = "";
   }
