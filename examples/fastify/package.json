@@ -10,7 +10,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@autometrics/autometrics": "^0.6.0",
+    "@autometrics/autometrics": "^0.7.0-beta5",
     "@autometrics/exporter-prometheus": "^0.7.0-beta5",
     "@prisma/client": "^5.2.0",
     "fastify": "^4.13.0"
