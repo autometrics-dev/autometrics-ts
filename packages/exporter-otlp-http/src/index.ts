@@ -1,8 +1,4 @@
 import {
-  AggregationTemporality,
-  PeriodicExportingMetricReader,
-} from "@opentelemetry/sdk-metrics";
-import {
   AggregationTemporalityPreference,
   OTLPMetricExporter,
 } from "@opentelemetry/exporter-metrics-otlp-http";
@@ -12,8 +8,11 @@ import {
   createDefaultBuildInfo,
   recordBuildInfo,
 } from "@autometrics/autometrics";
+import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 
 import { registerExporterInternal } from "./registerExporterInternal";
+
+export { AggregationTemporalityPreference };
 
 const MAX_SAFE_INTERVAL = 2 ** 31 - 1;
 
@@ -54,11 +53,9 @@ export type InitOptions = {
    * The aggregation temporality preference.
    *
    * By default, we use `AggregationTemporality.CUMULATIVE`. You may wish to
-   * change this depending on the OpenTelemetry Collector you use.
+   * change this depending on the setup you use.
    */
-  temporalityPreference?:
-    | AggregationTemporalityPreference
-    | AggregationTemporality;
+  temporalityPreference?: AggregationTemporalityPreference;
 
   /**
    * Optional build info to be added to the `build_info` metric.
@@ -75,7 +72,7 @@ export function init({
   pushInterval = 5000,
   concurrencyLimit,
   timeout = 1000,
-  temporalityPreference = AggregationTemporality.CUMULATIVE,
+  temporalityPreference = AggregationTemporalityPreference.CUMULATIVE,
   buildInfo,
 }: InitOptions) {
   amLogger.info(`Exporter will push to the OTLP/HTTP endpoint at ${url}`);
