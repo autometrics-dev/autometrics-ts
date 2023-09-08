@@ -9,6 +9,8 @@ import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 
 import { PushGatewayExporter } from "./pushGatewayExporter";
 
+const MAX_SAFE_INTERVAL = 2 ** 31 - 1;
+
 export type InitOptions = {
   /**
    * The full URL (including https://) of the aggregating push gateway for
@@ -84,7 +86,7 @@ export function init({
 
     const metricReader = new PeriodicExportingMetricReader({
       exporter,
-      exportIntervalMillis: Number.MAX_SAFE_INTEGER,
+      exportIntervalMillis: MAX_SAFE_INTERVAL,
       exportTimeoutMillis: timeout,
     });
 

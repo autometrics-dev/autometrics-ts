@@ -16,8 +16,8 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@autometrics/autometrics": "^0.6.0",
-    "@autometrics/exporter-prometheus": "^0.7.0-beta5",
+    "@autometrics/autometrics": "^0.7.0-beta10",
+    "@autometrics/exporter-prometheus": "^0.7.0-beta10",
     "express": "^4.18.2",
     "node-fetch": "^3.3.1"
   }
