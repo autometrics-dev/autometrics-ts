@@ -14,6 +14,8 @@ import { registerExporterInternal } from "./registerExporterInternal";
 
 export { AggregationTemporalityPreference };
 
+const MAX_SAFE_INTERVAL = 2 ** 31 - 1;
+
 export type InitOptions = {
   /**
    * URL of the OpenTelemetry Collector to push metrics to.
@@ -96,7 +98,7 @@ export function init({
 
     const metricReader = new PeriodicExportingMetricReader({
       exporter,
-      exportIntervalMillis: Number.MAX_SAFE_INTEGER,
+      exportIntervalMillis: MAX_SAFE_INTERVAL,
       exportTimeoutMillis: timeout,
     });
 

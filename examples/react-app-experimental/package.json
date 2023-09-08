@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@autometrics/autometrics": "^0.7.0-beta5",
-    "@autometrics/exporter-otlp-http": "^0.7.0-beta5",
+    "@autometrics/autometrics": "^0.7.0-beta10",
+    "@autometrics/exporter-otlp-http": "^0.7.0-beta10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
