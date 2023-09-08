@@ -1,15 +1,6 @@
 import { Attributes, ValueType } from "@opentelemetry/api";
 
 import {
-  ALSInstance,
-  getALSCaller,
-  getALSInstance,
-  getModulePath,
-  isFunction,
-  isObject,
-  isPromise,
-} from "./utils";
-import {
   COUNTER_DESCRIPTION,
   COUNTER_NAME,
   GAUGE_DESCRIPTION,
@@ -18,8 +9,17 @@ import {
   HISTOGRAM_NAME,
 } from "./constants";
 import { getMeter, metricsRecorded } from "./instrumentation";
-import type { Objective } from "./objectives";
 import { trace, warn } from "./logger";
+import type { Objective } from "./objectives";
+import {
+  ALSInstance,
+  getALSCaller,
+  getALSInstance,
+  getModulePath,
+  isFunction,
+  isObject,
+  isPromise,
+} from "./utils";
 
 let asyncLocalStorage: ALSInstance | undefined;
 if (typeof window === "undefined") {
@@ -33,7 +33,7 @@ if (typeof window === "undefined") {
  * This seems to be the preferred way for defining functions in TypeScript
  * @internal
  */
-// rome-ignore lint/suspicious/noExplicitAny:
+// biome-ignore lint/suspicious/noExplicitAny:
 export type FunctionSig = (...args: any[]) => any;
 
 type AnyFunction<T extends FunctionSig> = (
@@ -44,9 +44,7 @@ type AnyFunction<T extends FunctionSig> = (
  * This type signals to the language service plugin that it should show extra
  * documentation along with the queries.
  */
-/* rome-ignore lint/suspicious/noEmptyInterface: Converting this to a type
-breaks the language server plugin */
-interface AutometricsWrapper<T extends AnyFunction<T>> extends AnyFunction<T> {}
+type AutometricsWrapper<T extends AnyFunction<T>> = AnyFunction<T>;
 
 /**
  * @group Wrapper and Decorator API

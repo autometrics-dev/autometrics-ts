@@ -2,18 +2,18 @@ import ts, { server } from "typescript/lib/tsserverlibrary";
 
 import {
   getNodeAtCursor,
-  getNodeType,
   getNodeIdentifier,
+  getNodeType,
   isAutometricsWrappedOrDecorated,
 } from "./astHelpers";
 import {
+  createErrorRatioQuery,
   createLatencyQuery,
   createRequestRateQuery,
-  createErrorRatioQuery,
   makePrometheusUrl,
 } from "./queryHelpers";
-import { createLogger, getProxy } from "./utils";
 import { Tsserver } from "./types";
+import { createLogger, getProxy } from "./utils";
 
 type Config = {
   prometheusUrl?: string;

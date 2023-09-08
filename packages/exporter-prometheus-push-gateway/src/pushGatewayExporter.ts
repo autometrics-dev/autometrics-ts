@@ -1,16 +1,16 @@
-import {
-  AggregationTemporality,
-  InstrumentType,
-  PushMetricExporter,
-  ResourceMetrics,
-} from "@opentelemetry/sdk-metrics";
+import { amLogger } from "@autometrics/autometrics";
 import {
   BindOnceFuture,
   ExportResult,
   ExportResultCode,
 } from "@opentelemetry/core";
 import { PrometheusSerializer } from "@opentelemetry/exporter-prometheus";
-import { amLogger } from "@autometrics/autometrics";
+import {
+  AggregationTemporality,
+  InstrumentType,
+  PushMetricExporter,
+  ResourceMetrics,
+} from "@opentelemetry/sdk-metrics";
 
 import type { InitOptions } from "./index";
 

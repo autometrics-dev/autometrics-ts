@@ -1,4 +1,4 @@
-import { registerExporter, ExporterOptions } from "@autometrics/autometrics";
+import { ExporterOptions, registerExporter } from "@autometrics/autometrics";
 import { MetricReader } from "@opentelemetry/sdk-metrics";
 
 export let metricReader: MetricReader | undefined;

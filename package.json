@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "build": "yarn workspaces foreach -pt --verbose --exclude=\"*-example\" run build",
-    "lint": "rome ci packages/**/src",
+    "lint": "biome ci packages/**/src",
     "test": "vitest",
     "release-all": "yarn workspaces foreach -t --verbose --exclude=\"*-example\" --exclude=\"*-monorepo\" npm publish",
     "release-all:beta": "yarn workspaces foreach -t --verbose --exclude=\"*-example\" --exclude=\"*-monorepo\" npm publish --tag beta",
@@ -34,7 +34,7 @@
     "clean:parcel-plugin": "cd packages/parcel-transformer-autometrics && yarn clean"
   },
   "devDependencies": {
-    "rome": "^12.1.0",
+    "@biomejs/biome": "1.1.2",
     "tsup": "^7.2.0",
     "typescript": "^5.0.4",
     "vitest": "^0.34.3"
