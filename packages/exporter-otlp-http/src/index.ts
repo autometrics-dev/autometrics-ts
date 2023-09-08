@@ -1,13 +1,13 @@
 import {
-  AggregationTemporalityPreference,
-  OTLPMetricExporter,
-} from "@opentelemetry/exporter-metrics-otlp-http";
-import {
   BuildInfo,
   amLogger,
   createDefaultBuildInfo,
   recordBuildInfo,
 } from "@autometrics/autometrics";
+import {
+  AggregationTemporalityPreference,
+  OTLPMetricExporter,
+} from "@opentelemetry/exporter-metrics-otlp-http";
 import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 
 import { registerExporterInternal } from "./registerExporterInternal";
