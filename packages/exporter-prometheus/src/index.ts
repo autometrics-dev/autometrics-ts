@@ -14,7 +14,7 @@ export type InitOptions = {
   buildInfo?: BuildInfo;
 
   /**
-   * Port on which to open the Prometheus scrape endpoint (default: 4964).
+   * Port on which to open the Prometheus scrape endpoint (default: 9464).
    */
   port?: number;
 };
@@ -25,7 +25,7 @@ export type InitOptions = {
  * This opens up a webserver with the `/metrics` endpoint, to be scraped by
  * Prometheus.
  */
-export function init({ buildInfo, port }: InitOptions = {}) {
+export function init({ buildInfo, port = 9464 }: InitOptions = {}) {
   amLogger.info(`Opening a Prometheus scrape endpoint at port ${port}`);
 
   registerExporter({ metricReader: new PrometheusExporter({ port }) });

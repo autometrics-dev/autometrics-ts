@@ -10,7 +10,7 @@ import {
 } from "./routes.js";
 import { delay, generateRandomTraffic } from "./util.js";
 
-init(); // opens the `/metrics` endpoint on port 4964
+init(); // opens the `/metrics` endpoint on port 9464
 
 const app = express();
 

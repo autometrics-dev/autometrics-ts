@@ -2,7 +2,7 @@
 
 Export metrics by opening up a Prometheus scrape endpoint.
 
-This package will start a webserver on port 4964, by default, with a
+This package will start a webserver on port 9464, by default, with a
 Prometheus-compatible `/metrics` endpoint.
 
 You should configure your Prometheus instance to scrape this endpoint. For
@@ -35,7 +35,7 @@ pnpm add @autometrics/autometrics @autometrics/exporter-prometheus
 import { autometrics } from "@autometrics/autometrics";
 import { init } from "@autometrics/exporter-prometheus";
 
-init(); // starts the webserver with the `/metrics` endpoint on port 4964
+init(); // starts the webserver with the `/metrics` endpoint on port 9464
 
 async function createUserRaw(payload: User) {
   // ...
