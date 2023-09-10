@@ -3,7 +3,7 @@ import { autometrics } from "@autometrics/autometrics";
 import { init } from "@autometrics/exporter-prometheus";
 import { PrismaClient } from "@prisma/client";
 
-init(); // opens the `/metrics` endpoint on port 4964
+init(); // opens the `/metrics` endpoint on port 9464
 
 const port = 8080;
 const server = fastify();
