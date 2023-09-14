@@ -3,6 +3,9 @@ import {
   EmitHint,
   NewLineKind,
   Node,
+  NodeFactory,
+  ObjectLiteralElementLike,
+  ObjectLiteralExpression,
   ScriptTarget,
   TransformationContext,
   TransformerFactory,
@@ -13,13 +16,10 @@ import {
   isFunctionExpression,
   isIdentifier,
   isObjectLiteralExpression,
+  isVariableDeclaration,
   transform,
   visitEachChild,
   visitNode,
-  NodeFactory,
-  ObjectLiteralExpression,
-  isVariableDeclaration,
-  ObjectLiteralElementLike,
 } from "typescript";
 
 let moduleName: string;
@@ -29,7 +29,7 @@ const transformerFactory: TransformerFactory<Node> = (
   const { factory } = context;
   return (rootNode) => {
     function visit(node: Node): Node {
-      // rome-ignore lint/style/noParameterAssign: it is what it is
+      // biome-ignore lint/style/noParameterAssign: it is what it is
       node = visitEachChild(node, visit, context);
 
       if (

@@ -30,9 +30,8 @@ jobs:
 
       - run: yarn
 
-      - run: yarn build --workspace=@autometrics/typescript-plugin
-
-      - run: yarn release --workspace=@autometrics/typescript-plugin
+      - run: yarn release
+        working-directory: packages/typescript-plugin
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

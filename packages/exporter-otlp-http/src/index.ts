@@ -1,20 +1,20 @@
 import {
-  AggregationTemporality,
-  PeriodicExportingMetricReader,
-} from "@opentelemetry/sdk-metrics";
-import {
-  AggregationTemporalityPreference,
-  OTLPMetricExporter,
-} from "@opentelemetry/exporter-metrics-otlp-http";
-import {
   BuildInfo,
   amLogger,
   createDefaultBuildInfo,
   recordBuildInfo,
 } from "@autometrics/autometrics";
-import { OnDemandMetricReader } from "@autometrics/on-demand-metric-reader";
+import {
+  AggregationTemporalityPreference,
+  OTLPMetricExporter,
+} from "@opentelemetry/exporter-metrics-otlp-http";
+import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 
 import { registerExporterInternal } from "./registerExporterInternal";
+
+export { AggregationTemporalityPreference };
+
+const MAX_SAFE_INTERVAL = 2 ** 31 - 1;
 
 export type InitOptions = {
   /**
@@ -33,7 +33,7 @@ export type InitOptions = {
    * Set to `0` to push eagerly without batching metrics. This is mainly useful
    * for edge functions and some client-side scenarios.
    *
-   * Note the push interval may not be smaller than the `timeout`.
+   * Note the push interval (if non-zero) may not be smaller than the `timeout`.
    */
   pushInterval?: number;
 
@@ -45,7 +45,7 @@ export type InitOptions = {
   /**
    * The timeout for pushing metrics, in milliseconds (default: `1000ms`).
    *
-   * Note the timeout may not be larger than the `pushInterval`.
+   * Note the timeout may not be larger than the `pushInterval` (if non-zero).
    */
   timeout?: number;
 
@@ -53,11 +53,9 @@ export type InitOptions = {
    * The aggregation temporality preference.
    *
    * By default, we use `AggregationTemporality.CUMULATIVE`. You may wish to
-   * change this depending on the OpenTelemetry Collector you use.
+   * change this depending on the setup you use.
    */
-  temporalityPreference?:
-    | AggregationTemporalityPreference
-    | AggregationTemporality;
+  temporalityPreference?: AggregationTemporalityPreference;
 
   /**
    * Optional build info to be added to the `build_info` metric.
@@ -74,7 +72,7 @@ export function init({
   pushInterval = 5000,
   concurrencyLimit,
   timeout = 1000,
-  temporalityPreference = AggregationTemporality.CUMULATIVE,
+  temporalityPreference = AggregationTemporalityPreference.CUMULATIVE,
   buildInfo,
 }: InitOptions) {
   amLogger.info(`Exporter will push to the OTLP/HTTP endpoint at ${url}`);
@@ -98,8 +96,9 @@ export function init({
   } else if (pushInterval === 0) {
     amLogger.debug("Configuring Autometrics to push metrics eagerly");
 
-    const metricReader = new OnDemandMetricReader({
+    const metricReader = new PeriodicExportingMetricReader({
       exporter,
+      exportIntervalMillis: MAX_SAFE_INTERVAL,
       exportTimeoutMillis: timeout,
     });
 

@@ -1,6 +1,10 @@
-import { useState } from "react";
+import {
+  AggregationTemporalityPreference,
+  init,
+} from "@autometrics/exporter-otlp-http";
 import { autometrics } from "@autometrics/autometrics";
-import { init } from "@autometrics/exporter-otlp-http";
+import { useState } from "react";
+
 import "./App.css";
 
 // In order for Prometheus to succesfully get your client-side app metrics, you
@@ -21,6 +25,9 @@ init({
     commit: import.meta.env.VITE_AUTOMETRICS_COMMIT,
     branch: import.meta.env.VITE_AUTOMETRICS_BRANCH,
   },
+  // Delta temporality is important to allow for correct aggregation of
+  // client-side metrics.
+  temporalityPreference: AggregationTemporalityPreference.DELTA,
 });
 
 type Post = {

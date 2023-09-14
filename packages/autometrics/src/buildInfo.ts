@@ -1,9 +1,9 @@
 import type { UpDownCounter } from "@opentelemetry/api";
 
 import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants";
-import { debug } from "./logger";
 import { getMeter } from "./instrumentation";
-import { getRuntime, Runtime } from "./utils";
+import { debug } from "./logger";
+import { Runtime, getRuntime } from "./utils";
 
 /**
  * BuildInfo is used to create the `build_info` metric that helps to identify

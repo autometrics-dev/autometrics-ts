@@ -191,6 +191,9 @@ export class TemporaryMeter implements Meter {
    * their newly created counterparts, as consumers might be holding on to the
    * instances created by the temporary exporter.
    *
+   * Do NOT create new metrics from this meter after the handover! It will only
+   * yield noop metrics from that moment on.
+   *
    * @internal
    */
   handover(meter: Meter) {
@@ -235,6 +238,11 @@ export class TemporaryMeter implements Meter {
     this._createdObservableGauges = [];
     this._createdObservableUpDownCounters = [];
     this._registeredBatchObservableCallbacks = [];
+
+    if (this._timer) {
+      clearTimeout(this._timer);
+      this._timer = false;
+    }
   }
 
   metricsRecorded() {}
@@ -249,6 +257,11 @@ export class TemporaryMeter implements Meter {
    * metrics into an ever-growing, never-seen memory pool. To avoid the user
    * shooting themselves in the foot, we will log a warning if the timer expires
    * and stop the collecting of metrics when that happens.
+   *
+   * The timer remains `undefined` as long as no metrics are registered and is
+   * only initialized on the first metric registration. A value of `false` means
+   * a timer was created, but has already expired, in which case no new timer
+   * should be scheduled.
    *
    * @internal
    */

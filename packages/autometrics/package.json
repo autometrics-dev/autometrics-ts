@@ -1,6 +1,6 @@
 {
   "name": "@autometrics/autometrics",
-  "version": "0.6.0",
+  "version": "0.7.0-beta10",
   "type": "module",
   "description": "Easily add metrics to your system -- and actually understand them using automatically customized Prometheus queries",
   "author": "Fiberplane <info@fiberplane.com>",
@@ -13,7 +13,7 @@
     "Arend van Beelen jr."
   ],
   "repository": {
-    "url": "https://github.com/autometrics-dev/autometrics-ts.git"
+    "url": "git+https://github.com/autometrics-dev/autometrics-ts.git"
   },
   "license": "MIT",
   "publishConfig": {
@@ -27,6 +27,7 @@
     "build": "tsup",
     "docs": "typedoc",
     "dev": "tsup --watch",
+    "prepublish": "yarn build",
     "release": "npm publish",
     "type-check": "tsc -p tsconfig.json"
   },

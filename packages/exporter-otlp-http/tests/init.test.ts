@@ -10,10 +10,10 @@ class Foo {
   bar() {}
 }
 
-// make sure that metrics that are collected before `init()` is called are
-// correctly tracked.
 describe("init test", () => {
-  test("collects metrics recorded before init was called", async () => {
+  // make sure that metrics that are collected before `init()` is called are
+  // correctly tracked.
+  test("collects metrics recorded before init() was called", async () => {
     const foo = new Foo();
     foo.bar(); // one before
 

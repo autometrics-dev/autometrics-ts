@@ -1,16 +1,16 @@
-import {
-  AggregationTemporality,
-  InstrumentType,
-  PushMetricExporter,
-  ResourceMetrics,
-} from "@opentelemetry/sdk-metrics";
+import { amLogger } from "@autometrics/autometrics";
 import {
   BindOnceFuture,
   ExportResult,
   ExportResultCode,
 } from "@opentelemetry/core";
 import { PrometheusSerializer } from "@opentelemetry/exporter-prometheus";
-import { amLogger } from "@autometrics/autometrics";
+import {
+  AggregationTemporality,
+  InstrumentType,
+  PushMetricExporter,
+  ResourceMetrics,
+} from "@opentelemetry/sdk-metrics";
 
 import type { InitOptions } from "./index";
 
@@ -31,7 +31,10 @@ export class PushGatewayExporter implements PushMetricExporter {
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
     this.shutdown = this.shutdown.bind(this);
-    window.addEventListener("unload", this.shutdown);
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("unload", this.shutdown);
+    }
   }
 
   export(
@@ -98,7 +101,9 @@ export class PushGatewayExporter implements PushMetricExporter {
   }
 
   shutdown(): Promise<void> {
-    window.removeEventListener("unload", this.shutdown);
+    if (typeof window !== "undefined") {
+      window.removeEventListener("unload", this.shutdown);
+    }
 
     return this._shutdownOnce.call();
   }
