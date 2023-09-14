@@ -87,7 +87,7 @@ them to be scraped by Prometheus.
 ```ts
 import { init } from "@autometrics/exporter-prometheus";
 
-init(); // starts the webserver with the `/metrics` endpoint on port 4964
+init(); // starts the webserver with the `/metrics` endpoint on port 9464
 ```
 
 3. **Run Prometheus locally to validate and preview the data**
@@ -170,7 +170,7 @@ pnpm add @autometrics/autometrics @autometrics/exporter-prometheus
 import { autometrics } from "@autometrics/autometrics";
 import { init } from "@autometrics/exporter-prometheus";
 
-init(); // starts the webserver with the `/metrics` endpoint on port 4964
+init(); // starts the webserver with the `/metrics` endpoint on port 9464
 
 async function createUserRaw(payload: User) {
   // ...
