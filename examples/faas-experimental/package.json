@@ -14,8 +14,8 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@autometrics/autometrics": "^0.7.0-beta10",
-    "@autometrics/exporter-prometheus-push-gateway": "^0.7.0-beta10",
+    "@autometrics/autometrics": "^0.7.0",
+    "@autometrics/exporter-prometheus-push-gateway": "^0.7.0",
     "node-fetch": "^3.3.1"
   }
 }
