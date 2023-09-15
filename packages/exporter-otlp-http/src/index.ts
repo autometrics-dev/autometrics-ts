@@ -18,7 +18,9 @@ const MAX_SAFE_INTERVAL = 2 ** 31 - 1;
 
 export type InitOptions = {
   /**
-   * URL of the OpenTelemetry Collector to push metrics to.
+   * URL of the OpenTelemetry Collector to push metrics to. Should be a
+   * complete url with port and `/v1/metrics` endpoint:
+   * `http://localhost:4317/v1/metrics`.
    */
   url: string;
 
@@ -76,6 +78,14 @@ export function init({
   buildInfo,
 }: InitOptions) {
   amLogger.info(`Exporter will push to the OTLP/HTTP endpoint at ${url}`);
+
+  const urlObj = new URL(url);
+
+  if (urlObj.pathname !== "/v1/metrics") {
+    amLogger.warn(
+      "The OTLP/HTTP endpoint path for metrics should be '/v1/metrics', your metrics data might not be submitted properly. See: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#endpoint-urls-for-otlphttp",
+    );
+  }
 
   const exporter = new OTLPMetricExporter({
     url,
