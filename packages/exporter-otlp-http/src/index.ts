@@ -81,7 +81,7 @@ export function init({
 
   const urlObj = new URL(url);
 
-  if (urlObj.pathname !== "/v1/metrics") {
+  if (!urlObj.pathname.endsWith("/v1/metrics")) {
     amLogger.warn(
       "The OTLP/HTTP endpoint path for metrics should be '/v1/metrics', your metrics data might not be submitted properly. See: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#endpoint-urls-for-otlphttp",
     );
