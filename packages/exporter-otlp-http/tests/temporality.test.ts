@@ -14,7 +14,7 @@ describe("temporality test with scheduled push", () => {
     const timeout = 10; // must be smaller than `pushInterval`.
 
     init({
-      url: "/metrics",
+      url: "http://localhost:4317/metrics",
       pushInterval,
       timeout,
       temporalityPreference: AggregationTemporality.DELTA,
