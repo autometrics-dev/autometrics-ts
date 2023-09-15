@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 
 export function shouldError() {
-  if ((Math.floor(Math.random() * 100) + 1) === 1) {
+  if (Math.floor(Math.random() * 100) + 1 === 1) {
     throw new Error("Error occurred");
   }
 }
