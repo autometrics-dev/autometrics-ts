@@ -13,7 +13,7 @@ describe("temporality test with on-demand push", () => {
     const pushInterval = 0;
 
     init({
-      url: "http://localhost:4317/metrics",
+      url: "http://localhost:4317/",
       pushInterval,
       temporalityPreference: AggregationTemporality.DELTA,
     });
