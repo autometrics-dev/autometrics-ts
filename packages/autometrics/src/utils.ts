@@ -56,12 +56,8 @@ export function getModulePath(): string | undefined {
     const stack = new Error().stack?.split("\n");
     wrappedFunctionPath = stack?.[3]
       ?.split(" ")
-      .filter((el) => el.length !== 0)[3];
-  }
-
-  // check if the string is wrapped in parenthesis, if so, remove them
-  if (wrappedFunctionPath?.startsWith("(")) {
-    wrappedFunctionPath = wrappedFunctionPath.slice(1, -1);
+      .filter((el) => el.length !== 0)
+      .pop(); // last item of the array is the path
   }
 
   let rootDir: string;
@@ -91,14 +87,28 @@ export function getModulePath(): string | undefined {
     rootDir = "";
   }
 
-  // We split away everything up to the root directory of the project,
-  // if the path contains file:// we need to remove it
-  const containsFileProtocol = wrappedFunctionPath?.includes("file://");
+  // check if the string is wrapped in parenthesis, if so, remove them
+  if (wrappedFunctionPath?.startsWith("(")) {
+    wrappedFunctionPath = wrappedFunctionPath.slice(1, -1);
+  }
 
-  return wrappedFunctionPath?.replace(
-    containsFileProtocol ? `file://${rootDir}` : rootDir,
-    "",
-  );
+  // If the path contains file:// protocol we need to remove it
+  if (wrappedFunctionPath?.includes("file://")) {
+    wrappedFunctionPath = wrappedFunctionPath.replace("file://", "");
+  }
+
+  // if the path contains the column/line number we need to remove it
+
+  if (wrappedFunctionPath?.includes(":")) {
+    wrappedFunctionPath = wrappedFunctionPath.slice(
+      0,
+      wrappedFunctionPath.indexOf(":"),
+    );
+  }
+
+  wrappedFunctionPath = wrappedFunctionPath?.replace(rootDir, "");
+
+  return wrappedFunctionPath;
 }
 
 type ALSContext = {
