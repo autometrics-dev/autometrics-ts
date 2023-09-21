@@ -78,16 +78,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@autometrics/autometrics@file:../../packages/autometrics::locator=express-example%40workspace%3Aexamples%2Fexpress":
-  version: 0.7.0-beta10
-  resolution: "@autometrics/autometrics@file:../../packages/autometrics#../../packages/autometrics::hash=ce3045&locator=express-example%40workspace%3Aexamples%2Fexpress"
-  dependencies:
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-  checksum: 8bfc33b2fb32d8a4fb3be389b66a216df48de669dcd92ab54c1c78a996e12143722a71caba153beccd809392a6c488b5ea1c2287eb3467c9c21ef831d06c600e
-  languageName: node
-  linkType: hard
-
 "@autometrics/exporter-otlp-http@^0.7.0-beta10, @autometrics/exporter-otlp-http@workspace:packages/exporter-otlp-http":
   version: 0.0.0-use.local
   resolution: "@autometrics/exporter-otlp-http@workspace:packages/exporter-otlp-http"
@@ -3403,7 +3393,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "express-example@workspace:examples/express"
   dependencies:
-    "@autometrics/autometrics": "file:../../packages/autometrics"
+    "@autometrics/autometrics": ^0.7.0-beta10
     "@autometrics/exporter-prometheus": ^0.7.0-beta10
     "@autometrics/typescript-plugin": ^0.5.4
     "@types/express": ^4.17.16
