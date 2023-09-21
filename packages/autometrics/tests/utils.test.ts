@@ -12,7 +12,7 @@ describe("getModulePath test", () => {
     // getModulePath is always called from within the autometrics wrapper
     // function so we're recreating that here
     const dummyFunction = () => {
-       modulePath = getModulePath();
+      modulePath = getModulePath();
     };
 
     dummyFunction();
