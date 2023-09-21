@@ -77,15 +77,24 @@ export function init({
   temporalityPreference = AggregationTemporalityPreference.CUMULATIVE,
   buildInfo,
 }: InitOptions) {
-  amLogger.info(`Exporter will push to the OTLP/HTTP endpoint at ${url}`);
+  const defaultPath = "/v1/metrics";
 
   const urlObj = new URL(url);
 
-  if (!urlObj.pathname.endsWith("/v1/metrics")) {
+  if (!urlObj.pathname.endsWith("/v1/metrics") && !(urlObj.pathname === "/")) {
     amLogger.warn(
-      "The OTLP/HTTP endpoint path for metrics should be '/v1/metrics', your metrics data might not be submitted properly. See: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#endpoint-urls-for-otlphttp",
+      "Warning: The official OTLP/HTTP endpoint path for metrics is '/v1/metrics', your metrics data might not be submitted properly. See: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#endpoint-urls-for-otlphttp",
     );
   }
+
+  if (urlObj.pathname === "/" && urlObj.port === "4317") {
+    amLogger.info(
+      "Appending default path /v1/metrics to OTLP/HTTP endpoint URL",
+    );
+    url = urlObj.origin + defaultPath;
+  }
+
+  amLogger.info(`Exporter will push to the OTLP/HTTP endpoint at ${url}`);
 
   const exporter = new OTLPMetricExporter({
     url,
