@@ -20,17 +20,49 @@ export function getRuntime(): Runtime {
 // HACK: this entire function is a hacky way to acquire the module name for a
 // given function e.g.: dist/index.js
 export function getModulePath(): string | undefined {
-  const defaultPrepareStackTrace = Error.prepareStackTrace;
-  Error.prepareStackTrace = (_, stack) => stack;
-  const { stack: stackConstructor } = new Error() as Error & {
-    stack: NodeJS.CallSite[];
-  };
-  Error.prepareStackTrace = defaultPrepareStackTrace; // we have to make sure to reset this to normal
+  let wrappedFunctionPath: string | undefined;
 
-  const stack = stackConstructor.map((callSite) => ({
-    name: callSite.getFunctionName(),
-    file: callSite.getFileName(),
-  }));
+  if ("prepareStackTrace" in Error) {
+    const defaultPrepareStackTrace = Error.prepareStackTrace;
+    Error.prepareStackTrace = (_, stack) => stack;
+    const { stack: stackConstructor } = new Error() as Error & {
+      stack: NodeJS.CallSite[];
+    };
+    Error.prepareStackTrace = defaultPrepareStackTrace; // we have to make sure to reset this to normal
+
+    const stack = stackConstructor.map((callSite) => ({
+      name: callSite.getFunctionName(),
+      file: callSite.getFileName(),
+    }));
+
+    if (!stack) {
+      return;
+    }
+
+    /**
+     * Finds the original wrapped function, first it checks if it's a decorator,
+     * and returns that filename or gets the 3th item of the stack trace:
+     *
+     * 0: Error
+     * 1: at getModulePath ...
+     * 2: at autometrics ...
+     * 3: at ... -> 4th line is always the original wrapped function
+     */
+    wrappedFunctionPath =
+      stack.find((call) => {
+        if (call.name?.includes("__decorate")) return true;
+      })?.file ?? stack[2]?.file;
+  } else {
+    const stack = new Error().stack?.split("\n");
+    wrappedFunctionPath = stack?.[3]
+      ?.split(" ")
+      .filter((el) => el.length !== 0)[3];
+  }
+
+  // check if the string is wrapped in parenthesis, if so, remove them
+  if (wrappedFunctionPath?.startsWith("(")) {
+    wrappedFunctionPath = wrappedFunctionPath.slice(1, -1);
+  }
 
   let rootDir: string;
   const runtime = getRuntime();
@@ -59,28 +91,10 @@ export function getModulePath(): string | undefined {
     rootDir = "";
   }
 
-  if (!stack) {
-    return;
-  }
-
-  /**
-   * Finds the original wrapped function, first it checks if it's a decorator,
-   * and returns that filename or gets the 3th item of the stack trace:
-   *
-   * 0: Error
-   * 1: at getModulePath ...
-   * 2: at autometrics ...
-   * 3: at ... -> 4th line is always the original wrapped function
-   */
-  const wrappedFunctionPath =
-    stack.find((call) => {
-      if (call.name?.includes("__decorate")) return true;
-    })?.file ?? stack[2]?.file;
-
-  const containsFileProtocol = wrappedFunctionPath?.includes("file://");
-
   // We split away everything up to the root directory of the project,
   // if the path contains file:// we need to remove it
+  const containsFileProtocol = wrappedFunctionPath?.includes("file://");
+
   return wrappedFunctionPath?.replace(
     containsFileProtocol ? `file://${rootDir}` : rootDir,
     "",
