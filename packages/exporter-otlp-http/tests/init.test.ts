@@ -17,7 +17,7 @@ describe("init test", () => {
     const foo = new Foo();
     foo.bar(); // one before
 
-    init({ url: "/metrics", pushInterval: 5000 });
+    init({ url: "http://localhost:4317", pushInterval: 5000 });
 
     foo.bar(); // one after
 

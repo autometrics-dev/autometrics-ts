@@ -17,7 +17,7 @@ export const API_SLO: Objective = {
   latency: [ObjectiveLatency.Ms250, ObjectivePercentile.P99],
 };
 
-@Autometrics({objective: API_SLO})
+@Autometrics({ objective: API_SLO })
 export class DatabaseClient {
   public users: User[];
   constructor() {
