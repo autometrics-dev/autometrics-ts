@@ -7,10 +7,17 @@ import { getModulePath } from "../src/utils";
 // the function works as expected
 describe("getModulePath test", () => {
   test("gets the correct module path for the original caller", () => {
-    const modulePath = getModulePath();
+    let modulePath: string | undefined;
+
+    // getModulePath is always called from within the autometrics wrapper
+    // function so we're recreating that here
+    const dummyFunction = () => {
+      modulePath = getModulePath();
+    };
+
+    dummyFunction();
+
     expect(modulePath).toBeDefined();
-    // the original caller in this case is the vitest test runner although normally
-    // it would be the file route from which the function call came
-    expect(modulePath).toBe("/node_modules/@vitest/runner/dist/index.js");
+    expect(modulePath).toBe("/packages/autometrics/tests/utils.test.ts");
   });
 });

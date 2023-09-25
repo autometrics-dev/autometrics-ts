@@ -18,7 +18,8 @@
   "scripts": {
     "build": "yarn workspaces foreach -pt --verbose --exclude=\"*-example\" run build",
     "lint": "biome ci packages/**/src",
-    "test": "vitest",
+    "test": "yarn test:bun && vitest",
+    "test:bun": "bun test packages/autometrics",
     "release-all": "yarn workspaces foreach -t --verbose --exclude=\"*-example\" --exclude=\"*-monorepo\" npm publish",
     "release-all:beta": "yarn workspaces foreach -t --verbose --exclude=\"*-example\" --exclude=\"*-monorepo\" npm publish --tag beta",
     "release-lib": "yarn workspaces foreach -t --verbose --include=\"@autometrics/autometrics\" --include=\"@autometrics/exporter-*\" npm publish",
