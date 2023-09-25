@@ -77,17 +77,23 @@ export function init({
   temporalityPreference = AggregationTemporalityPreference.CUMULATIVE,
   buildInfo,
 }: InitOptions) {
-  const defaultPath = "/v1/metrics";
+  const defaultPath = "/v1/metrics" as const;
+  const defaultPort = "4317" as const;
 
   const urlObj = new URL(url);
 
-  if (!urlObj.pathname.endsWith(defaultPath) && urlObj.pathname !== "/") {
+  //`pathname` is not reliable - it will always return "/" even if no explicit
+  // path is specified (see: https://github.com/autometrics-dev/autometrics-ts/pull/126#discussion_r1335623052).
+  // If this variable is not an empty string we should only give a warning without substituting
+  const explicitPath = url.replace(urlObj.origin, "");
+
+  if (explicitPath !== "" && !explicitPath.endsWith(defaultPath)) {
     amLogger.warn(
       "Warning: The official OTLP/HTTP endpoint path for metrics is '/v1/metrics', your metrics data might not be submitted properly. See: https://opentelemetry.io/docs/specs/otel/protocol/exporter/#endpoint-urls-for-otlphttp",
     );
   }
 
-  if (urlObj.pathname === "/" && urlObj.port === "4317") {
+  if (explicitPath === "" && urlObj.port === defaultPort) {
     amLogger.info(
       "Appending default path /v1/metrics to OTLP/HTTP endpoint URL",
     );
