@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@autometrics/autometrics": "^0.7.0",
-    "@autometrics/exporter-prometheus": "^0.7.0",
+    "@autometrics/exporter-prometheus": "^0.7.1",
     "express": "^4.18.2",
     "node-fetch": "^3.3.1"
   }

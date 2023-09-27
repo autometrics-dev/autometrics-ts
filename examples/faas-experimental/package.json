@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@autometrics/autometrics": "^0.7.0",
-    "@autometrics/exporter-prometheus-push-gateway": "^0.7.0",
+    "@autometrics/exporter-prometheus-push-gateway": "^0.7.1",
     "node-fetch": "^3.3.1"
   }
 }
