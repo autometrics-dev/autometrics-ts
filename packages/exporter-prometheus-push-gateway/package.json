@@ -1,6 +1,6 @@
 {
   "name": "@autometrics/exporter-prometheus-push-gateway",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "type": "module",
   "description": "Export metrics by pushing them to a Prometheus-compatible gateway",
   "author": "Fiberplane <info@fiberplane.com>",
