@@ -38,6 +38,8 @@ jobs:
 
       - run: yarn
 
+      - run: yarn build
+
       - run: yarn release-lib
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
