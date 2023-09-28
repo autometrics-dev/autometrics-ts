@@ -3,8 +3,8 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
-    "@autometrics/autometrics": "file:../../packages/autometrics",
-    "@autometrics/exporter-otlp-http": "file:../../packages/exporter-otlp-http",
+    "@autometrics/autometrics": "beta",
+    "@autometrics/exporter-otlp-http": "beta",
     "hono": "^3.6.0"
   },
   "devDependencies": {
