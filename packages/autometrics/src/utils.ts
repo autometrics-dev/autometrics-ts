@@ -118,8 +118,12 @@ type ALSContext = {
 export type ALSInstance = Awaited<ReturnType<typeof getALSInstance>>;
 
 export async function getALSInstance() {
-  const { AsyncLocalStorage } = await import("node:async_hooks");
-  return new AsyncLocalStorage<ALSContext>();
+  try {
+    const { AsyncLocalStorage } = await import("node:async_hooks");
+    return new AsyncLocalStorage<ALSContext>();
+  } catch (_) {
+    return undefined;
+  }
 }
 
 export function getALSCaller(context?: ALSInstance) {
