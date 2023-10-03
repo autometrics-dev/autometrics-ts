@@ -20,6 +20,7 @@ import {
   isObject,
   isPromise,
 } from "./utils";
+import * as performance from "./performance";
 
 let asyncLocalStorage: ALSInstance | undefined;
 if (typeof window === "undefined") {
