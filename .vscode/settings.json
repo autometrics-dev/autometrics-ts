@@ -1,0 +1,7 @@
+{
+  "deno.enable": true,
+  "deno.lint": false,
+  "deno.unstable": false,
+  "editor.defaultFormatter": "biomejs.biome",
+  "files.insertFinalNewline": true
+}

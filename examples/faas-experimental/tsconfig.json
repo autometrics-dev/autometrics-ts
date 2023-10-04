@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "module": "NodeNext",
-    "experimentalDecorators": true,
     "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "noImplicitAny": true,

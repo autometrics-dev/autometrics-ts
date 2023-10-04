@@ -1,0 +1,8 @@
+build:
+    bun install
+
+start:
+    bun run dev
+
+test:
+    bun test

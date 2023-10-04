@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "biomejs.biome",
+        "denoland.vscode-deno",
+        "kokakiwi.vscode-just"
+    ]
+}

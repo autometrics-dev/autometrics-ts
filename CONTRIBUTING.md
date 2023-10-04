@@ -1,14 +1,17 @@
 # Contributing
 
-## Development workflow
+## Tools
 
-The project uses `yarn` as the package manager.
+The project uses [Deno](https://deno.com/) and relies on a
+[justfile](https://just.systems/man/en/) for common commands.
 
-```shell
-git clone git@github.com:autometrics-dev/autometrics-ts.git
-cd autometrics-ts
-yarn
-```
+Run `just -l` for a list of available commands.
+
+For linting and formatting, we use [Biome](https://biomejs.dev/).
+
+Also, we have a bunch of [`examples/`](examples/) that use a variety of tools.
+But each has their own `justfile` that you can use to build, test or start the
+example (assuming you have the right tools installed).
 
 ### Overview
 
@@ -87,7 +90,9 @@ values.
 > Note: after each update of your plugin source code you will need to restart
 > the TypeScript server to see the changes
 
-Read this [blog post](https://blog.andrewbran.ch/debugging-the-type-script-codebase/) for more information on debugging TypeScript plugins
+Read this
+[blog post](https://blog.andrewbran.ch/debugging-the-type-script-codebase/) for
+more information on debugging TypeScript plugins
 
 3. Use TypeScript AST viewer
 

@@ -15,14 +15,14 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Setup the project
-        run: yarn
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
 
-      - name: Run linter and format checker
-        run: yarn lint
+      - uses: taiki-e/install-action@just
 
       - name: Run unit tests
-        run: yarn test
+        run: just test
 
   publish:
     runs-on: ubuntu-latest

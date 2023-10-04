@@ -1,7 +1,0 @@
-node_modules
-reference
-src
-tests
-tsconfig.json
-tsup.config.ts
-typedoc.json

@@ -1,6 +1,7 @@
 import { autometrics } from "@autometrics/autometrics";
 import { init } from "@autometrics/exporter-prometheus";
 import express from "express";
+
 import { API_SLO } from "./database.js";
 import {
   handleCreateUser,

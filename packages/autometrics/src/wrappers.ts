@@ -1,4 +1,4 @@
-import { Attributes, ValueType } from "@opentelemetry/api";
+import { Attributes, ValueType } from "npm:@opentelemetry/api@^1.6.0";
 
 import {
   COUNTER_DESCRIPTION,
@@ -7,10 +7,10 @@ import {
   GAUGE_NAME,
   HISTOGRAM_DESCRIPTION,
   HISTOGRAM_NAME,
-} from "./constants";
-import { getMeter, metricsRecorded } from "./instrumentation";
-import { trace, warn } from "./logger";
-import type { Objective } from "./objectives";
+} from "./constants.ts";
+import { getMeter, metricsRecorded } from "./instrumentation.ts";
+import { trace, warn } from "./logger.ts";
+import type { Objective } from "./objectives.ts";
 import {
   ALSInstance,
   getALSCaller,
@@ -19,7 +19,7 @@ import {
   isFunction,
   isObject,
   isPromise,
-} from "./utils";
+} from "./utils.ts";
 
 let asyncLocalStorage: ALSInstance | undefined;
 if (typeof window === "undefined") {
@@ -271,9 +271,9 @@ export function autometrics<F extends FunctionSig>(
   });
   const concurrencyGauge = trackConcurrency
     ? meter.createUpDownCounter(GAUGE_NAME, {
-        description: GAUGE_DESCRIPTION,
-        valueType: ValueType.INT,
-      })
+      description: GAUGE_DESCRIPTION,
+      valueType: ValueType.INT,
+    })
     : null;
   const caller = getALSCaller(asyncLocalStorage);
 
@@ -373,7 +373,7 @@ export function autometrics<F extends FunctionSig>(
 
     function instrumentedFn() {
       try {
-        // @ts-ignore
+        // @ts-ignore TypeScript doesn't the type of `this`.
         const returnValue: ReturnType<F> = fn.apply(this, params);
         if (isPromise(returnValue)) {
           return returnValue
@@ -387,7 +387,7 @@ export function autometrics<F extends FunctionSig>(
             });
         }
 
-        // @ts-ignore
+        // @ts-ignore TypeScript seems to struggle with `Awaited<T>` here...
         recordSuccess(returnValue);
         return returnValue;
       } catch (error) {

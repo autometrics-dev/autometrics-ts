@@ -1,8 +1,11 @@
-import type { Meter } from "@opentelemetry/api";
-import { MeterProvider, MetricReader } from "@opentelemetry/sdk-metrics";
+import type { Meter } from "npm:@opentelemetry/api@^1.6.0";
+import {
+  MeterProvider,
+  MetricReader,
+} from "npm:@opentelemetry/sdk-metrics@^1.17.0";
 
-import { createDefaultHistogramView } from "./histograms";
-import { TemporaryMeter } from "./temporaryMeter";
+import { createDefaultHistogramView } from "./histograms.ts";
+import { TemporaryMeter } from "./temporaryMeter.ts";
 
 const meterProvider = new MeterProvider({
   views: [createDefaultHistogramView()],

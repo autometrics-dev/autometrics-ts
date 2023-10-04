@@ -1,6 +1,6 @@
 {
   "readme": "none",
-  "entryPoints": ["src/index.ts"],
+  "entryPoints": ["src/mod.ts"],
   "excludeInternal": true,
   "cleanOutputDir": true,
   "out": "./reference",

@@ -15,6 +15,7 @@
 // NOTE - For now we need a fetch polyfill in node.
 //        (Fetch will already be defined in the browser and in Deno.)
 import "./fetch-polyfill";
+
 import { autometrics } from "@autometrics/autometrics";
 import { init } from "@autometrics/exporter-prometheus-push-gateway";
 
