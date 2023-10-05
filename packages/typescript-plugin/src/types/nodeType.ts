@@ -1,1 +1,1 @@
-export type NodeType = "function" | "method";
+export type NodeType = "function" | "method" | undefined;
