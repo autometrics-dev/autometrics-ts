@@ -10,6 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # setup Bun for runtime tests
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
       - name: Setup the project
         run: yarn
 
@@ -32,6 +37,8 @@ jobs:
           scope: "@autometrics"
 
       - run: yarn
+
+      - run: yarn build
 
       - run: yarn release-lib
         env:
