@@ -20,7 +20,7 @@ export function isAutometricsWrappedOrDecorated(
   // Checks if the user is hovering over the autometrics wrapper itself in which
   // case we should not show the queries
   const isAutometricsWrapper =
-    typechecker.getTypeAtLocation(node)?.symbol?.getEscapedName() ===
+    typechecker.getTypeAtLocation(node)?.aliasSymbol?.getEscapedName() ===
     "autometrics";
 
   if (isAutometricsWrapper) {
@@ -35,7 +35,7 @@ export function isAutometricsWrappedOrDecorated(
       return;
     }
 
-    return typechecker.getTypeAtLocation(node)?.symbol?.getEscapedName();
+    return typechecker.getTypeAtLocation(node)?.aliasSymbol?.getEscapedName();
   };
 
   const type = checkWrapperType(node);

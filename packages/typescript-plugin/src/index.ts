@@ -52,9 +52,6 @@ function init(modules: { typescript: Tsserver }) {
       }
 
       const nodeType = getNodeType(nodeAtCursor, typechecker, ts);
-      if (!nodeType) {
-        return prior;
-      }
 
       const autometrics = isAutometricsWrappedOrDecorated(
         nodeAtCursor,
