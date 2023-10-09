@@ -1,51 +1,16 @@
-import { assertMatch, assertRejects } from "../../tests/deps.ts";
-import { Autometrics, autometrics } from "../../../mod.ts";
-import { collectAndSerialize, stepWithMetricReader } from "./util.ts";
+import assert from "node:assert";
+import test from "node:test";
 
-Deno.test("Autometrics integration test", async (t) => {
-  await stepWithMetricReader(t, "single function", async (metricReader) => {
-    const helloWorldFn = autometrics(function helloWorld() {});
+import { AutometricsLegacy } from "@autometrics/autometrics";
 
-    helloWorldFn();
-    helloWorldFn();
+import { collectAndSerialize, stepWithMetricReader } from "./test-utils.js";
 
-    const serialized = await collectAndSerialize(metricReader);
-
-    assertMatch(
-      serialized,
-      /function_calls_total\{\S*function="helloWorld"\S*module="\/packages\/exporter-prometheus\/tests\/integration.test.ts"\S*\} 2/gm,
-    );
-    assertMatch(
-      serialized,
-      /function_calls_duration_bucket\{\S*function="helloWorld"\S*module="\/packages\/exporter-prometheus\/tests\/integration.test.ts"\S*\}/gm,
-    );
-  });
-
-  await stepWithMetricReader(
-    t,
-    "single function with throw",
-    async (metricReader) => {
-      const errorFn = autometrics(function error() {
-        return Promise.reject("Oh no");
-      });
-
-      await assertRejects(errorFn);
-
-      const serialized = await collectAndSerialize(metricReader);
-
-      assertMatch(
-        serialized,
-        /function_calls_total\{\S*function="error"\S*result="error"\S*\} 1/gm,
-      );
-    },
-  );
-
+test("legacy decorator test", async (t) => {
   await stepWithMetricReader(t, "class method", async (metricReader) => {
     // @Autometrics decorator is likely to be used along-side other decorators
     // this tests for any conflicts
     function bar(
-      // deno-lint-ignore ban-types
-      _target: Function,
+      _target: Object,
       _propertyKey: string,
       descriptor: PropertyDescriptor,
     ) {
@@ -53,8 +18,7 @@ Deno.test("Autometrics integration test", async (t) => {
       descriptor.value = originalMethod;
     }
 
-    @Autometrics()
-    class Foo {
+    @AutometricsLegacy() class Foo {
       @bar
       helloWorld() {}
     }
@@ -65,11 +29,11 @@ Deno.test("Autometrics integration test", async (t) => {
 
     const serialized = await collectAndSerialize(metricReader);
 
-    assertMatch(
+    assert.match(
       serialized,
       /function_calls_total\{\S*function="helloWorld"\S*module="\/packages\/exporter-prometheus\/tests\/integration.test.ts"\S*\} 2/gm,
     );
-    assertMatch(
+    assert.match(
       serialized,
       /function_calls_duration_bucket\{\S*function="helloWorld"\S*module="\/packages\/exporter-prometheus\/tests\/integration.test.ts"\S*\}/gm,
     );

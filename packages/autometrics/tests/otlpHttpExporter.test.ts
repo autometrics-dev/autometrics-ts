@@ -1,26 +1,22 @@
-import { assertEquals, assertSnapshot } from "../../tests/deps.ts";
-import { Autometrics } from "../../../mod.ts";
-import { COUNTER_NAME } from "../../constants.ts";
-import { init } from "../mod.ts";
-import { metricReader } from "../registerExporterInternal.ts";
+import { autometrics } from "../mod.ts";
+import { COUNTER_NAME } from "../src/constants.ts";
+import { init } from "../src/exporter-otlp-http/mod.ts";
+import { metricReader } from "../src/exporter-otlp-http/registerExporterInternal.ts";
+import { assertEquals, assertSnapshot } from "./deps.ts";
 
-@Autometrics()
-class Foo {
-  bar() {}
-}
+const foo = autometrics(function foo() {});
 
-Deno.test("init test", async (t) => {
+Deno.test("OTLP exporter", async (t) => {
   // make sure that metrics that are collected before `init()` is called are
   // correctly tracked.
   await t.step(
     "collects metrics recorded before init() was called",
     async () => {
-      const foo = new Foo();
-      foo.bar(); // one before
+      foo(); // one before
 
       init({ url: "http://localhost:4317", pushInterval: 5000 });
 
-      foo.bar(); // one after
+      foo(); // one after
 
       const collectionResult = await metricReader?.collect();
 

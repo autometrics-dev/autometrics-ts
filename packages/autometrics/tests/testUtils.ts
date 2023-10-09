@@ -1,12 +1,12 @@
+import { PrometheusSerializer } from "npm:@opentelemetry/exporter-prometheus@^0.43.0";
 import {
   AggregationTemporality,
   InMemoryMetricExporter,
   MetricReader,
   PeriodicExportingMetricReader,
 } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
-import { PrometheusSerializer } from "npm:@opentelemetry/exporter-prometheus@^0.43.0";
 
-import { registerExporter } from "../../../mod.ts";
+import { registerExporter } from "../mod.ts";
 
 export async function collectAndSerialize(metricReader: MetricReader) {
   const response = await metricReader.collect();
@@ -26,8 +26,9 @@ export async function stepWithMetricReader(
   registerExporter({ metricReader });
 
   try {
-    t.step(stepName, () => testFn(metricReader));
+    await t.step(stepName, () => testFn(metricReader));
   } finally {
     await metricReader.forceFlush();
+    await metricReader.shutdown();
   }
 }

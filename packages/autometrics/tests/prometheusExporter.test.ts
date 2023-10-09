@@ -1,11 +1,11 @@
 // @deno-types="npm:@types/express@4.17.18"
 import express, { Request, Response } from "npm:express@4.18.2";
 
-import { autometrics } from "../../../mod.ts";
-import { assertEquals, assertMatch } from "../../tests/deps.ts";
-import { init } from "../mod.ts";
+import { autometrics } from "../mod.ts";
+import { init } from "../src/exporter-prometheus/mod.ts";
+import { assertEquals, assertMatch } from "./deps.ts";
 
-Deno.test("Autometrics wrapper for functions", async (t) => {
+Deno.test("Prometheus exporter", async (t) => {
   init();
 
   const app = express();
@@ -26,10 +26,10 @@ Deno.test("Autometrics wrapper for functions", async (t) => {
       assertEquals(res.status, 200);
       assertEquals(await res.text(), "Hello world");
 
-      const metRes = await fetch("http://localhost:9464/metrics");
-      assertEquals(metRes.status, 200);
+      const metricsResult = await fetch("http://localhost:9464/metrics");
+      assertEquals(metricsResult.status, 200);
 
-      const data = await metRes.text();
+      const data = await metricsResult.text();
 
       assertMatch(data, /function_calls_duration_count{function="rootRoute"/gm);
     },

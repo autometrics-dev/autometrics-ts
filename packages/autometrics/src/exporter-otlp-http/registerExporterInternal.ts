@@ -2,6 +2,11 @@ import { MetricReader } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
 
 import { ExporterOptions, registerExporter } from "../../mod.ts";
 
+/**
+ * Exported for use in tests only.
+ *
+ * @internal
+ */
 export let metricReader: MetricReader | undefined;
 
 /**

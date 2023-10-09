@@ -1,17 +1,22 @@
-import { build, emptyDir } from "https://deno.land/x/dnt@0.38.1/mod.ts";
+import {
+  build,
+  emptyDir,
+  PackageJson,
+} from "https://deno.land/x/dnt@0.38.1/mod.ts";
 
 const OUT_DIR = "./dist";
 
 const version = Deno.args[0] || "beta";
 
 const exporterMappings = {
-  "./packages/autometrics/mod.ts": `npm:@autometrics/autometrics@${version}`,
+  "./packages/autometrics/mod.ts": "@autometrics/autometrics",
 };
 
 const packages = {
   "mod.ts": {
     name: "autometrics",
-    description: "Easily add metrics to your system -- " +
+    description:
+      "Easily add metrics to your system -- " +
       "and actually understand them using automatically customized Prometheus queries",
     readme: "packages/autometrics/README.node.md",
     mappings: {
@@ -64,11 +69,7 @@ const packageJsonFields = {
   publishConfig: {
     access: "public",
   },
-  files: [
-    "dist/",
-    "README.md",
-    "package.json",
-  ],
+  files: ["dist/", "README.md", "package.json"],
   devDependencies: {
     "@types/node": "^18.6.5",
   },
@@ -76,20 +77,33 @@ const packageJsonFields = {
 
 await emptyDir(OUT_DIR);
 
-for (
-  const [entrypoint, { name, description, mappings, readme }] of Object.entries(
-    packages,
-  )
-) {
+for (const [entrypoint, packageInfo] of Object.entries(packages)) {
+  const { name, description, mappings, readme } = packageInfo;
+
+  const packageJson: PackageJson = {
+    name: `@autometrics/${name}`,
+    description,
+    ...packageJsonFields,
+  };
+
+  if (name !== "autometrics") {
+    packageJson.dependencies = {
+      "@autometrics/autometrics": version,
+      "@opentelemetry/api": "^1.6.0", // will trigger unmet peer dependency warnings if omitted
+    };
+    packageJson.resolutions = {
+      "@autometrics/autometrics": "portal:../autometrics",
+    };
+  }
+
   await build({
     entryPoints: [`packages/autometrics/${entrypoint}`],
     outDir: `${OUT_DIR}/${name}`,
-    shims: { deno: false },
-    package: {
-      name: `@autometrics/${name}`,
-      description,
-      ...packageJsonFields,
+    compilerOptions: {
+      lib: ["ESNext", "DOM"],
     },
+    shims: { deno: false },
+    package: packageJson,
     mappings,
     packageManager: "yarn",
     test: false,
@@ -100,10 +114,7 @@ for (
     postBuild() {
       // steps to run after building and before running the tests
       Deno.copyFileSync("LICENSE", `${OUT_DIR}/${name}/LICENSE`);
-      Deno.copyFileSync(
-        readme,
-        `${OUT_DIR}/${name}/README.md`,
-      );
+      Deno.copyFileSync(readme, `${OUT_DIR}/${name}/README.md`);
     },
   });
 }

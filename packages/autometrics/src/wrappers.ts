@@ -31,10 +31,9 @@ if (typeof window === "undefined") {
 /**
  * Function Wrapper
  * This seems to be the preferred way for defining functions in TypeScript
- * @internal
  */
 // biome-ignore lint/suspicious/noExplicitAny:
-export type FunctionSig = (...args: any[]) => any;
+type FunctionSig = (...args: any[]) => any;
 
 type AnyFunction<T extends FunctionSig> = (
   ...params: Parameters<T>
@@ -51,12 +50,24 @@ type AutometricsWrapper<T extends AnyFunction<T>> = AnyFunction<T>;
  */
 export type AutometricsOptions<F extends FunctionSig> = {
   /**
-   * Name of your function. Only necessary if using the decorator/wrapper on the
-   * client side where builds get minified.
+   * Name of your function.
+   *
+   * This is automatically set by the `autometrics` wrapper, but you may wish to
+   * set it explicitly when you use a minifier on your code.
    *
    * @group Wrapper and Decorator API
    */
   functionName?: string;
+
+  /**
+   * Name of your class.
+   *
+   * This is automatically set by the `@Autometrics` decorator, but you may wish
+   * to set it explicitly when you use a minifier on your code.
+   *
+   * @group Wrapper and Decorator API
+   */
+  className?: string;
 
   /**
    * Name of the module (usually filename)
@@ -212,6 +223,10 @@ export function autometrics<F extends FunctionSig>(
     fn = maybeFn;
 
     functionName = options.functionName ?? fn.name;
+    if (options.className) {
+      functionName = `${options.className}#${functionName}`;
+    }
+
     moduleName = options.moduleName ?? getModulePath();
 
     objective = options.objective;
@@ -271,9 +286,9 @@ export function autometrics<F extends FunctionSig>(
   });
   const concurrencyGauge = trackConcurrency
     ? meter.createUpDownCounter(GAUGE_NAME, {
-      description: GAUGE_DESCRIPTION,
-      valueType: ValueType.INT,
-    })
+        description: GAUGE_DESCRIPTION,
+        valueType: ValueType.INT,
+      })
     : null;
   const caller = getALSCaller(asyncLocalStorage);
 
@@ -285,7 +300,7 @@ export function autometrics<F extends FunctionSig>(
     ...counterObjectiveAttributes,
   });
 
-  return function (...params) {
+  return (...params) => {
     const autometricsStart = performance.now();
     concurrencyGauge?.add(1, {
       function: functionName,
@@ -404,10 +419,7 @@ export function autometrics<F extends FunctionSig>(
   };
 }
 
-/**
- * @internal
- */
-export type AutometricsClassDecoratorOptions = Omit<
+type AutometricsClassDecoratorOptions = Omit<
   AutometricsOptions<FunctionSig>,
   "functionName"
 >;
@@ -478,7 +490,50 @@ type AutometricsDecoratorOptions<F> = F extends FunctionSig
  *
  * @group Wrapper and Decorator API
  */
-export function Autometrics<T extends Function | Object>(
+export function Autometrics<T extends FunctionSig>(
+  autometricsOptions: AutometricsOptions<T> = {},
+) {
+  return (target: T, context: DecoratorContext): T | void => {
+    switch (context.kind) {
+      case "class": {
+        const className =
+          typeof context.name === "string" ? context.name : target.name;
+        context.addInitializer(function () {
+          const classDecorator = getAutometricsClassDecorator({
+            className,
+            ...autometricsOptions,
+          });
+          classDecorator(this);
+        });
+      }
+
+      case "method": {
+        const functionName =
+          typeof context.name === "string" ? context.name : target.name;
+        return autometrics(
+          { functionName, ...autometricsOptions },
+          target,
+        ) as unknown as T;
+      }
+
+      default:
+        throw new Error(
+          "Autometrics decorator can only be used on classes and methods",
+        );
+    }
+  };
+}
+
+/**
+ * Autometrics decorator that can be used with TypeScript's
+ * `experimentalDecorators` option.
+ *
+ * The options and usage are the same as the modern {@link Autometrics}
+ * decorator.
+ *
+ * @group Wrapper and Decorator API
+ */
+export function AutometricsLegacy<T extends Function | Object>(
   autometricsOptions?: AutometricsDecoratorOptions<T>,
 ) {
   function decorator<T extends Function>(target: T): void;
@@ -487,7 +542,7 @@ export function Autometrics<T extends Function | Object>(
     propertyKey: string,
     descriptor: PropertyDescriptor,
   ): void;
-  function decorator<T extends Function | Object>(
+  function decorator(
     target: T,
     propertyKey?: string,
     descriptor?: PropertyDescriptor,

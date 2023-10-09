@@ -27,6 +27,11 @@ lerna-debug.log*
 # Yarn/NPM/Bun
 .pnp.*
 .yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 node_modules
 package-lock.json
 yarn.lock

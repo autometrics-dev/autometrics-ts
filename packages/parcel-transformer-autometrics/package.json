@@ -19,6 +19,11 @@
   },
   "keywords": [],
   "main": "dist/index",
+  "files": [
+    "dist/",
+    "package.json",
+    "README.md"
+  ],
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",

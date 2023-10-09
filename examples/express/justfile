@@ -6,3 +6,6 @@ start:
 
 test:
     npm test
+
+clean:
+    rm -Rf dist

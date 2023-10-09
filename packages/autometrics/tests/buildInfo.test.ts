@@ -1,8 +1,8 @@
-import { assertMatch } from "../../tests/deps.ts";
-import { collectAndSerialize, stepWithMetricReader } from "./util.ts";
-import { recordBuildInfo } from "../../../mod.ts";
+import { recordBuildInfo } from "../mod.ts";
+import { assertMatch } from "./deps.ts";
+import { collectAndSerialize, stepWithMetricReader } from "./testUtils.ts";
 
-Deno.test("Autometrics build info tests", async (t) => {
+Deno.test("Build info tests", async (t) => {
   await stepWithMetricReader(
     t,
     "build info is recorded",

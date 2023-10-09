@@ -1,9 +1,9 @@
 import type { UpDownCounter } from "npm:@opentelemetry/api@^1.6.0";
 
 import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants.ts";
+import { getMeter } from "./instrumentation.ts";
 import { debug } from "./logger.ts";
 import { getBranch, getCommit, getVersion } from "./platform.deno.ts";
-import { getMeter } from "./instrumentation.ts";
 
 /**
  * BuildInfo is used to create the `build_info` metric that helps to identify
@@ -55,7 +55,8 @@ let buildInfoGauge: UpDownCounter;
 /**
  * Records the build info for the application.
  *
- * @internal
+ * This function is automatically called for you when you call `init()` in one
+ * of the exporters.
  */
 export function recordBuildInfo(info: BuildInfo) {
   debug("Recording build info");

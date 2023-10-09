@@ -1,7 +1,7 @@
 {
-    "recommendations": [
-        "biomejs.biome",
-        "denoland.vscode-deno",
-        "kokakiwi.vscode-just"
-    ]
+  "recommendations": [
+    "biomejs.biome",
+    "denoland.vscode-deno",
+    "kokakiwi.vscode-just"
+  ]
 }

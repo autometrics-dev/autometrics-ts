@@ -5,8 +5,8 @@ import {
 import { PeriodicExportingMetricReader } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
 
 import {
-  amLogger,
   BuildInfo,
+  amLogger,
   createDefaultBuildInfo,
   recordBuildInfo,
 } from "../../mod.ts";
@@ -108,6 +108,7 @@ export function init({
     concurrencyLimit,
     keepAlive: true,
     temporalityPreference,
+    timeoutMillis: timeout,
   });
 
   if (pushInterval > 0) {

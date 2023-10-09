@@ -1,16 +1,22 @@
-import { assertMatch } from "../../tests/deps.ts";
-import { autometrics } from "../../../mod.ts";
-import { collectAndSerialize, stepWithMetricReader } from "./util.ts";
+import { autometrics } from "../mod.ts";
+import { assertMatch } from "./deps.ts";
+import { collectAndSerialize, stepWithMetricReader } from "./testUtils.ts";
 
-Deno.test("Autometrics concurrency tests", async (t) => {
+Deno.test("Concurrency tests", async (t) => {
   await stepWithMetricReader(
     t,
     "increases and decreases the concurrency gauge",
     async (metricReader) => {
+      const timeouts: Array<ReturnType<typeof setTimeout>> = [];
+
       const sleepFn = autometrics(
         { trackConcurrency: true },
         function sleep(ms: number) {
-          return new Promise((resolve) => setTimeout(resolve, ms));
+          return new Promise((resolve) => {
+            const timeout = setTimeout(resolve, ms);
+            timeouts.push(timeout);
+            return timeout;
+          });
         },
       );
 
@@ -26,6 +32,10 @@ Deno.test("Autometrics concurrency tests", async (t) => {
         serialized,
         /function_calls_concurrent\{\S*function="sleep"\S*\} 1/gm,
       );
+
+      for (const timeout of timeouts) {
+        clearTimeout(timeout);
+      }
     },
   );
 });

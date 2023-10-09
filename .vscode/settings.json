@@ -3,5 +3,8 @@
   "deno.lint": false,
   "deno.unstable": false,
   "editor.defaultFormatter": "biomejs.biome",
-  "files.insertFinalNewline": true
+  "files.insertFinalNewline": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
 }

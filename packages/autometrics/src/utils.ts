@@ -76,7 +76,7 @@ function getWrappedFunctionPath(): string | undefined {
     // 4: at ... -> 5th line is always the original wrapped function
     return (
       stack.find((call) => call.name?.includes("__decorate"))?.file ??
-        stack[3]?.file
+      stack[3]?.file
     );
   } else {
     const stack = new Error().stack?.split("\n");

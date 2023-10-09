@@ -1,8 +1,8 @@
 import { PrometheusExporter } from "npm:@opentelemetry/exporter-prometheus@^0.43.0";
 
 import {
-  amLogger,
   BuildInfo,
+  amLogger,
   createDefaultBuildInfo,
   recordBuildInfo,
   registerExporter,

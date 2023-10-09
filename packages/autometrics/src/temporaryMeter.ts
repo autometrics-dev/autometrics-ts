@@ -3,7 +3,6 @@ import {
   BatchObservableCallback,
   Context,
   Counter,
-  createNoopMeter,
   Histogram,
   Meter,
   MetricOptions,
@@ -13,6 +12,7 @@ import {
   ObservableGauge,
   ObservableUpDownCounter,
   UpDownCounter,
+  createNoopMeter,
 } from "npm:@opentelemetry/api@^1.6.0";
 
 import { warn } from "./logger.ts";
@@ -147,7 +147,7 @@ export class TemporaryMeter implements Meter {
     observables: Array<Observable<AttributesTypes>>,
   ): void {
     if (this._noopMeter) {
-      return this._noopMeter.addBatchObservableCallback(callback, observables);
+      this._noopMeter.addBatchObservableCallback(callback, observables);
     }
 
     this._initTimer();

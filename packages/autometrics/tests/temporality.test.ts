@@ -1,20 +1,25 @@
-import { AggregationTemporalityPreference, init } from "../mod.ts";
-import { assertEquals } from "../../tests/deps.ts";
-import { autometrics } from "../../../mod.ts";
-import { COUNTER_NAME } from "../../constants.ts";
-import { metricReader } from "../registerExporterInternal.ts";
+import { autometrics } from "../mod.ts";
+import { COUNTER_NAME } from "../src/constants.ts";
+import {
+  AggregationTemporalityPreference,
+  init,
+} from "../src/exporter-otlp-http/mod.ts";
+import { metricReader } from "../src/exporter-otlp-http/registerExporterInternal.ts";
+import { assertEquals } from "./deps.ts";
 
 const foo = autometrics(function foo() {});
 
-Deno.test("temporality test with on-demand push", async (t) => {
+Deno.test("Temporality test with scheduled push", async (t) => {
   await t.step(
     "clears metrics when they are pushed and DELTA temporality is used",
     async () => {
-      const pushInterval = 0;
+      const pushInterval = 50;
+      const timeout = 10; // must be smaller than `pushInterval`.
 
       init({
         url: "http://localhost:4317/",
         pushInterval,
+        timeout,
         temporalityPreference: AggregationTemporalityPreference.DELTA,
       });
 
@@ -31,7 +36,7 @@ Deno.test("temporality test with on-demand push", async (t) => {
         throw new Error("Counter metric not recorded");
       }
 
-      await metricReader?.forceFlush();
+      assertEquals(counterMetricBeforePush.dataPoints[0].value, 1);
 
       await new Promise((resolve) => setTimeout(resolve, pushInterval));
 

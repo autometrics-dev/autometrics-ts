@@ -1,12 +1,8 @@
-import {
-  autometrics,
-  ObjectiveLatency,
-  ObjectivePercentile,
-} from "../../../mod.ts";
-import { assertMatch } from "../../tests/deps.ts";
-import { collectAndSerialize, stepWithMetricReader } from "./util.ts";
+import { ObjectiveLatency, ObjectivePercentile, autometrics } from "../mod.ts";
+import { assertMatch } from "./deps.ts";
+import { collectAndSerialize, stepWithMetricReader } from "./testUtils.ts";
 
-Deno.test("Autometrics objectives test", async (t) => {
+Deno.test("Objectives test", async (t) => {
   await stepWithMetricReader(t, "success rate", async (metricReader) => {
     const successRateFn = autometrics(
       { objective: { name: "test", successRate: ObjectivePercentile.P99 } },

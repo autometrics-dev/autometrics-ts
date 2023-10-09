@@ -1,8 +1,8 @@
 import { PeriodicExportingMetricReader } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
 
 import {
-  amLogger,
   BuildInfo,
+  amLogger,
   createDefaultBuildInfo,
   recordBuildInfo,
   registerExporter,
@@ -21,7 +21,7 @@ export type InitOptions = {
   /**
    * Optional headers to send along to the push gateway.
    */
-  headers?: HeadersInit;
+  headers?: Record<string, string>;
 
   /**
    * The interval for pushing metrics, in milliseconds (default: 5000ms).
