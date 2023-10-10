@@ -1,3 +1,4 @@
+import { MetricData } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
 import { autometrics } from "../mod.ts";
 import { COUNTER_NAME } from "../src/constants.ts";
 import {
@@ -7,25 +8,90 @@ import {
 import { metricReader } from "../src/exporter-otlp-http/registerExporterInternal.ts";
 import { assertEquals } from "./deps.ts";
 
-const foo = autometrics(function foo() {});
+const assertMetricDataHasValue = (value: number) => (data: MetricData) => {
+  assertEquals(data.dataPoints.length, 1);
+  assertEquals(data.dataPoints[0].value, value);
+};
 
-Deno.test("Temporality test with scheduled push", async (t) => {
+const assertMetricDataIsEmpty = () => (data: MetricData) => {
+  assertEquals(data.dataPoints.length, 0);
+};
+
+Deno.test("Temporality tests", async (t) => {
+  const port = 4317;
+  const url = `http://localhost:${port}/v1/metrics`;
+
+  // We need a real endpoint to submit to, or the OTLP exporter will keep on
+  // retrying, which may mess with other tests.
+  const serverController = new AbortController();
+  const { signal } = serverController;
+  Deno.serve({ port, signal }, () => new Response("ok"));
+
   await t.step(
-    "clears metrics when they are pushed and DELTA temporality is used",
-    async () => {
-      const pushInterval = 50;
-      const timeout = 10; // must be smaller than `pushInterval`.
+    "accumulates metrics when they are pushed on-demand and cumulative temporality is used",
+    testWithTemporality({
+      temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
+      pushInterval: 0,
+      assertBeforePush: assertMetricDataHasValue(1),
+      assertAfterPush: assertMetricDataHasValue(1),
+    }),
+  );
 
-      init({
-        url: "http://localhost:4317/",
-        pushInterval,
-        timeout,
-        temporalityPreference: AggregationTemporalityPreference.DELTA,
-      });
+  await t.step(
+    "clears metrics when they are pushed on-demand and delta temporality is used",
+    testWithTemporality({
+      temporalityPreference: AggregationTemporalityPreference.DELTA,
+      pushInterval: 0,
+      // there isn't really a "before push" here, because it pushes eagerly:
+      assertBeforePush: assertMetricDataIsEmpty(),
+      assertAfterPush: assertMetricDataIsEmpty(),
+    }),
+  );
 
+  await t.step(
+    "accumulates metrics when they are pushed at an interval and cumulative temporality is used",
+    testWithTemporality({
+      temporalityPreference: AggregationTemporalityPreference.CUMULATIVE,
+      pushInterval: 50,
+      assertBeforePush: assertMetricDataHasValue(1),
+      assertAfterPush: assertMetricDataHasValue(1),
+    }),
+  );
+
+  await t.step(
+    "clears metrics when they are pushed at an interval and delta temporality is used",
+    testWithTemporality({
+      temporalityPreference: AggregationTemporalityPreference.DELTA,
+      pushInterval: 50,
+      assertBeforePush: assertMetricDataHasValue(1),
+      assertAfterPush: assertMetricDataIsEmpty(),
+    }),
+  );
+
+  function testWithTemporality({
+    temporalityPreference,
+    pushInterval,
+    assertBeforePush,
+    assertAfterPush,
+  }: {
+    temporalityPreference: AggregationTemporalityPreference;
+    pushInterval: number;
+    assertBeforePush: (data: MetricData) => void;
+    assertAfterPush: (data: MetricData) => void;
+  }) {
+    return async () => {
+      const timeout = 10;
+
+      init({ url, pushInterval, temporalityPreference, timeout });
+
+      if (!metricReader) {
+        throw new Error("No metric reader defined");
+      }
+
+      const foo = autometrics(function foo() {});
       foo(); // record metric
 
-      const collectionResultBeforePush = await metricReader?.collect();
+      const collectionResultBeforePush = await metricReader.collect();
 
       const counterMetricBeforePush =
         collectionResultBeforePush?.resourceMetrics.scopeMetrics[0].metrics.find(
@@ -36,11 +102,11 @@ Deno.test("Temporality test with scheduled push", async (t) => {
         throw new Error("Counter metric not recorded");
       }
 
-      assertEquals(counterMetricBeforePush.dataPoints[0].value, 1);
+      assertBeforePush(counterMetricBeforePush);
 
       await new Promise((resolve) => setTimeout(resolve, pushInterval));
 
-      const collectionResultAfterPush = await metricReader?.collect();
+      const collectionResultAfterPush = await metricReader.collect();
 
       const counterMetricAfterPush =
         collectionResultAfterPush?.resourceMetrics.scopeMetrics[0].metrics.find(
@@ -51,7 +117,12 @@ Deno.test("Temporality test with scheduled push", async (t) => {
         throw new Error("Counter metric not recorded");
       }
 
-      assertEquals(counterMetricAfterPush.dataPoints.length, 0);
-    },
-  );
+      assertAfterPush(counterMetricAfterPush);
+
+      await metricReader.forceFlush();
+      await metricReader.shutdown();
+    };
+  }
+
+  serverController.abort();
 });

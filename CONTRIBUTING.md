@@ -26,6 +26,10 @@ The `justfile` has several commands that are useful during development:
   Note this does not re-organize import statements.
 * `just fix` applies all Biome's linter suggestions, including organization of
   import statements.
+* `just update-snapshot <test_file>`. We have a few snapshot tests in the
+  repository. If a snapshot needs to be updated, you can use this command to
+  update it. `test_file` must be the path to the test file from the project
+  root.
 
 Run `just -l` for a list of all available commands.
 

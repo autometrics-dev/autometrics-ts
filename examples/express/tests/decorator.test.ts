@@ -5,7 +5,7 @@ import { AutometricsLegacy } from "@autometrics/autometrics";
 
 import { collectAndSerialize, stepWithMetricReader } from "./test-utils.js";
 
-test("legacy decorator test", async (t) => {
+test("Legacy decorator test", async (t) => {
   await stepWithMetricReader(t, "class method", async (metricReader) => {
     // @Autometrics decorator is likely to be used along-side other decorators
     // this tests for any conflicts
@@ -31,11 +31,11 @@ test("legacy decorator test", async (t) => {
 
     assert.match(
       serialized,
-      /function_calls_total\{\S*function="helloWorld"\S*module="\/packages\/exporter-prometheus\/tests\/integration.test.ts"\S*\} 2/gm,
+      /function_calls_total\{\S*function="helloWorld"\S*module="\/[^"]*\/tests\/decorator.test.js"\S*\} 2/gm,
     );
     assert.match(
       serialized,
-      /function_calls_duration_bucket\{\S*function="helloWorld"\S*module="\/packages\/exporter-prometheus\/tests\/integration.test.ts"\S*\}/gm,
+      /function_calls_duration_bucket\{\S*function="helloWorld"\S*module="\/[^"]*\/tests\/decorator.test.js"\S*\}/gm,
     );
   });
 });

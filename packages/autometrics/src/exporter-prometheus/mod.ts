@@ -1,18 +1,27 @@
-import { PrometheusExporter } from "npm:@opentelemetry/exporter-prometheus@^0.43.0";
-
 import {
   BuildInfo,
+  MetricReader,
   amLogger,
   createDefaultBuildInfo,
   recordBuildInfo,
   registerExporter,
 } from "../../mod.ts";
+import { PrometheusExporter } from "./PrometheusExporter.ts";
+
+let metricReader: MetricReader | undefined;
 
 export type InitOptions = {
   /**
    * Optional build info to be added to the `build_info` metric.
    */
   buildInfo?: BuildInfo;
+
+  /**
+   * Hostname or IP address on which to listen.
+   *
+   * @default '0.0.0.0'
+   */
+  hostname?: string;
 
   /**
    * Port on which to open the Prometheus scrape endpoint (default: 9464).
@@ -26,10 +35,31 @@ export type InitOptions = {
  * This opens up a webserver with the `/metrics` endpoint, to be scraped by
  * Prometheus.
  */
-export function init({ buildInfo, port = 9464 }: InitOptions = {}) {
+export function init({
+  buildInfo,
+  hostname = "0.0.0.0",
+  port = 9464,
+}: InitOptions = {}) {
+  if (metricReader) {
+    throw new Error("Prometheus exporter is already running");
+  }
+
   amLogger.info(`Opening a Prometheus scrape endpoint at port ${port}`);
 
-  registerExporter({ metricReader: new PrometheusExporter({ port }) });
+  metricReader = new PrometheusExporter({ host: hostname, port });
+  registerExporter({ metricReader });
 
   recordBuildInfo(buildInfo ?? createDefaultBuildInfo());
+}
+
+/**
+ * Stops the built-in Prometheus exporter.
+ */
+export async function stop() {
+  if (metricReader) {
+    await metricReader.shutdown();
+    metricReader = undefined;
+  } else {
+    amLogger.warn("Prometheus exporter already stopped or never started");
+  }
 }

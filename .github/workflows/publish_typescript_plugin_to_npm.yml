@@ -4,21 +4,8 @@ on:
     tags:
       - "typescript-plugin-*"
 jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup the project
-        run: yarn
-
-      - name: Run linter and format checker
-        run: yarn lint
-
   publish:
     runs-on: ubuntu-latest
-    needs: test
     steps:
       - uses: actions/checkout@v3
         # Setup .npmrc file to publish to npm
@@ -29,6 +16,10 @@ jobs:
           scope: "@autometrics"
 
       - run: yarn
+        working-directory: packages/typescript-plugin
+
+      - run: yarn test
+        working-directory: packages/typescript-plugin
 
       - run: yarn release
         working-directory: packages/typescript-plugin

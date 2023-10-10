@@ -4,24 +4,8 @@ on:
     tags:
       - "parcel-transformer-*"
 jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup the project
-        run: yarn
-
-      - name: Run linter and format checker
-        run: yarn lint
-
-      - name: Run unit tests
-        run: yarn test
-
   publish:
     runs-on: ubuntu-latest
-    needs: test
     steps:
       - uses: actions/checkout@v3
         # Setup .npmrc file to publish to npm
@@ -32,6 +16,10 @@ jobs:
           scope: "@autometrics"
 
       - run: yarn
+        working-directory: packages/parcel-transformer-autometrics
+
+      - run: yarn test
+        working-directory: packages/parcel-transformer-autometrics
 
       - run: yarn release
         working-directory: packages/parcel-transformer-autometrics

@@ -12,11 +12,11 @@ Deno.test("Utils tests", async (t) => {
 
       // getModulePath is always called from within the autometrics wrapper
       // function so we're recreating that here
-      const dummyFunction = () => {
+      const wrapper = () => {
         modulePath = getModulePath();
       };
 
-      dummyFunction();
+      wrapper();
 
       assertEquals(modulePath, "/packages/autometrics/tests/utils.test.ts");
     },

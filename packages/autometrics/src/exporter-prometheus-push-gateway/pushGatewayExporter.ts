@@ -3,7 +3,6 @@ import {
   ExportResult,
   ExportResultCode,
 } from "npm:@opentelemetry/core@^1.17.0";
-import { PrometheusSerializer } from "npm:@opentelemetry/exporter-prometheus@^0.43.0";
 import {
   AggregationTemporality,
   InstrumentType,
@@ -12,6 +11,7 @@ import {
 } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
 
 import { amLogger } from "../../mod.ts";
+import { PrometheusSerializer } from "../exporter-prometheus/PrometheusSerializer.ts";
 import type { InitOptions } from "./mod.ts";
 
 const serializer = new PrometheusSerializer();

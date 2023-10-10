@@ -1,4 +1,3 @@
-import { PrometheusSerializer } from "npm:@opentelemetry/exporter-prometheus@^0.43.0";
 import {
   AggregationTemporality,
   InMemoryMetricExporter,
@@ -7,6 +6,7 @@ import {
 } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
 
 import { registerExporter } from "../mod.ts";
+import { PrometheusSerializer } from "../src/exporter-prometheus/PrometheusSerializer.ts";
 
 export async function collectAndSerialize(metricReader: MetricReader) {
   const response = await metricReader.collect();

@@ -35,14 +35,22 @@ const packages = {
     description:
       "Export metrics by pushing them to a Prometheus-compatible gateway",
     readme: "packages/autometrics/src/exporter-prometheus/README.node.md",
-    mappings: exporterMappings,
+    mappings: {
+      ...exporterMappings,
+      "./packages/autometrics/src/exporter-prometheus/PrometheusExporter.ts":
+        "@opentelemetry/exporter-prometheus",
+    },
   },
   "exporter-prometheus-push-gateway.ts": {
     name: "exporter-prometheus-push-gateway",
     description: "Export metrics by opening up a Prometheus scrape endpoint",
     readme:
       "packages/autometrics/src/exporter-prometheus-push-gateway/README.node.md",
-    mappings: exporterMappings,
+    mappings: {
+      ...exporterMappings,
+      "./packages/autometrics/src/exporter-prometheus/PrometheusSerializer.ts":
+        "@opentelemetry/exporter-prometheus",
+    },
   },
 };
 
@@ -92,8 +100,15 @@ for (const [entrypoint, packageInfo] of Object.entries(packages)) {
       "@opentelemetry/api": "^1.6.0", // will trigger unmet peer dependency warnings if omitted
     };
     packageJson.resolutions = {
-      "@autometrics/autometrics": "portal:../autometrics",
+      "@autometrics/autometrics": "portal:../autometrics"
     };
+
+    if (
+      Object.values(mappings).includes("@opentelemetry/exporter-prometheus")
+    ) {
+      packageJson.dependencies["@opentelemetry/exporter-prometheus"] =
+        "^0.43.0";
+    }
   }
 
   await build({

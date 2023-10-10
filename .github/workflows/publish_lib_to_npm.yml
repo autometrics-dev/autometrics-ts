@@ -21,7 +21,7 @@ jobs:
 
       - uses: taiki-e/install-action@just
 
-      - name: Run unit tests
+      - name: Run unit tests (for the core package only)
         run: just test
 
   publish:

@@ -2,7 +2,7 @@ import { autometrics } from "../mod.ts";
 import { assertMatch, assertRejects } from "./deps.ts";
 import { collectAndSerialize, stepWithMetricReader } from "./testUtils.ts";
 
-Deno.test("Integration tests", async (t) => {
+Deno.test("Prometheus serialization tests", async (t) => {
   await stepWithMetricReader(t, "single function", async (metricReader) => {
     const helloWorldFn = autometrics(function helloWorld() {});
 
@@ -13,17 +13,17 @@ Deno.test("Integration tests", async (t) => {
 
     assertMatch(
       serialized,
-      /function_calls_total\{\S*function="helloWorld"\S*module="\/packages\/autometrics\/tests\/integration.test.ts"\S*\} 2/gm,
+      /function_calls_total\{\S*function="helloWorld"\S*module="\/packages\/autometrics\/tests\/prometheusSerialization.test.ts"\S*\} 2/gm,
     );
     assertMatch(
       serialized,
-      /function_calls_duration_bucket\{\S*function="helloWorld"\S*module="\/packages\/autometrics\/tests\/integration.test.ts"\S*\}/gm,
+      /function_calls_duration_bucket\{\S*function="helloWorld"\S*module="\/packages\/autometrics\/tests\/prometheusSerialization.test.ts"\S*\}/gm,
     );
   });
 
   await stepWithMetricReader(
     t,
-    "single function with throw",
+    "single function that throws",
     async (metricReader) => {
       const errorFn = autometrics(function error() {
         return Promise.reject("Oh no");

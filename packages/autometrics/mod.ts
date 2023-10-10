@@ -1,3 +1,5 @@
+export { MetricReader } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
+
 export * from "./src/buildInfo.ts";
 export {
   type ExporterOptions,

@@ -66,24 +66,63 @@ function getWrappedFunctionPath(): string | undefined {
       return;
     }
 
-    // Finds the original wrapped function, first it checks if it's a decorator,
-    // and returns that filename or gets the 3th item of the stack trace:
+    // First checks if it is a TypeScript legacy decorator, and returns the
+    // file path in which the decorator is defined if it is. Otherwise it
+    // returns the first file path from the 4th call in the stack trace which
+    // does not point to our `wrappers.ts`.
+    //
+    // 0: getWrappedFunctionPath
+    // 1: getModulePath
+    // 2: autometrics
+    // 3: ... -> 4th call is the original wrapped function, but may be wrapped
+    //           by a decorator still.
+
+    const call =
+      stack.find((call) => call.name?.includes("__decorate")) ??
+      stack
+        .slice(3)
+        .find(
+          (call) =>
+            call.file &&
+            !call.file.includes("wrappers.ts") &&
+            !call.file.includes("wrappers.js"),
+        );
+    return call?.file;
+  } else {
+    // First checks if it is a TypeScript legacy decorator, and returns the
+    // file path in which the decorator is defined if it is. Otherwise it
+    // returns the first file path from the 5th line in the stack trace which
+    // does not point to our `wrappers.ts`.
     //
     // 0: Error
     // 1: at getWrappedFunctionPath ...
     // 2: at getModulePath ...
     // 3: at autometrics ...
-    // 4: at ... -> 5th line is always the original wrapped function
-    return (
-      stack.find((call) => call.name?.includes("__decorate"))?.file ??
-      stack[3]?.file
-    );
-  } else {
-    const stack = new Error().stack?.split("\n");
-    return stack?.[4]
-      ?.split(" ")
-      .filter((el) => el.length !== 0)
-      .pop(); // last item of the array is the path
+    // 4: at ... -> 5th line is the original wrapped function, but may be
+    //              wrapped by a decorator still.
+
+    const { stack } = new Error();
+    if (!stack) {
+      return;
+    }
+
+    const lines = stack.split("\n");
+    const line =
+      lines.find((line) => line.startsWith("at __decorate ")) ??
+      lines
+        .slice(4)
+        .find(
+          (line) =>
+            !line.includes("wrappers.ts") && !line.includes("wrappers.js"),
+        );
+
+    // Last space-separated item on the line is the path.
+    const path = line?.trim().split(" ").pop();
+
+    // Optionally strip surrounding braces before returning the path.
+    return path?.startsWith("(") && path.endsWith(")")
+      ? path.slice(1, path.length - 1)
+      : path;
   }
 }
 
