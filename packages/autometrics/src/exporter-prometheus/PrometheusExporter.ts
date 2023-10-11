@@ -17,9 +17,10 @@
 import {
   Aggregation,
   AggregationTemporality,
+  MetricReader,
 } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
 
-import { MetricReader, amLogger } from "../../mod.ts";
+import { amLogger } from "../../mod.ts";
 import { PrometheusSerializer } from "./PrometheusSerializer.ts";
 
 const HEADERS = { "content-type": "text/plain" };

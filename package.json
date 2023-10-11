@@ -1,0 +1,17 @@
+{
+  "name": "autometrics-root",
+  "description": "root workspace to enable dependency sharing",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "dist/autometrics",
+    "dist/exporter-otlp-http",
+    "dist/exporter-prometheus",
+    "dist/exporter-prometheus-push-gateway",
+    "packages/parcel-transfomer-autometrics",
+    "packages/typescript-plugin"
+  ],
+  "resolutions": {
+    "@opentelemetry/sdk-metrics": "1.17.1"
+  }
+}

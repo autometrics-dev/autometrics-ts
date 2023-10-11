@@ -3,6 +3,7 @@ import {
   emptyDir,
   PackageJson,
 } from "https://deno.land/x/dnt@0.38.1/mod.ts";
+import { bold, cyan, green } from "https://deno.land/std@0.203.0/fmt/colors.ts";
 
 const OUT_DIR = "./dist";
 
@@ -87,6 +88,7 @@ await emptyDir(OUT_DIR);
 
 for (const [entrypoint, packageInfo] of Object.entries(packages)) {
   const { name, description, mappings, readme } = packageInfo;
+  console.log(bold(`Building ${cyan(`@autometrics/${name}`)} package...`));
 
   const packageJson: PackageJson = {
     name: `@autometrics/${name}`,
@@ -98,9 +100,6 @@ for (const [entrypoint, packageInfo] of Object.entries(packages)) {
     packageJson.dependencies = {
       "@autometrics/autometrics": version,
       "@opentelemetry/api": "^1.6.0", // will trigger unmet peer dependency warnings if omitted
-    };
-    packageJson.resolutions = {
-      "@autometrics/autometrics": "portal:../autometrics"
     };
 
     if (
@@ -133,3 +132,5 @@ for (const [entrypoint, packageInfo] of Object.entries(packages)) {
     },
   });
 }
+
+console.log(bold(green("Done.")));

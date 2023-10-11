@@ -1,6 +1,7 @@
+import { MetricReader } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
+
 import {
   BuildInfo,
-  MetricReader,
   amLogger,
   createDefaultBuildInfo,
   recordBuildInfo,
