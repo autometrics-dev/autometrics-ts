@@ -3,11 +3,14 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
-    "@autometrics/autometrics": "beta",
-    "@autometrics/exporter-otlp-http": "beta",
+    "@autometrics/autometrics": "file:../../dist/autometrics",
+    "@autometrics/exporter-otlp-http": "file:../../dist/exporter-otlp-http",
     "hono": "^3.6.0"
   },
   "devDependencies": {
-    "bun-types": "^0.6.2"
+    "bun-types": "^1.0",
+    "@opentelemetry/exporter-prometheus": "^0.43.0",
+    "@opentelemetry/sdk-metrics": "^1.17.0",
+    "typescript": "^5.2.2"
   }
 }

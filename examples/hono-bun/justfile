@@ -6,3 +6,9 @@ start:
 
 test:
     bun test
+
+type-check:
+    bun x tsc -p tsconfig.json --noEmit
+
+clean:
+    true # nothing to clean
