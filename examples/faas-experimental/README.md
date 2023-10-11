@@ -1,5 +1,6 @@
 # Running Example
 
 ```ts
-npx tsx index.ts
+npm install
+npm run start
 ```

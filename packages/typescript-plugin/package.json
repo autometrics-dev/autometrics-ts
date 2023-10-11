@@ -28,10 +28,8 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
-    "clean": "rm -rf dist/",
     "prepublish": "yarn build",
-    "release": "npm publish",
-    "type-check": "tsc -p tsconfig.json"
+    "release": "npm publish"
   },
   "devDependencies": {
     "typescript": "^5.0.4"

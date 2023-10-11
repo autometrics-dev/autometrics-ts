@@ -1,16 +1,18 @@
 {
-  "name": "autometrics-root",
-  "description": "root workspace to enable dependency sharing",
-  "version": "0.1.0",
   "private": true,
+  "name": "autometrics-monorepo",
+  "packageManager": "yarn@3.6.3",
   "workspaces": [
     "dist/autometrics",
     "dist/exporter-otlp-http",
     "dist/exporter-prometheus",
     "dist/exporter-prometheus-push-gateway",
-    "packages/parcel-transfomer-autometrics",
+    "packages/parcel-transformer-autometrics",
     "packages/typescript-plugin"
   ],
+  "devDependencies": {
+    "@parcel/types": "^2.10.0"
+  },
   "resolutions": {
     "@opentelemetry/sdk-metrics": "1.17.1"
   }

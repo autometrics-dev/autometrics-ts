@@ -4,12 +4,11 @@
  *
  * If you need an aggregation gateway locally, try:
  *
-    docker pull ghcr.io/zapier/prom-aggregation-gateway:v0.7.1
-    docker run --platform linux/amd64 \
-      -dit --name aggregation-gateway \
-      -p 9092:80 \
-      ghcr.io/zapier/prom-aggregation-gateway:v0.7.1
- *
+ *   docker pull ghcr.io/zapier/prom-aggregation-gateway:v0.7.1
+ *   docker run --platform linux/amd64 \
+ *     -dit --name aggregation-gateway \
+ *     -p 9092:80 \
+ *     ghcr.io/zapier/prom-aggregation-gateway:v0.7.1
  */
 
 // NOTE - For now we need a fetch polyfill in node.
