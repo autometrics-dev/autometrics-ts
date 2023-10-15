@@ -92,7 +92,7 @@ init(); // starts the webserver with the `/metrics` endpoint on port 9464
 
 3. **Run Prometheus locally to validate and preview the data**
 
-You can use the open source Autometrics CLI to run automatically configured Prometheus locally to see the metrics that will be registered by the change. See the [Autometrics CLI docs](https://docs.autometrics.dev/local-development#getting-started-with-am) for more information.
+You can use the open source Autometrics CLI to run automatically configure Prometheus locally to see the metrics that will be registered by the change. See the [Autometrics CLI docs](https://docs.autometrics.dev/local-development#getting-started-with-am) for more information.
 
 or you can configure Prometheus manually:
 
