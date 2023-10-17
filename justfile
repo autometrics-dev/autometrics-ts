@@ -9,7 +9,7 @@ test_permissions := "--allow-env --allow-net --allow-read --allow-sys"
 build: (build-npm "beta")
 
 build-npm version:
-    CI=false FORCE_COLOR=2 deno run --allow-env --allow-net=deno.land --allow-read --allow-run=yarn --allow-write=dist scripts/build_npm.ts {{version}}
+    deno run --allow-env --allow-net=deno.land --allow-read --allow-run=yarn --allow-write=dist scripts/build_npm.ts {{version}}
 
 build-examples:
     #!/usr/bin/env bash
