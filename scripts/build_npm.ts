@@ -55,6 +55,23 @@ const packages = {
   },
 };
 
+const decoder = new TextDecoder("utf-8");
+const denoLock = JSON.parse(decoder.decode(Deno.readFileSync("./deno.lock")));
+const { specifiers } = denoLock.packages;
+
+function getNpmVersionRange(npmPackageName: string): string {
+  const keyPrefix = `npm:${npmPackageName}@`;
+  for (const key of Object.keys(specifiers)) {
+    if (key.startsWith(keyPrefix)) {
+      return key.slice(keyPrefix.length);
+    }
+  }
+
+  throw new Error(
+    `Cannot find version range for ${npmPackageName} in deno.lock`,
+  );
+}
+
 const packageJsonFields = {
   version,
   author: "Fiberplane <info@fiberplane.com>",
@@ -99,15 +116,17 @@ for (const [entrypoint, packageInfo] of Object.entries(packages)) {
 
   if (name !== "autometrics") {
     packageJson.dependencies = {
-      "@autometrics/autometrics": version,
-      "@opentelemetry/api": "^1.6.0", // will trigger unmet peer dependency warnings if omitted
+      // will trigger unmet peer dependency warnings if omitted:
+      "@opentelemetry/api": getNpmVersionRange("@opentelemetry/api"),
     };
 
-    if (
-      Object.values(mappings).includes("@opentelemetry/exporter-prometheus")
-    ) {
-      packageJson.dependencies["@opentelemetry/exporter-prometheus"] =
-        "^0.43.0";
+    for (const npmPackage of Object.values(mappings).filter(
+      (target) => !target.startsWith("."),
+    )) {
+      packageJson.dependencies[npmPackage] =
+        npmPackage === "@autometrics/autometrics"
+          ? version
+          : getNpmVersionRange(npmPackage);
     }
   }
 
