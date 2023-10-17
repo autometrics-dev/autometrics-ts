@@ -84,11 +84,12 @@ const packageJsonFields = {
   },
 };
 
-await emptyDir(OUT_DIR);
-
 for (const [entrypoint, packageInfo] of Object.entries(packages)) {
   const { name, description, mappings, readme } = packageInfo;
   console.log(bold(`Building ${cyan(`@autometrics/${name}`)} package...`));
+
+  const outDir = `${OUT_DIR}/${name}`;
+  await emptyDir(outDir);
 
   const packageJson: PackageJson = {
     name: `@autometrics/${name}`,
@@ -112,7 +113,7 @@ for (const [entrypoint, packageInfo] of Object.entries(packages)) {
 
   await build({
     entryPoints: [`packages/autometrics/${entrypoint}`],
-    outDir: `${OUT_DIR}/${name}`,
+    outDir,
     compilerOptions: {
       lib: ["ESNext", "DOM"],
     },
