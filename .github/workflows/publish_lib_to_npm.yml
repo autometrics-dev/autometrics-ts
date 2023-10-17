@@ -19,10 +19,18 @@ jobs:
         with:
           deno-version: v1.x
 
-      - uses: taiki-e/install-action@just
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: biome,just
 
-      - name: Run unit tests (for the core package only)
-        run: just test
+      - name: Create builds
+        run: just build-all
+
+      - name: Make sure everything type-checks
+        run: just type-check-all
+
+      - name: Run all tests
+        run: just test-all
 
   publish:
     runs-on: ubuntu-latest
