@@ -1,5 +1,6 @@
+import { assertEquals } from "$std/assert/mod.ts";
+
 import { TemporaryMeter } from "../src/temporaryMeter.ts";
-import { assertEquals } from "./deps.ts";
 
 Deno.test("Temporary meter test", async (t) => {
   await t.step("it disables itself after the timeout expires", async () => {

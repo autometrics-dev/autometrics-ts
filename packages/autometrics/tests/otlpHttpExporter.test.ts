@@ -1,8 +1,10 @@
+import { assertEquals } from "$std/assert/mod.ts";
+import { assertSnapshot } from "$std/testing/snapshot.ts";
+
 import { autometrics } from "../mod.ts";
 import { COUNTER_NAME } from "../src/constants.ts";
 import { init } from "../src/exporter-otlp-http/mod.ts";
 import { metricReader } from "../src/exporter-otlp-http/registerExporterInternal.ts";
-import { assertEquals, assertSnapshot } from "./deps.ts";
 
 Deno.test("OTLP/HTTP exporter", async (t) => {
   const port = 4317;

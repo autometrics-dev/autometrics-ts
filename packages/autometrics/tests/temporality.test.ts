@@ -1,3 +1,5 @@
+import { assertEquals } from "$std/assert/mod.ts";
+
 import { MetricData } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
 import { autometrics } from "../mod.ts";
 import { COUNTER_NAME } from "../src/constants.ts";
@@ -6,7 +8,6 @@ import {
   init,
 } from "../src/exporter-otlp-http/mod.ts";
 import { metricReader } from "../src/exporter-otlp-http/registerExporterInternal.ts";
-import { assertEquals } from "./deps.ts";
 
 const assertMetricDataHasValue = (value: number) => (data: MetricData) => {
   assertEquals(data.dataPoints.length, 1);

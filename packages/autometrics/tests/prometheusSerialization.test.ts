@@ -1,5 +1,6 @@
+import { assertMatch, assertRejects } from "$std/assert/mod.ts";
+
 import { autometrics } from "../mod.ts";
-import { assertMatch, assertRejects } from "./deps.ts";
 import { collectAndSerialize, stepWithMetricReader } from "./testUtils.ts";
 
 Deno.test("Prometheus serialization tests", async (t) => {

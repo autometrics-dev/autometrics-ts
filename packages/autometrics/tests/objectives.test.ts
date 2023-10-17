@@ -1,5 +1,6 @@
+import { assertMatch } from "$std/assert/mod.ts";
+
 import { ObjectiveLatency, ObjectivePercentile, autometrics } from "../mod.ts";
-import { assertMatch } from "./deps.ts";
 import { collectAndSerialize, stepWithMetricReader } from "./testUtils.ts";
 
 Deno.test("Objectives test", async (t) => {

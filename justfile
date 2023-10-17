@@ -2,7 +2,7 @@ alias b := build
 alias l := lint
 alias t := test
 
-examples := "express faas-experimental fastify hono-bun"
+examples := "deno-fresh express faas-experimental fastify hono-bun"
 
 test_permissions := "--allow-env --allow-net --allow-read --allow-sys"
 

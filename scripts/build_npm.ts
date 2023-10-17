@@ -3,7 +3,7 @@ import {
   emptyDir,
   PackageJson,
 } from "https://deno.land/x/dnt@0.38.1/mod.ts";
-import { bold, cyan, green } from "https://deno.land/std@0.203.0/fmt/colors.ts";
+import { bold, cyan, green } from "$std/fmt/colors.ts";
 
 const OUT_DIR = "./dist";
 

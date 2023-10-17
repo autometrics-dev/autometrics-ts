@@ -2,19 +2,18 @@
   "deno.enable": true,
   "deno.lint": false,
   "deno.unstable": false,
+  "deno.disablePaths": [
+    "examples/express",
+    "examples/faas-experimental",
+    "examples/fastify",
+    "examples/hono-bun",
+    "examples/nestjs",
+    "examples/react-app-experimental",
+    "node_modules"
+  ],
   "editor.defaultFormatter": "biomejs.biome",
   "files.insertFinalNewline": true,
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome"
-  },
-  "nodejs-testing.extensions": [
-    {
-      "extensions": ["mjs", "cjs", "js"],
-      "parameters": []
-    },
-    {
-      "extensions": ["mts", "cts", "ts"],
-      "parameters": ["--loader", "tsx"]
-    }
-  ]
+  }
 }

@@ -1,0 +1,14 @@
+build:
+    deno run -A dev.ts build
+
+start:
+    deno run -A --watch=static/,routes/ dev.ts
+
+preview:
+    deno run -A main.ts
+
+test:
+    true # no tests; no issues
+
+type-check:
+    deno check main.ts

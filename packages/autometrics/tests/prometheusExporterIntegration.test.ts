@@ -1,9 +1,10 @@
+import { assertEquals, assertMatch } from "$std/assert/mod.ts";
+
 // @deno-types="npm:@types/express@4.17.18"
 import express, { Request, Response } from "npm:express@4.18.2";
 
 import { autometrics } from "../mod.ts";
 import { init, stop } from "../src/exporter-prometheus/mod.ts";
-import { assertEquals, assertMatch } from "./deps.ts";
 
 Deno.test("Prometheus exporter integration with Express", async (t) => {
   await t.step(
