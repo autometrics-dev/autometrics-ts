@@ -29,7 +29,7 @@ jobs:
       - name: Create builds
         run: just build-all
 
-      - name: Make sure everything type-checks
+      - name: Perform type-checking
         run: just type-check-all
 
       - name: Run all tests

@@ -4,6 +4,8 @@ alias t := test
 
 examples := "deno-fresh express faas-experimental fastify hono-bun"
 
+lib_packages := "autometrics exporter-otlp-http exporter-prometheus exporter-prometheus-push-gateway"
+
 test_permissions := "--allow-env --allow-net --allow-read --allow-sys"
 
 build: (build-npm "beta")
@@ -93,3 +95,12 @@ format:
 
 lint:
     biome ci packages
+
+release-lib:
+    #!/usr/bin/env bash
+    set -euxo pipefail
+    for package in {{lib_packages}}; do
+        pushd "dist/$package"
+        yarn npm publish
+        popd
+    done

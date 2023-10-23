@@ -1,5 +1,6 @@
 import { Attributes, ValueType } from "npm:@opentelemetry/api@^1.6.0";
 
+import { amLogger } from "../mod.ts";
 import {
   COUNTER_DESCRIPTION,
   COUNTER_NAME,
@@ -20,7 +21,6 @@ import {
   isObject,
   isPromise,
 } from "./utils.ts";
-import { amLogger } from "../mod.ts";
 
 let asyncLocalStorage: ALSInstance | undefined;
 if (typeof window === "undefined") {

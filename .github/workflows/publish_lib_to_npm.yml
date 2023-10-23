@@ -1,16 +1,24 @@
-name: Publish main @autometrics/autometrics and the exporters to NPM
+name: Publish main @autometrics/autometrics and/or the exporters to NPM
 on:
   push:
     tags:
       - "lib-*"
+
 jobs:
-  test:
+  test-and-publish:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      # setup Bun for runtime tests
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
+          scope: "@autometrics"
+
+      # Setup Bun for runtime tests
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
@@ -26,28 +34,13 @@ jobs:
       - name: Create builds
         run: just build-all
 
-      - name: Make sure everything type-checks
+      - name: Perform type-checking
         run: just type-check-all
 
       - name: Run all tests
         run: just test-all
 
-  publish:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v3
-        # Setup .npmrc file to publish to npm
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
-          registry-url: 'https://registry.npmjs.org'
-          scope: "@autometrics"
-
-      - run: yarn
-
-      - run: yarn build
-
-      - run: yarn release-lib
+      - name: Publish
+        run: just release-lib
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
