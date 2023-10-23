@@ -7,7 +7,6 @@
     "dist/exporter-otlp-http",
     "dist/exporter-prometheus",
     "dist/exporter-prometheus-push-gateway",
-    "examples/fastify",
     "packages/parcel-transformer-autometrics",
     "packages/typescript-plugin"
   ],

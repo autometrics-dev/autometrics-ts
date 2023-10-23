@@ -10,8 +10,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@autometrics/autometrics": "file:../../dist/autometrics",
-    "@autometrics/exporter-prometheus": "file:../../dist/exporter-prometheus",
+    "@autometrics/autometrics": "portal:../../dist/autometrics",
+    "@autometrics/exporter-prometheus": "portal:../../dist/exporter-prometheus",
     "@prisma/client": "^5.2.0",
     "fastify": "^4.13.0"
   },
