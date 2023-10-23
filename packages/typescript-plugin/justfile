@@ -5,7 +5,7 @@ start:
     yarn dev
 
 test:
-    true # no tests; no issues
+    true # no tests; no issues (please see: https://github.com/autometrics-dev/autometrics-ts/issues/6)
 
 type-check:
     yarn tsc -p tsconfig.json --noEmit
