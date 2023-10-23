@@ -1,3 +1,5 @@
+import { AsyncLocalStorage } from "node:async_hooks";
+
 /**
  * Returns the version of the application, based on environment variables.
  *
@@ -34,4 +36,24 @@ export function getBranch(): string | undefined {
  */
 export function getCwd(): string {
   return Deno.cwd();
+}
+
+/**
+ * Caller information we track across async function calls.
+ *
+ * @internal
+ */
+export type AsyncContext = { caller?: string };
+
+/**
+ * Returns a new `AsyncLocalStorage` instance for storing caller information.
+ *
+ * Note: We include `undefined` in the return type since the web version of
+ * this function won't return anything. This way, we force ourselves to apply
+ * guards whenever we call this function.
+ *
+ * @internal
+ */
+export function getALSInstance(): AsyncLocalStorage<AsyncContext> | undefined {
+  return new AsyncLocalStorage<AsyncContext>();
 }

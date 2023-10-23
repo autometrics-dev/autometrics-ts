@@ -9,25 +9,13 @@ import {
   HISTOGRAM_DESCRIPTION,
   HISTOGRAM_NAME,
 } from "./constants.ts";
+import { getALSInstance } from "./platform.deno.ts";
 import { getMeter, metricsRecorded } from "./instrumentation.ts";
+import { getModulePath, isFunction, isObject, isPromise } from "./utils.ts";
 import { trace, warn } from "./logger.ts";
 import type { Objective } from "./objectives.ts";
-import {
-  ALSInstance,
-  getALSCaller,
-  getALSInstance,
-  getModulePath,
-  isFunction,
-  isObject,
-  isPromise,
-} from "./utils.ts";
 
-let asyncLocalStorage: ALSInstance | undefined;
-if (typeof window === "undefined") {
-  (async () => {
-    asyncLocalStorage = await getALSInstance();
-  })();
-}
+const asyncLocalStorage = getALSInstance();
 
 /**
  * Function Wrapper
@@ -291,7 +279,7 @@ export function autometrics<F extends FunctionSig>(
         valueType: ValueType.INT,
       })
     : null;
-  const caller = getALSCaller(asyncLocalStorage);
+  const caller = asyncLocalStorage?.getStore()?.caller;
 
   counter.add(0, {
     function: functionName,

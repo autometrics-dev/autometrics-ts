@@ -14,26 +14,34 @@ import { getBranch, getCommit, getVersion } from "./platform.deno.ts";
  */
 export type BuildInfo = {
   /**
-   * The current version of the application. Should be set through an
-   * environment variable: `AUTOMETRICS_VERSION` or `PACKAGE_VERSION`.
+   * The current version of the application.
+   *
+   * Should be set through the `AUTOMETRICS_VERSION` environment variable, or by
+   * explicitly specifying the `buildInfo` when calling `init()`.
    */
   version?: string;
 
   /**
-   * The current commit hash of the application. Should be set through an
-   * environment variable: `AUTOMETRICS_COMMIT` or `COMMIT_SHA`.
+   * The current commit hash of the application.
+   *
+   * Should be set through the `AUTOMETRICS_COMMIT` environment variable, or by
+   * explicitly specifying the `buildInfo` when calling `init()`.
    */
   commit?: string;
 
   /**
-   * The current commit hash of the application. Should be set through an
-   * environment variable: `AUTOMETRICS_BRANCH` or `BRANCH_NAME`.
+   * The current commit hash of the application.
+   *
+   * Should be set through the `AUTOMETRICS_BRANCH` environment variable, or by
+   * explicitly specifying the `buildInfo` when calling `init()`.
    */
   branch?: string;
 
   /**
    * The "clearmode" label of the `build_info` metric.
-   * This label is used when pushing to a Gravel Gateway
+   *
+   * Only used when pushing to a Gravel Gateway. Should be set by explicitly
+   * specifying the `buildInfo` when calling `init()`.
    *
    * When pushing to a Gravel Gateway, it's recommended to use the "family"
    * clearmode. See the Gravel Gateways documentation for more details.

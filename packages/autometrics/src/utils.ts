@@ -29,24 +29,6 @@ export function getModulePath(): string | undefined {
   return wrappedFunctionPath;
 }
 
-type ALSContext = {
-  caller?: string;
-};
-
-export type ALSInstance = Awaited<ReturnType<typeof getALSInstance>>;
-
-export async function getALSInstance() {
-  const { AsyncLocalStorage } = await import("node:async_hooks");
-  return new AsyncLocalStorage<ALSContext>();
-}
-
-export function getALSCaller(context?: ALSInstance) {
-  if (context) {
-    const contextValue = context.getStore();
-    return contextValue?.caller;
-  }
-}
-
 function getWrappedFunctionPath(): string | undefined {
   if ("prepareStackTrace" in Error) {
     const defaultPrepareStackTrace = Error.prepareStackTrace;
