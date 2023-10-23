@@ -1,9 +1,9 @@
-import { describe, expect, test } from "vitest";
+import { assertEquals } from "$std/assert/mod.ts";
 
-import { TemporaryMeter } from "../src/temporaryMeter";
+import { TemporaryMeter } from "../src/temporaryMeter.ts";
 
-describe("temporaryMeter test", () => {
-  test("it disables itself after the timeout expires", async () => {
+Deno.test("Temporary meter test", async (t) => {
+  await t.step("it disables itself after the timeout expires", async () => {
     const timeout = 50;
 
     const meter = new TemporaryMeter({ timeout });
@@ -11,23 +11,26 @@ describe("temporaryMeter test", () => {
     const counter = meter.createCounter("test.counter");
     counter.add(1);
 
-    // @ts-ignore
-    expect(meter._createdCounters.length).toBe(1);
-    // @ts-ignore
-    expect(counter._addedValues.length).toBe(1);
+    // @ts-expect-error Testing a private field.
+    assertEquals(meter._createdCounters.length, 1);
+
+    // @ts-ignore Testing a private field.
+    assertEquals(counter._addedValues.length, 1);
 
     await new Promise((resolve) => setTimeout(resolve, timeout));
 
-    // @ts-ignore
-    expect(meter._createdCounters.length).toBe(0);
-    // @ts-ignore
-    expect(counter._addedValues.length).toBe(0);
+    // @ts-expect-error Testing a private field.
+    assertEquals(meter._createdCounters.length, 0);
+
+    // @ts-ignore Testing a private field.
+    assertEquals(counter._addedValues.length, 0);
 
     counter.add(1);
 
-    // @ts-ignore
-    expect(meter._createdCounters.length).toBe(0);
-    // @ts-ignore
-    expect(counter._addedValues.length).toBe(0);
+    // @ts-expect-error Testing a private field.
+    assertEquals(meter._createdCounters.length, 0);
+
+    // @ts-ignore Testing a private field.
+    assertEquals(counter._addedValues.length, 0);
   });
 });

@@ -1,4 +1,5 @@
 import express from "express";
+
 import { db } from "./database.js";
 
 export async function handleGetUsers(

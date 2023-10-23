@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "strict": true,
-    "jsx": "react-jsx",
-    "jsxFragmentFactory": "Fragment",
-    "jsxImportSource": "hono/jsx"
-  }
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strict": true
+  },
+  // Somehow "bun:test" seems to be missing from the Bun type definitions...
+  "exclude": ["tests/*.test.ts"]
 }

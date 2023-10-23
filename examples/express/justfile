@@ -1,0 +1,14 @@
+build:
+    npm install && npm run build
+
+start:
+    npm run start
+
+test:
+    npm test
+
+type-check:
+    npx tsc -p tsconfig.json --noEmit
+
+clean:
+    rm -Rf dist

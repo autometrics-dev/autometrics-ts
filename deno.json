@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.window", "ESNext.Decorators"],
+    "strict": true
+  },
+  "imports": {
+    "$std/": "https://deno.land/std@0.203.0/"
+  }
+}

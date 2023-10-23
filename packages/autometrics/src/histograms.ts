@@ -1,9 +1,9 @@
 import {
   ExplicitBucketHistogramAggregation,
   View,
-} from "@opentelemetry/sdk-metrics";
+} from "npm:@opentelemetry/sdk-metrics@^1.17.0";
 
-import { HISTOGRAM_NAME } from "./constants";
+import { HISTOGRAM_NAME } from "./constants.ts";
 
 export function createDefaultHistogramView(): View {
   return new View({

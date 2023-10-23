@@ -35,13 +35,13 @@ yarn
 5. Run the initial migration
 
 ```shell
-npx prisma migrate dev --name init
+yarn dlx prisma migrate dev --name init
 ```
 
 6. Generate the client
 
 ```shell
-npx prisma generate
+yarn dlx prisma generate
 ```
 
 7. Build and run the application

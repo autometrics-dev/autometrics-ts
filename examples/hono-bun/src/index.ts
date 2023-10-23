@@ -1,6 +1,6 @@
 import { Context, Hono } from "hono";
 import { logger } from "hono/logger";
-import { Autometrics, autometrics } from "@autometrics/autometrics";
+import { AutometricsLegacy, autometrics } from "@autometrics/autometrics";
 import { init } from "@autometrics/exporter-otlp-http";
 
 init({
@@ -9,7 +9,7 @@ init({
 
 const app = new Hono();
 
-@Autometrics()
+@AutometricsLegacy()
 class dbClient {
   async connect() {
     // delay for 100ms

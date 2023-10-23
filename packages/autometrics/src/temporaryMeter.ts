@@ -1,4 +1,4 @@
-import type {
+import {
   Attributes,
   BatchObservableCallback,
   Context,
@@ -12,17 +12,10 @@ import type {
   ObservableGauge,
   ObservableUpDownCounter,
   UpDownCounter,
-} from "@opentelemetry/api";
+  createNoopMeter,
+} from "npm:@opentelemetry/api@^1.6.0";
 
-import {
-  NoopCounterMetric,
-  NoopHistogramMetric,
-  NoopMeter,
-  NoopObservableCounterMetric,
-  NoopObservableGaugeMetric,
-  NoopObservableUpDownCounterMetric,
-} from "@opentelemetry/api/build/src/metrics/NoopMeter";
-import { warn } from "./logger";
+import { warn } from "./logger.ts";
 
 type TemporaryMeterOptions = {
   /**
@@ -51,6 +44,7 @@ export class TemporaryMeter implements Meter {
   private _createdObservableUpDownCounters: Array<
     TemporaryObservable<Attributes>
   > = [];
+  private _noopMeter: Meter | undefined;
   private _registeredBatchObservableCallbacks: Array<RegisteredBatchObservableCallback> =
     [];
 
@@ -60,14 +54,11 @@ export class TemporaryMeter implements Meter {
     name: string,
     options?: MetricOptions,
   ): Counter<AttributesTypes> {
-    if (!this._initTimer()) {
-      // @ts-ignore: `NoopCounterMetric` assumes `attributes` in the type
-      //             definition of its (no-op) `add()` method, even though the
-      //             `Counter` interface says they're optional. This is only an
-      //             issue when using TypeScript strict checking and can be
-      //             safely ignored.
-      return new NoopCounterMetric();
+    if (this._noopMeter) {
+      return this._noopMeter.createCounter(name, options);
     }
+
+    this._initTimer();
 
     const counter = new TemporaryCounter(name, options);
     this._createdCounters.push(counter);
@@ -78,14 +69,11 @@ export class TemporaryMeter implements Meter {
     name: string,
     options?: MetricOptions,
   ): Histogram<AttributesTypes> {
-    if (!this._initTimer()) {
-      // @ts-ignore: `NoopHistogramMetric` assumes `attributes` in the type
-      //             definition of its (no-op) `record()` method, even though
-      //             the `Histogram` interface says they're optional. This is
-      //             only an issue when using TypeScript strict checking and can
-      //             be safely ignored.
-      return new NoopHistogramMetric();
+    if (this._noopMeter) {
+      return this._noopMeter.createHistogram(name, options);
     }
+
+    this._initTimer();
 
     const histogram = new TemporaryHistogram(name, options);
     this._createdHistograms.push(histogram);
@@ -96,14 +84,11 @@ export class TemporaryMeter implements Meter {
     name: string,
     options?: MetricOptions,
   ): UpDownCounter<AttributesTypes> {
-    if (!this._initTimer()) {
-      // @ts-ignore: `NoopCounterMetric` assumes `attributes` in the type
-      //             definition of its (no-op) `add()` method, even though the
-      //             `UpDownCounter` interface says they're optional. This is
-      //             only an issue when using TypeScript strict checking and can
-      //             be safely ignored.
-      return new NoopCounterMetric();
+    if (this._noopMeter) {
+      return this._noopMeter.createUpDownCounter(name, options);
     }
+
+    this._initTimer();
 
     const upDownCounter = new TemporaryCounter(name, options);
     this._createdUpDownCounters.push(upDownCounter);
@@ -114,9 +99,11 @@ export class TemporaryMeter implements Meter {
     name: string,
     options?: MetricOptions,
   ): ObservableCounter<AttributesTypes> {
-    if (!this._initTimer()) {
-      return new NoopObservableCounterMetric();
+    if (this._noopMeter) {
+      return this._noopMeter.createObservableCounter(name, options);
     }
+
+    this._initTimer();
 
     const observableCounter = new TemporaryObservable(name, options);
     this._createdObservableCounters.push(observableCounter);
@@ -127,9 +114,11 @@ export class TemporaryMeter implements Meter {
     name: string,
     options?: MetricOptions,
   ): ObservableGauge<AttributesTypes> {
-    if (!this._initTimer()) {
-      return new NoopObservableGaugeMetric();
+    if (this._noopMeter) {
+      return this._noopMeter.createObservableGauge(name, options);
     }
+
+    this._initTimer();
 
     const observableGauge = new TemporaryObservable(name, options);
     this._createdObservableGauges.push(observableGauge);
@@ -142,9 +131,11 @@ export class TemporaryMeter implements Meter {
     name: string,
     options?: MetricOptions,
   ): ObservableUpDownCounter<AttributesTypes> {
-    if (!this._initTimer()) {
-      return new NoopObservableUpDownCounterMetric();
+    if (this._noopMeter) {
+      return this._noopMeter.createObservableUpDownCounter(name, options);
     }
+
+    this._initTimer();
 
     const observableUpDownCounter = new TemporaryObservable(name, options);
     this._createdObservableUpDownCounters.push(observableUpDownCounter);
@@ -155,9 +146,11 @@ export class TemporaryMeter implements Meter {
     callback: BatchObservableCallback<AttributesTypes>,
     observables: Array<Observable<AttributesTypes>>,
   ): void {
-    if (!this._initTimer()) {
-      return;
+    if (this._noopMeter) {
+      this._noopMeter.addBatchObservableCallback(callback, observables);
     }
+
+    this._initTimer();
 
     const rboc: RegisteredBatchObservableCallback = [callback, observables];
     if (!this._registeredBatchObservableCallbacks.some(matchesRboc(rboc))) {
@@ -241,7 +234,7 @@ export class TemporaryMeter implements Meter {
 
     if (this._timer) {
       clearTimeout(this._timer);
-      this._timer = false;
+      this._timer = undefined;
     }
   }
 
@@ -258,38 +251,26 @@ export class TemporaryMeter implements Meter {
    * shooting themselves in the foot, we will log a warning if the timer expires
    * and stop the collecting of metrics when that happens.
    *
-   * The timer remains `undefined` as long as no metrics are registered and is
-   * only initialized on the first metric registration. A value of `false` means
-   * a timer was created, but has already expired, in which case no new timer
-   * should be scheduled.
-   *
    * @internal
    */
-  private _timer: ReturnType<typeof setTimeout> | false | undefined;
+  private _timer: ReturnType<typeof setTimeout> | undefined;
 
   /**
    * Initializes the timer after which the temporary exporter will stop
    * collecting metrics.
-   *
-   * Returns `false` if the timer has already expired.
    */
-  private _initTimer(): boolean {
-    if (this._timer === false) {
-      return false;
-    }
-
+  private _initTimer() {
     const timeout = this._options.timeout ?? 1000;
     this._timer ??= setTimeout(() => {
       // Empty the collected metrics into the noop meter.
-      this.handover(new NoopMeter());
+      this._noopMeter = createNoopMeter();
+      this.handover(this._noopMeter);
 
-      this._timer = false;
+      this._timer = undefined;
       warn(
         `No metric reader was registered within ${timeout}ms. Metric collection disabled.`,
       );
     }, timeout);
-
-    return true;
   }
 }
 

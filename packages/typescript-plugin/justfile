@@ -1,0 +1,14 @@
+build:
+    yarn && yarn build
+
+start:
+    yarn dev
+
+test:
+    true # no tests; no issues
+
+type-check:
+    yarn tsc -p tsconfig.json --noEmit
+
+clean:
+    rm -Rf dist

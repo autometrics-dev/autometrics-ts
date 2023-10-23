@@ -1,0 +1,21 @@
+{
+  "deno.enable": true,
+  "deno.lint": false,
+  "deno.unstable": false,
+  "deno.disablePaths": [
+    "examples/express",
+    "examples/faas-experimental",
+    "examples/fastify",
+    "examples/hono-bun",
+    "examples/nestjs",
+    "examples/react-app-experimental",
+    "node_modules",
+    "packages/parcel-transformer-autometrics",
+    "packages/typescript-plugin"
+  ],
+  "editor.defaultFormatter": "biomejs.biome",
+  "files.insertFinalNewline": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
+}

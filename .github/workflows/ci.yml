@@ -15,14 +15,22 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Setup the project
-        run: yarn
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: biome,just
 
       - name: Run linter and format checker
-        run: yarn lint
+        run: just lint
 
-      - name: Create a build
-        run: yarn build
+      - name: Create builds
+        run: YARN_ENABLE_IMMUTABLE_INSTALLS=false just build-all
 
-      - name: Run unit tests
-        run: yarn test
+      - name: Perform type-checking
+        run: just type-check-all
+
+      - name: Run all tests
+        run: just test-all

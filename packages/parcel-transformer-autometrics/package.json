@@ -19,21 +19,24 @@
   },
   "keywords": [],
   "main": "dist/index",
+  "files": [
+    "dist/",
+    "package.json",
+    "README.md"
+  ],
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
-    "clean": "rm -rf dist/",
     "prepublish": "yarn build",
-    "release": "npm publish",
-    "type-check": "tsc -p tsconfig.json"
+    "release": "yarn npm publish",
+    "test": "node --test dist/*.test.js"
   },
   "dependencies": {
     "@parcel/plugin": "^2.9.0",
     "typescript": ">=5.0.4"
   },
   "devDependencies": {
-    "@parcel/types": "^2.9.3",
-    "@types/node": "^20.5.7",
-    "vitest": "^0.34.3"
+    "@parcel/core": "^2.10.0",
+    "@types/node": "^20.5.7"
   }
 }

@@ -19,7 +19,7 @@
       "request": "attach",
       "port": 9229,
       "restart": true,
-      "sourceMaps": true,
+      "sourceMaps": true
     }
   ],
   "inputs": [
@@ -31,8 +31,7 @@
         "examples/express",
         "examples/fastify",
         "examples/nestjs",
-        "examples/react-app-experimental",
-        "examples/svelte-app",
+        "examples/react-app-experimental"
       ]
     }
   ]

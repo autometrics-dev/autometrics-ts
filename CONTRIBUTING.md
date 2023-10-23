@@ -1,23 +1,50 @@
 # Contributing
 
-## Development workflow
+## Tools
 
-The project uses `yarn` as the package manager.
+The project uses [Deno](https://deno.com/) and relies on a
+[justfile](https://just.systems/man/en/) for common commands.
 
-```shell
-git clone git@github.com:autometrics-dev/autometrics-ts.git
-cd autometrics-ts
-yarn
-```
+For linting and formatting, we use [Biome](https://biomejs.dev/).
+
+Also, we have a bunch of [`examples/`](examples/) that use a variety of tools.
+But each has their own `justfile` that you can use to build, test or start the
+example (assuming you have the right tools installed).
+
+### Common Commands
+
+The `justfile` has several commands that are useful during development:
+
+* `just build` builds the NPM packages from the core Deno package. Use
+  `just build-npm <version>` if you want to build a specific version, rather
+  than the generic "beta" placeholder. You can use `just build-all` if you also
+  want to build all the examples.
+* `just test` runs all the tests located in the core Deno package. Use
+  `just test-all` to also run tests that are located in the examples. Note that
+  many of the examples do need to be built before tests can be run.
+* `just format` applies Biome's formatting to all source files in the project.
+  Note this does not re-organize import statements.
+* `just fix` applies all Biome's linter suggestions, including organization of
+  import statements.
+* `just update-snapshot <test_file>`. We have a few snapshot tests in the
+  repository. If a snapshot needs to be updated, you can use this command to
+  update it. `test_file` must be the path to the test file from the project
+  root.
+
+Run `just -l` for a list of all available commands.
 
 ### Overview
 
-#### `@autometrics/autometrics`
+#### `packages/autometrics`
 
-Houses code that wraps and instruments the functions or class methods and
-exposes them on an endpoint via an exporter.
+Contains the core library as written for Deno.
 
-#### `@autometrics/typescript-plugin`
+NPM packages can be generated from the Deno sources, for which we use
+[`dnt`](https://github.com/denoland/dnt). Run `just build` to generate the NPM
+packages. They'll be located in the root's `dist/` folder and are required for
+running many of the examples.
+
+#### `packages/typescript-plugin`
 
 Houses code that writes the queries in your IDE on hover. Its main function is
 to intercept the `quick info` (that's the tooltip doc comments) requests from
@@ -27,18 +54,11 @@ into the generated query templates.
 
 ### Getting the wrapper library and plugin running
 
-#### Wrapper library
-
-```shell
-# in project root
-yarn dev:lib
-```
-
 ##### TypeScript plugin
 
 ```shell
-# in project root
-yarn dev:plugin
+# in packages/typescript-plugin
+yarn dev
 ```
 
 #### Debugging TypeScript plugin
@@ -87,7 +107,9 @@ values.
 > Note: after each update of your plugin source code you will need to restart
 > the TypeScript server to see the changes
 
-Read this [blog post](https://blog.andrewbran.ch/debugging-the-type-script-codebase/) for more information on debugging TypeScript plugins
+Read this
+[blog post](https://blog.andrewbran.ch/debugging-the-type-script-codebase/) for
+more information on debugging TypeScript plugins
 
 3. Use TypeScript AST viewer
 

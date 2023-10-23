@@ -1,7 +1,6 @@
 .env
 .env*.local
 
-node_modules
 dist
 
 packages/**/*/node_modules
@@ -10,6 +9,7 @@ packages/**/*/dist
 examples/**/*/dist
 examples/**/*/build
 examples/**/*/.next
+examples/**/*/.yarn
 examples/**/*/out
 examples/**/*/data
 examples/**/*/next-env.d.ts
@@ -25,7 +25,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# Yarn
+# Yarn/NPM/Bun
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -33,6 +33,8 @@ lerna-debug.log*
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+node_modules
+package-lock.json
 
 # OS
 .DS_Store

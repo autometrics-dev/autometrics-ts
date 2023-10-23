@@ -1,9 +1,9 @@
-import type { UpDownCounter } from "@opentelemetry/api";
+import type { UpDownCounter } from "npm:@opentelemetry/api@^1.6.0";
 
-import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants";
-import { getMeter } from "./instrumentation";
-import { debug } from "./logger";
-import { Runtime, getRuntime } from "./utils";
+import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants.ts";
+import { getMeter } from "./instrumentation.ts";
+import { debug } from "./logger.ts";
+import { getBranch, getCommit, getVersion } from "./platform.deno.ts";
 
 /**
  * BuildInfo is used to create the `build_info` metric that helps to identify
@@ -55,7 +55,8 @@ let buildInfoGauge: UpDownCounter;
 /**
  * Records the build info for the application.
  *
- * @internal
+ * This function is automatically called for you when you call `init()` in one
+ * of the exporters.
  */
 export function recordBuildInfo(info: BuildInfo) {
   debug("Recording build info");
@@ -78,65 +79,9 @@ export function recordBuildInfo(info: BuildInfo) {
  * Creates the default `BuildInfo` based on environment variables.
  */
 export function createDefaultBuildInfo(): BuildInfo {
-  const runtime = getRuntime();
   return {
-    version: getVersion(runtime),
-    commit: getCommit(runtime),
-    branch: getBranch(runtime),
+    version: getVersion(),
+    commit: getCommit(),
+    branch: getBranch(),
   };
-}
-
-/**
- * Returns the version of the application, based on environment variables.
- *
- * @internal
- */
-function getVersion(runtime: Runtime): string | undefined {
-  if (runtime === "node") {
-    if (process.env.npm_package_version) {
-      return process.env.npm_package_version;
-    }
-    return process.env.PACKAGE_VERSION || process.env.AUTOMETRICS_VERSION;
-  }
-
-  if (runtime === "deno") {
-    return (
-      //@ts-ignore
-      Deno.env.get("AUTOMETRICS_VERSION") || Deno.env.get("PACKAGE_VERSION")
-    );
-  }
-}
-
-/**
- * Returns the commit hash of the current build of the application, based on
- * environment variables.
- *
- * @internal
- */
-function getCommit(runtime: Runtime) {
-  if (runtime === "node") {
-    return process.env.COMMIT_SHA || process.env.AUTOMETRICS_COMMIT;
-  }
-
-  if (runtime === "deno") {
-    //@ts-ignore
-    return Deno.env.get("AUTOMETRICS_COMMIT");
-  }
-}
-
-/**
- * Returns the branch of the current build of the application, based on
- * environment variables.
- *
- * @internal
- */
-function getBranch(runtime: Runtime) {
-  if (runtime === "node") {
-    return process.env.BRANCH_NAME || process.env.AUTOMETRICS_BRANCH;
-  }
-
-  if (runtime === "deno") {
-    //@ts-ignore
-    return Deno.env.get("AUTOMETRICS_BRANCH");
-  }
 }

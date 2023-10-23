@@ -1,5 +1,6 @@
-import { Attributes, ValueType } from "@opentelemetry/api";
+import { Attributes, ValueType } from "npm:@opentelemetry/api@^1.6.0";
 
+import { amLogger } from "../mod.ts";
 import {
   COUNTER_DESCRIPTION,
   COUNTER_NAME,
@@ -7,10 +8,10 @@ import {
   GAUGE_NAME,
   HISTOGRAM_DESCRIPTION,
   HISTOGRAM_NAME,
-} from "./constants";
-import { getMeter, metricsRecorded } from "./instrumentation";
-import { trace, warn } from "./logger";
-import type { Objective } from "./objectives";
+} from "./constants.ts";
+import { getMeter, metricsRecorded } from "./instrumentation.ts";
+import { trace, warn } from "./logger.ts";
+import type { Objective } from "./objectives.ts";
 import {
   ALSInstance,
   getALSCaller,
@@ -19,7 +20,7 @@ import {
   isFunction,
   isObject,
   isPromise,
-} from "./utils";
+} from "./utils.ts";
 
 let asyncLocalStorage: ALSInstance | undefined;
 if (typeof window === "undefined") {
@@ -31,10 +32,9 @@ if (typeof window === "undefined") {
 /**
  * Function Wrapper
  * This seems to be the preferred way for defining functions in TypeScript
- * @internal
  */
 // biome-ignore lint/suspicious/noExplicitAny:
-export type FunctionSig = (...args: any[]) => any;
+type FunctionSig = (...args: any[]) => any;
 
 type AnyFunction<T extends FunctionSig> = (
   ...params: Parameters<T>
@@ -51,12 +51,24 @@ type AutometricsWrapper<T extends AnyFunction<T>> = AnyFunction<T>;
  */
 export type AutometricsOptions<F extends FunctionSig> = {
   /**
-   * Name of your function. Only necessary if using the decorator/wrapper on the
-   * client side where builds get minified.
+   * Name of your function.
+   *
+   * This is automatically set by the `autometrics` wrapper, but you may wish to
+   * set it explicitly when you use a minifier on your code.
    *
    * @group Wrapper and Decorator API
    */
   functionName?: string;
+
+  /**
+   * Name of your class.
+   *
+   * This is automatically set by the `@Autometrics` decorator, but you may wish
+   * to set it explicitly when you use a minifier on your code.
+   *
+   * @group Wrapper and Decorator API
+   */
+  className?: string;
 
   /**
    * Name of the module (usually filename)
@@ -212,6 +224,10 @@ export function autometrics<F extends FunctionSig>(
     fn = maybeFn;
 
     functionName = options.functionName ?? fn.name;
+    if (options.className) {
+      functionName = `${options.className}#${functionName}`;
+    }
+
     moduleName = options.moduleName ?? getModulePath();
 
     objective = options.objective;
@@ -285,7 +301,7 @@ export function autometrics<F extends FunctionSig>(
     ...counterObjectiveAttributes,
   });
 
-  return function (...params) {
+  return (...params) => {
     const autometricsStart = performance.now();
     concurrencyGauge?.add(1, {
       function: functionName,
@@ -373,7 +389,7 @@ export function autometrics<F extends FunctionSig>(
 
     function instrumentedFn() {
       try {
-        // @ts-ignore
+        // @ts-ignore TypeScript doesn't the type of `this`.
         const returnValue: ReturnType<F> = fn.apply(this, params);
         if (isPromise(returnValue)) {
           return returnValue
@@ -387,7 +403,7 @@ export function autometrics<F extends FunctionSig>(
             });
         }
 
-        // @ts-ignore
+        // @ts-ignore TypeScript seems to struggle with `Awaited<T>` here...
         recordSuccess(returnValue);
         return returnValue;
       } catch (error) {
@@ -404,10 +420,7 @@ export function autometrics<F extends FunctionSig>(
   };
 }
 
-/**
- * @internal
- */
-export type AutometricsClassDecoratorOptions = Omit<
+type AutometricsClassDecoratorOptions = Omit<
   AutometricsOptions<FunctionSig>,
   "functionName"
 >;
@@ -478,7 +491,51 @@ type AutometricsDecoratorOptions<F> = F extends FunctionSig
  *
  * @group Wrapper and Decorator API
  */
-export function Autometrics<T extends Function | Object>(
+export function Autometrics<T extends FunctionSig>(
+  autometricsOptions: AutometricsOptions<T> = {},
+) {
+  return (target: T, context: DecoratorContext): T | undefined => {
+    switch (context.kind) {
+      case "class": {
+        const className =
+          typeof context.name === "string" ? context.name : target.name;
+        context.addInitializer(function () {
+          const classDecorator = getAutometricsClassDecorator({
+            className,
+            ...autometricsOptions,
+          });
+          classDecorator(this);
+        });
+        return;
+      }
+
+      case "method": {
+        const functionName =
+          typeof context.name === "string" ? context.name : target.name;
+        return autometrics(
+          { functionName, ...autometricsOptions },
+          target,
+        ) as unknown as T;
+      }
+
+      default:
+        amLogger.warn(
+          "Autometrics decorator can only be used on classes and methods",
+        );
+    }
+  };
+}
+
+/**
+ * Autometrics decorator that can be used with TypeScript's
+ * `experimentalDecorators` option.
+ *
+ * The options and usage are the same as the modern {@link Autometrics}
+ * decorator.
+ *
+ * @group Wrapper and Decorator API
+ */
+export function AutometricsLegacy<T extends Function | Object>(
   autometricsOptions?: AutometricsDecoratorOptions<T>,
 ) {
   function decorator<T extends Function>(target: T): void;
@@ -487,7 +544,7 @@ export function Autometrics<T extends Function | Object>(
     propertyKey: string,
     descriptor: PropertyDescriptor,
   ): void;
-  function decorator<T extends Function | Object>(
+  function decorator(
     target: T,
     propertyKey?: string,
     descriptor?: PropertyDescriptor,
