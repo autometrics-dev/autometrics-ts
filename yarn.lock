@@ -68,7 +68,7 @@ __metadata:
   dependencies:
     "@parcel/core": ^2.10.0
     "@parcel/plugin": ^2.9.0
-    "@types/node": ^20.5.7
+    "@types/node": ^18.6.5
     typescript: ">=5.0.4"
   languageName: unknown
   linkType: soft
@@ -772,15 +772,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.5.7":
-  version: 20.8.6
-  resolution: "@types/node@npm:20.8.6"
-  dependencies:
-    undici-types: ~5.25.1
-  checksum: ccfb7ac482c5a96edeb239893c5c099f5257fcc2ed9ae62fefdfbc782b79e16dbc2af9a85b379665237bf759904b44ca2be68e75d239e0297882aad42f61905c
-  languageName: node
-  linkType: hard
-
 "abbrev@npm:^1.0.0":
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
@@ -875,6 +866,7 @@ __metadata:
   resolution: "autometrics-monorepo@workspace:."
   dependencies:
     "@parcel/types": ^2.10.0
+    "@types/node": ^18.6.5
   languageName: unknown
   linkType: soft
 
@@ -2097,13 +2089,6 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 0f4da2f15e6f1245e49db15801dbee52f2bbfb267e1c39225afdab5afee1a72839cd86000e65ee9d7e4dfaff12239d28beaf5ee431357fcced15fb08583d72ca
-  languageName: node
-  linkType: hard
-
-"undici-types@npm:~5.25.1":
-  version: 5.25.3
-  resolution: "undici-types@npm:5.25.3"
-  checksum: ec9d2cc36520cbd9fbe3b3b6c682a87fe5be214699e1f57d1e3d9a2cb5be422e62735f06e0067dc325fd3dd7404c697e4d479f9147dc8a804e049e29f357f2ff
   languageName: node
   linkType: hard
 
