@@ -42,7 +42,10 @@ export function init({
   port = 9464,
 }: InitOptions = {}) {
   if (metricReader) {
-    throw new Error("Prometheus exporter is already running");
+    throw new Error(
+      "Prometheus exporter is already running. You might have called `init()` " +
+        "more than once.",
+    );
   }
 
   amLogger.info(`Opening a Prometheus scrape endpoint at port ${port}`);

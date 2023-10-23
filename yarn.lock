@@ -5,13 +5,13 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@autometrics/autometrics@npm:^0.7.0-beta11":
-  version: 0.7.0
-  resolution: "@autometrics/autometrics@npm:0.7.0"
+"@autometrics/autometrics@file:../../dist/autometrics::locator=fastify-example%40workspace%3Aexamples%2Ffastify":
+  version: beta
+  resolution: "@autometrics/autometrics@file:../../dist/autometrics#../../dist/autometrics::hash=d22bf5&locator=fastify-example%40workspace%3Aexamples%2Ffastify"
   dependencies:
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-  checksum: f5d20eb04d129ffc2aa1920faae499d085d9c769acca49062b1a8ad9f3f466b6afb71e0b652fdc1046820dbf0041984332678990f98483d5c69a0930a2906dfe
+    "@opentelemetry/api": ^1.6.0
+    "@opentelemetry/sdk-metrics": ^1.17.0
+  checksum: 778ce5c5f003f6872b3731d8cbbfb5e5c2504ba1681f3705d19497bfad0dbec162988d5c26b50257f20b792ecf25eac2341f836839d470357e82fa8e6bf44581
   languageName: node
   linkType: hard
 
@@ -60,15 +60,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@autometrics/exporter-prometheus@npm:beta":
-  version: 0.7.0-beta11
-  resolution: "@autometrics/exporter-prometheus@npm:0.7.0-beta11"
+"@autometrics/exporter-prometheus@file:../../dist/exporter-prometheus::locator=fastify-example%40workspace%3Aexamples%2Ffastify":
+  version: beta
+  resolution: "@autometrics/exporter-prometheus@file:../../dist/exporter-prometheus#../../dist/exporter-prometheus::hash=624060&locator=fastify-example%40workspace%3Aexamples%2Ffastify"
   dependencies:
-    "@autometrics/autometrics": ^0.7.0-beta11
-    "@opentelemetry/api": ^1.3.0
-    "@opentelemetry/exporter-prometheus": ">=0.41.2"
-    "@opentelemetry/sdk-metrics": ">=1.15.0"
-  checksum: fadfd6340181fec3f6f7e516961c461d87c86fcf6e22a0dea982fc12a1308daa4519a17fc9636b68e2e6191173c1e6a20513d185fb3e3c4b89d5419eb7eb97ec
+    "@autometrics/autometrics": beta
+    "@opentelemetry/api": ^1.6.0
+    "@opentelemetry/exporter-prometheus": ^0.43.0
+    "@opentelemetry/sdk-metrics": ^1.17.0
+  checksum: 80d4f158a441fbce6c1219b98e7cb110af2a67ad6b770bfc7b937fa8ac5247e2174f27d053a94dcb68f530472c98f5fda5004bc5f0602068ef580221d2cc50ac
   languageName: node
   linkType: hard
 
@@ -328,19 +328,6 @@ __metadata:
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
   checksum: 458a995eb86c82b8e96bb6d3bb276a76010dad9ed025316e086ce6086f5c4857f67d877b9590344cbf54e685f74a87df0fb930f6ad9cbe49449020a47589dc66
-  languageName: node
-  linkType: hard
-
-"@opentelemetry/exporter-prometheus@npm:>=0.41.2":
-  version: 0.44.0
-  resolution: "@opentelemetry/exporter-prometheus@npm:0.44.0"
-  dependencies:
-    "@opentelemetry/core": 1.17.1
-    "@opentelemetry/resources": 1.17.1
-    "@opentelemetry/sdk-metrics": 1.17.1
-  peerDependencies:
-    "@opentelemetry/api": ^1.3.0
-  checksum: f0c093ba8b70c23f16fb08e7f2ca59986dff853ae006fd42864b952e4dc9ceac97fcb423586288828f1a35271589a6676eed46f2017369d59e8ed3315e6ac79d
   languageName: node
   linkType: hard
 
@@ -1436,8 +1423,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fastify-example@workspace:examples/fastify"
   dependencies:
-    "@autometrics/autometrics": beta
-    "@autometrics/exporter-prometheus": beta
+    "@autometrics/autometrics": "file:../../dist/autometrics"
+    "@autometrics/exporter-prometheus": "file:../../dist/exporter-prometheus"
     "@autometrics/typescript-plugin": ^0.5.4
     "@prisma/client": ^5.2.0
     "@types/node": ^18.13.0

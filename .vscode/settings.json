@@ -9,7 +9,9 @@
     "examples/hono-bun",
     "examples/nestjs",
     "examples/react-app-experimental",
-    "node_modules"
+    "node_modules",
+    "packages/parcel-transformer-autometrics",
+    "packages/typescript-plugin"
   ],
   "editor.defaultFormatter": "biomejs.biome",
   "files.insertFinalNewline": true,

@@ -20,6 +20,7 @@ import {
   isObject,
   isPromise,
 } from "./utils.ts";
+import { amLogger } from "../mod.ts";
 
 let asyncLocalStorage: ALSInstance | undefined;
 if (typeof window === "undefined") {
@@ -493,7 +494,7 @@ type AutometricsDecoratorOptions<F> = F extends FunctionSig
 export function Autometrics<T extends FunctionSig>(
   autometricsOptions: AutometricsOptions<T> = {},
 ) {
-  return (target: T, context: DecoratorContext): T | void => {
+  return (target: T, context: DecoratorContext): T | undefined => {
     switch (context.kind) {
       case "class": {
         const className =
@@ -505,6 +506,7 @@ export function Autometrics<T extends FunctionSig>(
           });
           classDecorator(this);
         });
+        return;
       }
 
       case "method": {
@@ -517,7 +519,7 @@ export function Autometrics<T extends FunctionSig>(
       }
 
       default:
-        throw new Error(
+        amLogger.warn(
           "Autometrics decorator can only be used on classes and methods",
         );
     }
