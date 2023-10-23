@@ -32,7 +32,7 @@ jobs:
           tool: biome,just
 
       - name: Create packages
-        run: just build-npm ${GITHUB_REF}
+        run: YARN_ENABLE_IMMUTABLE_INSTALLS=false just build-npm ${GITHUB_REF}
 
       - name: Build examples
         run: just build-examples
