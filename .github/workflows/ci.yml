@@ -26,11 +26,11 @@ jobs:
       - name: Run linter and format checker
         run: just lint
 
-      - name: Perform type-checking
-        run: just type-check-all
-
       - name: Create builds
         run: just build-all
+
+      - name: Perform type-checking
+        run: just type-check-all
 
       - name: Run all tests
         run: just test-all

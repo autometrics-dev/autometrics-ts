@@ -31,14 +31,14 @@ jobs:
         with:
           tool: biome,just
 
-      - name: Perform type-checking
-        run: just type-check-all
-
       - name: Create packages
         run: just build-npm ${GITHUB_REF}
 
       - name: Build examples
         run: just build-examples
+
+      - name: Perform type-checking
+        run: just type-check-all
 
       - name: Run all tests
         run: just test-all
