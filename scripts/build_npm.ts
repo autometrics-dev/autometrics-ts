@@ -7,7 +7,7 @@ import { bold, cyan, green } from "$std/fmt/colors.ts";
 
 const OUT_DIR = "./dist";
 
-const version = Deno.args[0] || "beta";
+const version = getVersion();
 
 const exporterMappings = {
   "./packages/autometrics/mod.ts": "@autometrics/autometrics",
@@ -154,3 +154,21 @@ for (const [entrypoint, packageInfo] of Object.entries(packages)) {
 }
 
 console.log(bold(green("Done.")));
+
+/**
+ * Takes the version from the CLI arguments (defaults to "beta") and returns it
+ * in the format as it should be in the `package.json`.
+ *
+ * This supports taking GitHub tag refs to extract the version from them and
+ * will strip any leading `v` if present.
+ */
+function getVersion() {
+  let version = Deno.args[0] || "beta";
+  if (version.startsWith("refs/tags/lib-")) {
+    version = version.slice(14);
+  }
+  if (version.startsWith("v")) {
+    version = version.slice(1);
+  }
+  return version;
+}

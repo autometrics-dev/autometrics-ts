@@ -9,6 +9,7 @@ packages/**/*/dist
 examples/**/*/dist
 examples/**/*/build
 examples/**/*/.next
+examples/**/*/.yarn
 examples/**/*/out
 examples/**/*/data
 examples/**/*/next-env.d.ts
