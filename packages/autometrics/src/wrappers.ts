@@ -400,11 +400,9 @@ export function autometrics<F extends FunctionSig>(
       }
     }
 
-    if (asyncLocalStorage) {
-      return asyncLocalStorage.run({ caller: functionName }, instrumentedFn);
-    }
-
-    return instrumentedFn();
+    return asyncLocalStorage
+      ? asyncLocalStorage.run({ caller: functionName }, instrumentedFn)
+      : instrumentedFn();
   };
 }
 

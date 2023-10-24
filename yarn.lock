@@ -866,7 +866,6 @@ __metadata:
   resolution: "autometrics-monorepo@workspace:."
   dependencies:
     "@parcel/types": ^2.10.0
-    "@types/node": ^18.6.5
   languageName: unknown
   linkType: soft
 
