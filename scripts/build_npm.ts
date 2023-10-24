@@ -114,7 +114,12 @@ for (const [entrypoint, packageInfo] of Object.entries(packages)) {
     ...packageJsonFields,
   };
 
-  if (name !== "autometrics") {
+  if (name === "autometrics") {
+    packageJson.browser = {
+      "./esm/src/platform.node.js": "./esm/src/platform.web.js",
+      "./script/src/platform.node.js": "./script/src/platform.web.js",
+    };
+  } else {
     packageJson.dependencies = {
       // will trigger unmet peer dependency warnings if omitted:
       "@opentelemetry/api": getNpmVersionRange("@opentelemetry/api"),
@@ -145,7 +150,11 @@ for (const [entrypoint, packageInfo] of Object.entries(packages)) {
       // Ignore messages about `fetch` in Node.js. It's a TODO to have a better
       // fallback, but there's already a guard around its usage.
       !diagnostic.messageText.toString().includes("Cannot find name 'fetch'"),
-    postBuild() {
+    async postBuild() {
+      if (name === "autometrics") {
+        await buildWebPlatform();
+      }
+
       // steps to run after building and before running the tests
       Deno.copyFileSync("LICENSE", `${OUT_DIR}/${name}/LICENSE`);
       Deno.copyFileSync(readme, `${OUT_DIR}/${name}/README.md`);
@@ -154,6 +163,31 @@ for (const [entrypoint, packageInfo] of Object.entries(packages)) {
 }
 
 console.log(bold(green("Done.")));
+
+/**
+ * Builds `platform.web.js` and places it next to the already compiled
+ * `platform.node.js` to enable the NPM package to support both Node and web.
+ */
+async function buildWebPlatform() {
+  const targets = [
+    { dir: "esm", module: "es2022" },
+    { dir: "script", module: "commonjs" },
+  ];
+
+  for (const { dir, module } of targets) {
+    const source = "packages/autometrics/src/platform.web.ts";
+    const outDir = `dist/autometrics/${dir}/src`;
+    const command = new Deno.Command("yarn", {
+      args: ["tsc", "--outDir", outDir, "-m", module, source],
+      stdout: "inherit",
+      stderr: "inherit",
+    });
+    const output = await command.output();
+    if (!output.success) {
+      throw new Error(`Could not generate ${outDir}/platform.web.js`);
+    }
+  }
+}
 
 /**
  * Takes the version from the CLI arguments (defaults to "beta") and returns it

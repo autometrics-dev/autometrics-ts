@@ -11,7 +11,8 @@
     "packages/typescript-plugin"
   ],
   "devDependencies": {
-    "@parcel/types": "^2.10.0"
+    "@parcel/types": "^2.10.0",
+    "typescript": "^5.2.2"
   },
   "resolutions": {
     "@opentelemetry/sdk-metrics": "1.17.1"
