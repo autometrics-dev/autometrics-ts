@@ -99,6 +99,9 @@ const packageJsonFields = {
   devDependencies: {
     "@types/node": "^18.6.5",
   },
+  engines: {
+    node: ">=16.0.0",
+  },
 };
 
 for (const [entrypoint, packageInfo] of Object.entries(packages)) {
