@@ -279,13 +279,12 @@ export function autometrics<F extends FunctionSig>(
         valueType: ValueType.INT,
       })
     : null;
-  const caller = asyncLocalStorage?.getStore()?.caller;
 
   counter.add(0, {
     function: functionName,
     module: moduleName,
     result: "ok",
-    caller,
+    caller: "",
     ...counterObjectiveAttributes,
   });
 
@@ -295,6 +294,8 @@ export function autometrics<F extends FunctionSig>(
       function: functionName,
       module: moduleName,
     });
+
+    const caller = asyncLocalStorage?.getStore()?.caller ?? "";
 
     const onSuccess = () => {
       const autometricsDuration = (performance.now() - autometricsStart) / 1000;

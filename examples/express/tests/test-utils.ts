@@ -25,7 +25,7 @@ export async function stepWithMetricReader(
   registerExporter({ metricReader });
 
   try {
-    t.test(stepName, () => testFn(metricReader));
+    await t.test(stepName, () => testFn(metricReader));
   } finally {
     await metricReader.forceFlush();
   }
