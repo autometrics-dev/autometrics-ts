@@ -55,22 +55,9 @@ const packages = {
   },
 };
 
-const decoder = new TextDecoder("utf-8");
-const denoLock = JSON.parse(decoder.decode(Deno.readFileSync("./deno.lock")));
-const { specifiers } = denoLock.packages;
-
-function getNpmVersionRange(npmPackageName: string): string {
-  const keyPrefix = `npm:${npmPackageName}@`;
-  for (const key of Object.keys(specifiers)) {
-    if (key.startsWith(keyPrefix)) {
-      return key.slice(keyPrefix.length);
-    }
-  }
-
-  throw new Error(
-    `Cannot find version range for ${npmPackageName} in deno.lock`,
-  );
-}
+const { specifiers } = readJson<{ packages: { specifiers: Array<string> } }>(
+  "./deno.lock",
+).packages;
 
 const packageJsonFields = {
   version,
@@ -95,7 +82,6 @@ const packageJsonFields = {
   publishConfig: {
     access: "public",
   },
-  files: ["dist/", "README.md", "package.json"],
   devDependencies: {
     "@types/node": "^18.6.5",
   },
@@ -190,6 +176,25 @@ async function buildWebPlatform() {
 }
 
 /**
+ * Returns the version range to use for a given NPM package by extracting it
+ * from `deno.lock`.
+ *
+ * This helps us to avoid hard-coding version numbers in this script.
+ */
+function getNpmVersionRange(npmPackageName: string): string {
+  const keyPrefix = `npm:${npmPackageName}@`;
+  for (const key of Object.keys(specifiers)) {
+    if (key.startsWith(keyPrefix)) {
+      return key.slice(keyPrefix.length);
+    }
+  }
+
+  throw new Error(
+    `Cannot find version range for ${npmPackageName} in deno.lock`,
+  );
+}
+
+/**
  * Takes the version from the CLI arguments (defaults to "beta") and returns it
  * in the format as it should be in the `package.json`.
  *
@@ -197,7 +202,7 @@ async function buildWebPlatform() {
  * will strip any leading `v` if present.
  */
 function getVersion() {
-  let version = Deno.args[0] || "beta";
+  let version = Deno.args[0] || readJson<PackageJson>("./package.json").version;
   if (version.startsWith("refs/tags/lib-")) {
     version = version.slice(14);
   }
@@ -205,4 +210,9 @@ function getVersion() {
     version = version.slice(1);
   }
   return version;
+}
+
+function readJson<T>(path: string): T {
+  const decoder = new TextDecoder("utf-8");
+  return JSON.parse(decoder.decode(Deno.readFileSync(path)));
 }

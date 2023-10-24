@@ -12,3 +12,6 @@ test:
 
 type-check:
     deno check main.ts
+
+clean:
+    true # nothing to clean

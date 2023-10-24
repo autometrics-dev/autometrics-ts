@@ -2,7 +2,7 @@ build:
     yarn && yarn build
 
 start:
-    yarn start
+    yarn preview
 
 test:
     true # no tests; no issues
@@ -11,4 +11,4 @@ type-check:
     yarn tsc -p tsconfig.json --noEmit
 
 clean:
-    rm -Rf build node_modules .yarn
+    rm -Rf dist node_modules .yarn

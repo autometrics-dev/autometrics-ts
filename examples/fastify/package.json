@@ -9,6 +9,10 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
+  "workspaces": [
+    "../../dist/autometrics",
+    "../../dist/exporter-prometheus"
+  ],
   "dependencies": {
     "@autometrics/autometrics": "portal:../../dist/autometrics",
     "@autometrics/exporter-prometheus": "portal:../../dist/exporter-prometheus",
