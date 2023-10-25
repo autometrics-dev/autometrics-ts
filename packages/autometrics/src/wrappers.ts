@@ -9,11 +9,11 @@ import {
   HISTOGRAM_DESCRIPTION,
   HISTOGRAM_NAME,
 } from "./constants.ts";
-import { getALSInstance } from "./platform.deno.ts";
 import { getMeter, metricsRecorded } from "./instrumentation.ts";
-import { getModulePath, isFunction, isObject, isPromise } from "./utils.ts";
 import { trace, warn } from "./logger.ts";
 import type { Objective } from "./objectives.ts";
+import { getALSInstance } from "./platform.deno.ts";
+import { getModulePath, isFunction, isObject, isPromise } from "./utils.ts";
 
 const asyncLocalStorage = getALSInstance();
 
