@@ -296,15 +296,9 @@ export function autometrics<F extends FunctionSig>(
       module: moduleName,
     });
 
-    let callerFunction: string;
-    let callerModule: string;
-
-    const callerData = asyncLocalStorage?.getStore() ?? "";
-
-    if (callerData !== "") {
-      callerFunction = callerData.callerFunction ?? "";
-      callerModule = callerData.callerModule ?? "";
-    }
+    const callerData = asyncLocalStorage?.getStore();
+    const callerFunction = callerData?.callerFunction ?? "";
+    const callerModule = callerData?.callerModule ?? "";
 
     const onSuccess = () => {
       const autometricsDuration = (performance.now() - autometricsStart) / 1000;
