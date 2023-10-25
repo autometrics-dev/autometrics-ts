@@ -43,7 +43,7 @@ export function getCwd(): string {
  *
  * @internal
  */
-export type AsyncContext = { caller?: string };
+export type AsyncContext = { callerFunction?: string; callerModule?: string };
 
 /**
  * Returns a new `AsyncLocalStorage` instance for storing caller information.

@@ -284,7 +284,8 @@ export function autometrics<F extends FunctionSig>(
     function: functionName,
     module: moduleName,
     result: "ok",
-    caller: "",
+    caller_function: "",
+    caller_module: "",
     ...counterObjectiveAttributes,
   });
 
@@ -295,7 +296,15 @@ export function autometrics<F extends FunctionSig>(
       module: moduleName,
     });
 
-    const caller = asyncLocalStorage?.getStore()?.caller ?? "";
+    let callerFunction: string;
+    let callerModule: string;
+
+    const callerData = asyncLocalStorage?.getStore() ?? "";
+
+    if (callerData !== "") {
+      callerFunction = callerData.callerFunction ?? "";
+      callerModule = callerData.callerModule ?? "";
+    }
 
     const onSuccess = () => {
       const autometricsDuration = (performance.now() - autometricsStart) / 1000;
@@ -304,14 +313,16 @@ export function autometrics<F extends FunctionSig>(
         function: functionName,
         module: moduleName,
         result: "ok",
-        caller,
+        caller_function: callerFunction,
+        caller_module: callerModule,
         ...counterObjectiveAttributes,
       });
 
       histogram.record(autometricsDuration, {
         function: functionName,
         module: moduleName,
-        caller,
+        caller_function: callerFunction,
+        caller_module: callerModule,
         ...histogramObjectiveAttributes,
       });
 
@@ -330,21 +341,24 @@ export function autometrics<F extends FunctionSig>(
         function: functionName,
         module: moduleName,
         result: "error",
-        caller,
+        caller_function: callerFunction,
+        caller_module: callerModule,
         ...counterObjectiveAttributes,
       });
 
       histogram.record(autometricsDuration, {
         function: functionName,
         module: moduleName,
-        caller,
+        caller_function: callerFunction,
+        caller_module: callerModule,
         ...histogramObjectiveAttributes,
       });
 
       concurrencyGauge?.add(-1, {
         function: functionName,
         module: moduleName,
-        caller,
+        caller_function: callerFunction,
+        caller_module: callerModule,
       });
 
       metricsRecorded();
@@ -402,7 +416,10 @@ export function autometrics<F extends FunctionSig>(
     }
 
     return asyncLocalStorage
-      ? asyncLocalStorage.run({ caller: functionName }, instrumentedFn)
+      ? asyncLocalStorage.run(
+          { callerFunction: functionName, callerModule: moduleName },
+          instrumentedFn,
+        )
       : instrumentedFn();
   };
 }
