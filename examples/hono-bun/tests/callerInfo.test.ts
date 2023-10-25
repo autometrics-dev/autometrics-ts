@@ -17,10 +17,10 @@ test("Caller info test -- synchronous call", async () => {
     const serialized = await collectAndSerialize(metricReader);
 
     expect(serialized).toMatch(
-      /function_calls_total\{\S*function="bar"\S*caller=""\S*\} 1/gm,
+      /function_calls_total\{\S*function="bar"\S*caller_function=""\S*\} 1/gm,
     );
     expect(serialized).toMatch(
-      /function_calls_total\{\S*function="foo"\S*caller="bar"\S*\} 1/gm,
+      /function_calls_total\{\S*function="foo"\S*caller_function="bar"\S*caller_module="\/examples\/hono-bun\/tests\/callerInfo.test.ts"\S*\} 1/gm,
     );
   });
 });
@@ -40,10 +40,10 @@ test("Caller info test -- asynchronous call", async () => {
     const serialized = await collectAndSerialize(metricReader);
 
     expect(serialized).toMatch(
-      /function_calls_total\{\S*function="bar"\S*caller=""\S*\} 1/gm,
+      /function_calls_total\{\S*function="bar"\S*caller_function=""\S*\} 1/gm,
     );
     expect(serialized).toMatch(
-      /function_calls_total\{\S*function="foo"\S*caller="bar"\S*\} 1/gm,
+      /function_calls_total\{\S*function="foo"\S*caller_function="bar"\S*caller_module="\/examples\/hono-bun\/tests\/callerInfo.test.ts"\S*\} 1/gm,
     );
   });
 });

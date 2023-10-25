@@ -22,11 +22,11 @@ test("Caller info test", async (t) => {
 
       assert.match(
         serialized,
-        /function_calls_total\{\S*function="bar"\S*caller=""\S*\} 1/gm,
+        /function_calls_total\{\S*function="bar"\S*caller_function=""\S*\} 1/gm,
       );
       assert.match(
         serialized,
-        /function_calls_total\{\S*function="foo"\S*caller="bar"\S*\} 1/gm,
+        /function_calls_total\{\S*function="foo"\S*caller_function="bar"\S*caller_module="\/examples\/express\/tests\/callerInfo.test.ts"\S*\} 1/gm,
       );
     },
   );
@@ -49,11 +49,11 @@ test("Caller info test", async (t) => {
 
       assert.match(
         serialized,
-        /function_calls_total\{\S*function="bar"\S*caller=""\S*\} 1/gm,
+        /function_calls_total\{\S*function="bar"\S*caller_function=""\S*\} 1/gm,
       );
       assert.match(
         serialized,
-        /function_calls_total\{\S*function="foo"\S*caller="bar"\S*\} 1/gm,
+        /function_calls_total\{\S*function="foo"\S*caller_function="bar"\S*caller_module="\/examples\/express\/tests\/callerInfo.test.ts"\S*\} 1/gm,
       );
     },
   );

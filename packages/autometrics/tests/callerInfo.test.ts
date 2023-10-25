@@ -21,11 +21,11 @@ Deno.test("Caller info test", async (t) => {
 
       assertMatch(
         serialized,
-        /function_calls_total\{\S*function="bar"\S*caller=""\S*\} 1/gm,
+        /function_calls_total\{\S*function="bar"\S*caller_function=""\S*\} 1/gm,
       );
       assertMatch(
         serialized,
-        /function_calls_total\{\S*function="foo"\S*caller="bar"\S*\} 1/gm,
+        /function_calls_total\{\S*function="foo"\S*caller_function="bar"\S*caller_module="\/packages\/autometrics\/tests\/callerInfo.test.ts"\S*\} 1/gm,
       );
     },
   );
@@ -48,11 +48,11 @@ Deno.test("Caller info test", async (t) => {
 
       assertMatch(
         serialized,
-        /function_calls_total\{\S*function="bar"\S*caller=""\S*\} 1/gm,
+        /function_calls_total\{\S*function="bar"\S*caller_function=""\S*\} 1/gm,
       );
       assertMatch(
         serialized,
-        /function_calls_total\{\S*function="foo"\S*caller="bar"\S*\} 1/gm,
+        /function_calls_total\{\S*function="foo"\S*caller_function="bar"\S*caller_module="\/packages\/autometrics\/tests\/callerInfo.test.ts"\S*\} 1/gm,
       );
     },
   );

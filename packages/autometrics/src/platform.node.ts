@@ -58,5 +58,8 @@ export function getCwd(): string {
  * @internal
  */
 export function getALSInstance() {
-  return new AsyncLocalStorage<{ callerFunction?: string, callerModule?: string }>();
+  return new AsyncLocalStorage<{
+    callerFunction?: string;
+    callerModule?: string;
+  }>();
 }
