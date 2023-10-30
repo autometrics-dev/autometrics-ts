@@ -11,7 +11,7 @@ test_permissions := "--allow-env --allow-net --allow-read --allow-sys"
 build: (build-npm "")
 
 build-npm version:
-    deno run --allow-env --allow-net=deno.land --allow-read --allow-run=yarn --allow-write=dist scripts/build_npm.ts {{version}}
+    deno run --allow-env --allow-ffi --allow-net=deno.land --allow-read --allow-run --allow-sys --allow-write=dist scripts/build_npm.ts {{version}}
 
 build-examples:
     #!/usr/bin/env bash

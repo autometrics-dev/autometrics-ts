@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import type { AttributeValue, Attributes } from "npm:@opentelemetry/api@^1.6.0";
-import { hrTimeToMilliseconds } from "npm:@opentelemetry/core@^1.17.0";
-import type { IResource } from "npm:@opentelemetry/resources@^1.17.0";
+import type { AttributeValue, Attributes } from "$otel/api";
+import { hrTimeToMilliseconds } from "$otel/core";
+import type { IResource } from "$otel/resources";
 import {
   DataPoint,
   DataPointType,
@@ -25,7 +25,7 @@ import {
   MetricData,
   ResourceMetrics,
   ScopeMetrics,
-} from "npm:@opentelemetry/sdk-metrics@^1.17.0";
+} from "$otel/sdk-metrics";
 
 import { amLogger } from "../../mod.ts";
 

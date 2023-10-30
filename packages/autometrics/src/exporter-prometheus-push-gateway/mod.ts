@@ -1,4 +1,4 @@
-import { PeriodicExportingMetricReader } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
+import { PeriodicExportingMetricReader } from "$otel/sdk-metrics";
 
 import {
   BuildInfo,

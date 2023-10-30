@@ -18,7 +18,7 @@ import {
   Aggregation,
   AggregationTemporality,
   MetricReader,
-} from "npm:@opentelemetry/sdk-metrics@^1.17.0";
+} from "$otel/sdk-metrics";
 
 import { amLogger } from "../../mod.ts";
 import { PrometheusSerializer } from "./PrometheusSerializer.ts";

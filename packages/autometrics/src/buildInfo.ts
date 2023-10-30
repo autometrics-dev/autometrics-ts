@@ -1,4 +1,4 @@
-import type { UpDownCounter } from "npm:@opentelemetry/api@^1.6.0";
+import type { UpDownCounter } from "$otel/api";
 
 import { BUILD_INFO_DESCRIPTION, BUILD_INFO_NAME } from "./constants.ts";
 import { getMeter } from "./instrumentation.ts";

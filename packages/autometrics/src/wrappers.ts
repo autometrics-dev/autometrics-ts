@@ -1,6 +1,5 @@
-import { Attributes, ValueType } from "npm:@opentelemetry/api@^1.6.0";
+import { Attributes, ValueType } from "$otel/api";
 
-import { amLogger } from "../mod.ts";
 import {
   COUNTER_DESCRIPTION,
   COUNTER_NAME,
@@ -517,9 +516,7 @@ export function Autometrics<T extends FunctionSig>(
       }
 
       default:
-        amLogger.warn(
-          "Autometrics decorator can only be used on classes and methods",
-        );
+        warn("Autometrics decorator can only be used on classes and methods");
     }
   };
 }

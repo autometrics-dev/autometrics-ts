@@ -1,4 +1,4 @@
-import { MetricReader } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
+import { MetricReader } from "$otel/sdk-metrics";
 
 import { ExporterOptions, registerExporter } from "../../mod.ts";
 

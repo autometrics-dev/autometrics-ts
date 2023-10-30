@@ -1,8 +1,8 @@
 import {
   AggregationTemporalityPreference,
   OTLPMetricExporter,
-} from "npm:@opentelemetry/exporter-metrics-otlp-http@^0.43.0";
-import { PeriodicExportingMetricReader } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
+} from "$otel/exporter-metrics-otlp-http";
+import { PeriodicExportingMetricReader } from "$otel/sdk-metrics";
 
 import {
   BuildInfo,

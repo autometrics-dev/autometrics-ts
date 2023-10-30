@@ -8,11 +8,16 @@
   "imports": {
     "$autometrics/": "../../packages/autometrics/",
     "$fresh/": "https://deno.land/x/fresh@1.5.2/",
+    "$otel/api": "npm:@opentelemetry/api@^1.6.0",
+    "$otel/core": "npm:@opentelemetry/core@^1.17.0",
+    "$otel/exporter-metrics-otlp-http": "npm:@opentelemetry/exporter-metrics-otlp-http@^0.43.0",
+    "$otel/resources": "npm:@opentelemetry/resources@^1.17.0",
+    "$otel/sdk-metrics": "npm:@opentelemetry/sdk-metrics@^1.17.0",
+    "$std/": "https://deno.land/std@0.203.0/",
     "preact": "https://esm.sh/preact@10.18.1",
     "preact/": "https://esm.sh/preact@10.18.1/",
     "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.2.2",
     "@preact/signals": "https://esm.sh/*@preact/signals@1.2.1",
-    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.0",
-    "$std/": "https://deno.land/std@0.203.0/"
+    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.0"
   }
 }

@@ -1,8 +1,5 @@
-import type { Meter } from "npm:@opentelemetry/api@^1.6.0";
-import {
-  MeterProvider,
-  MetricReader,
-} from "npm:@opentelemetry/sdk-metrics@^1.17.0";
+import type { Meter } from "$otel/api";
+import { MeterProvider, MetricReader } from "$otel/sdk-metrics";
 
 import { createDefaultHistogramView } from "./histograms.ts";
 import { TemporaryMeter } from "./temporaryMeter.ts";
