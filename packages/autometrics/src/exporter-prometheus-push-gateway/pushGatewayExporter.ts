@@ -7,8 +7,8 @@ import {
 } from "$otel/sdk-metrics";
 
 import { amLogger } from "../../mod.ts";
-import { fetch } from "./fetch.ts";
 import { PrometheusSerializer } from "../exporter-prometheus/PrometheusSerializer.ts";
+import { fetch } from "./fetch.ts";
 import type { InitOptions } from "./mod.ts";
 
 const serializer = new PrometheusSerializer();
