@@ -7,6 +7,17 @@ This is the official TypeScript implementation for https://autometrics.dev/.
 Full documentation for the `@autometrics/autometrics` library can be found here:
 https://github.com/autometrics-dev/autometrics-ts
 
+## Installation
+
+Add the following mappings to your [import map](https://docs.deno.com/runtime/manual/basics/import_maps):
+
+```json
+{
+  "$autometrics/": "https://deno.land/x/autometrics/",
+  "$otel/": "npm:/@opentelemetry/",
+}
+```
+
 ## Recipe: Server-side example with Prometheus
 
 This recipe will start a webserver on port 9464, with a Prometheus-compatible
@@ -21,8 +32,8 @@ https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape
 1. Anywhere in your source code:
 
 ```typescript
-import { autometrics } from "https://deno.land/x/autometrics/mod.ts";
-import { init } from "https://deno.land/x/autometrics/exporter-prometheus.ts";
+import { autometrics } from "$autometrics/mod.ts";
+import { init } from "$autometrics/exporter-prometheus.ts";
 
 init(); // starts the webserver with the `/metrics` endpoint on port 9464
 
@@ -44,8 +55,8 @@ https://opentelemetry.io/docs/collector/getting-started/
 1. Anywhere in your source code:
 
 ```typescript
-import { autometrics } from "https://deno.land/x/autometrics/mod.ts";
-import { init } from "https://deno.land/x/autometrics/exporter-otlp-http.ts";
+import { autometrics } from "$autometrics/mod.ts";
+import { init } from "$autometrics/exporter-otlp-http.ts";
 
 init({ url: "https://<your-otel-collector>" });
 
@@ -67,8 +78,8 @@ gateway, such as: https://github.com/sinkingpoint/prometheus-gravel-gateway
 1. Anywhere in your source code:
 
 ```typescript
-import { autometrics } from "https://deno.land/x/autometrics/mod.ts";
-import { init } from "https://deno.land/x/autometrics/exporter-prometheus-push-gateway.ts";
+import { autometrics } from "$autometrics/mod.ts";
+import { init } from "$autometrics/exporter-prometheus-push-gateway.ts";
 
 init({ url: "https://<your-otel-collector>" });
 

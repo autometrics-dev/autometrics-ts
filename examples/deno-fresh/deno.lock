@@ -2,8 +2,11 @@
   "version": "3",
   "packages": {
     "specifiers": {
+      "npm:@opentelemetry/api": "npm:@opentelemetry/api@1.6.0",
       "npm:@opentelemetry/api@^1.6.0": "npm:@opentelemetry/api@1.6.0",
+      "npm:@opentelemetry/exporter-metrics-otlp-http": "npm:@opentelemetry/exporter-metrics-otlp-http@0.43.0_@opentelemetry+api@1.6.0",
       "npm:@opentelemetry/exporter-metrics-otlp-http@^0.43.0": "npm:@opentelemetry/exporter-metrics-otlp-http@0.43.0_@opentelemetry+api@1.6.0",
+      "npm:@opentelemetry/sdk-metrics": "npm:@opentelemetry/sdk-metrics@1.17.1_@opentelemetry+api@1.6.0",
       "npm:@opentelemetry/sdk-metrics@^1.17.0": "npm:@opentelemetry/sdk-metrics@1.17.1_@opentelemetry+api@1.6.0"
     },
     "npm": {
