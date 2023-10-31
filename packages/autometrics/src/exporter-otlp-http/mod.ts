@@ -19,7 +19,7 @@ const MAX_SAFE_INTERVAL = 2 ** 31 - 1;
 export type InitOptions = {
   /**
    * URL of the OpenTelemetry Collector to push metrics to. Should be a
-   * complete url with port and `/v1/metrics` endpoint:
+   * complete URL with port and `/v1/metrics` endpoint:
    * `http://localhost:4317/v1/metrics`.
    */
   url: string;
