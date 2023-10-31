@@ -124,13 +124,7 @@ const packageJsonFields = {
 const dtsPlugin = dts();
 const swcPlugin = swc(
   defineRollupSwcOption({
-    jsc: {
-      target: "es2021",
-      transform: {
-        decoratorMetadata: true,
-        legacyDecorator: true,
-      },
-    },
+    jsc: { target: "es2021" },
     sourceMaps: true,
   }),
 );
@@ -251,7 +245,7 @@ async function generatePackageJson(outDir: string, packageInfo: PackageInfo) {
 }
 
 async function installPackage(outDir: string) {
-  console.log("- Running `yarn install`...");
+  console.log("- Running yarn install...");
 
   const yarn = new Deno.Command("yarn", {
     args: ["install"],
