@@ -1,9 +1,13 @@
 {
   "compilerOptions": {
     "allowImportingTsExtensions": true,
-    "lib": ["ESNext"],
+    "lib": ["DOM", "ESNext"],
     "moduleResolution": "Bundler",
     "noEmit": true,
+    "paths": {
+      "$otel/*": ["./node_modules/@opentelemetry/*"]
+    },
     "strict": true
-  }
+  },
+  "exclude": ["dist"]
 }

@@ -7,6 +7,7 @@ import {
   recordBuildInfo,
   registerExporter,
 } from "../../mod.ts";
+import { fetch } from "./fetch.ts";
 import { PushGatewayExporter } from "./pushGatewayExporter.ts";
 
 const MAX_SAFE_INTERVAL = 2 ** 31 - 1;

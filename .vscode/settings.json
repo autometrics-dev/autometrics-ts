@@ -3,6 +3,7 @@
   "deno.lint": false,
   "deno.unstable": false,
   "deno.disablePaths": [
+    "dist",
     "examples/express",
     "examples/faas-experimental",
     "examples/fastify",

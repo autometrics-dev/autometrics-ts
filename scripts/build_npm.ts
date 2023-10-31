@@ -1,7 +1,7 @@
 import { bold, cyan, green } from "$std/fmt/colors.ts";
+import { dts } from "npm:rollup-plugin-dts@6.1.0";
 import { emptyDir, PackageJson } from "https://deno.land/x/dnt@0.38.1/mod.ts";
 import { rollup, Plugin } from "npm:rollup@3.29.4";
-import { dts } from "npm:rollup-plugin-dts@6.1.0";
 import { swc, defineRollupSwcOption } from "npm:rollup-plugin-swc3@0.10.3";
 
 const OUT_DIR = "./dist";
@@ -20,7 +20,14 @@ const otelImports = Object.entries(imports)
     return imports;
   }, {} as Record<string, string>);
 
-const packages = {
+type PackageInfo = {
+  name: string;
+  description: string;
+  readme: string;
+  mappings: Record<string, string>;
+};
+
+const packages: Record<string, PackageInfo> = {
   "mod.ts": {
     name: "autometrics",
     description:
@@ -67,6 +74,8 @@ const packages = {
     mappings: {
       ...pick(otelImports, "$otel/api", "$otel/core", "$otel/sdk-metrics"),
       "./packages/autometrics/mod.ts": "@autometrics/autometrics",
+      "./packages/autometrics/src/exporter-prometheus-push-gateway/fetch.ts":
+        "node-fetch-native",
       "./packages/autometrics/src/exporter-prometheus/PrometheusSerializer.ts":
         "@opentelemetry/exporter-prometheus",
     },
@@ -80,6 +89,7 @@ const packageJsonFields = {
     browser: "./index.web.js",
     import: "./index.mjs",
     require: "./index.cjs",
+    types: "./index.d.ts",
   },
   main: "./index.cjs",
   module: "./index.mjs",
@@ -132,14 +142,48 @@ for (const [entrypoint, packageInfo] of Object.entries(packages)) {
   const outDir = `${OUT_DIR}/${name}`;
   await emptyDir(outDir);
 
+  await generateNodeBundles(entrypoint, outDir, mappings);
+  await generateWebBundle(entrypoint, outDir, mappings);
+  await generateDtsBundle(entrypoint, outDir, mappings);
+  await generatePackageJson(outDir, packageInfo);
+
+  await Deno.copyFile("LICENSE", `${outDir}/LICENSE`);
+  await Deno.copyFile(readme, `${outDir}/README.md`);
+
+  await installPackage(outDir);
+}
+
+console.log(bold(green("Done.")));
+
+/**
+ * Generates the `index.cjs` and `index.mjs` files.
+ */
+async function generateNodeBundles(
+  entrypoint: string,
+  outDir: string,
+  mappings: Record<string, string>,
+) {
+  console.log("- Generating Node.js bundles...");
+
   const nodeBuild = await rollup({
     input: `./packages/autometrics/${entrypoint}`,
     external: ["node:async_hooks", ...Object.values(mappings)],
-    plugins: [/*dtsPlugin,*/ rewriteMappings(mappings), swcPlugin],
+    plugins: [rewriteMappings(mappings), swcPlugin],
   });
   await nodeBuild.write({ file: `${outDir}/index.mjs`, format: "esm" });
   await nodeBuild.write({ file: `${outDir}/index.cjs`, format: "commonjs" });
   await nodeBuild.close();
+}
+
+/**
+ * Generates the `index.web.js` file.
+ */
+async function generateWebBundle(
+  entrypoint: string,
+  outDir: string,
+  mappings: Record<string, string>,
+) {
+  console.log("- Generating web bundle...");
 
   const webBuild = await rollup({
     input: `./packages/autometrics/${entrypoint}`,
@@ -155,33 +199,66 @@ for (const [entrypoint, packageInfo] of Object.entries(packages)) {
   });
   await webBuild.write({ file: `${outDir}/index.web.js`, format: "esm" });
   await webBuild.close();
+}
 
+/**
+ * Generates the `index.d.ts` file.
+ */
+async function generateDtsBundle(
+  entrypoint: string,
+  outDir: string,
+  mappings: Record<string, string>,
+) {
+  console.log("- Generating TypeScript types...");
+
+  const typesBuild = await rollup({
+    input: `./packages/autometrics/${entrypoint}`,
+    external: Object.values(mappings),
+    plugins: [rewriteMappings(mappings), swcPlugin, dtsPlugin],
+  });
+  await typesBuild.write({ file: `${outDir}/index.d.ts`, format: "es" });
+  await typesBuild.close();
+}
+
+/**
+ * Generates the `package.json` file.
+ */
+async function generatePackageJson(outDir: string, packageInfo: PackageInfo) {
+  console.log("- Generating package.json...");
+
+  const { name, description, mappings } = packageInfo;
   const packageJson: PackageJson = {
     name: `@autometrics/${name}`,
     description,
     ...packageJsonFields,
+    dependencies: Object.values(mappings)
+      .filter((target) => !target.startsWith("."))
+      .reduce((dependencies, npmPackage) => {
+        dependencies[npmPackage] =
+          npmPackage === "@autometrics/autometrics"
+            ? version
+            : getNpmVersionRange(npmPackage);
+        return dependencies;
+      }, {} as Record<string, string>),
   };
 
-  packageJson.dependencies = Object.values(mappings)
-    .filter((target) => !target.startsWith("."))
-    .reduce((dependencies, npmPackage) => {
-      dependencies[npmPackage] =
-        npmPackage === "@autometrics/autometrics"
-          ? version
-          : getNpmVersionRange(npmPackage);
-      return dependencies;
-    }, {} as Record<string, string>);
-
-  Deno.writeFileSync(
-    `${OUT_DIR}/${name}/package.json`,
+  await Deno.writeFile(
+    `${outDir}/package.json`,
     new TextEncoder().encode(JSON.stringify(packageJson, null, 2)),
   );
-
-  Deno.copyFileSync("LICENSE", `${OUT_DIR}/${name}/LICENSE`);
-  Deno.copyFileSync(readme, `${OUT_DIR}/${name}/README.md`);
 }
 
-console.log(bold(green("Done.")));
+async function installPackage(outDir: string) {
+  console.log("- Running `yarn install`...");
+
+  const yarn = new Deno.Command("yarn", {
+    args: ["install"],
+    cwd: outDir,
+    stdout: "inherit",
+    stderr: "inherit",
+  });
+  await yarn.output();
+}
 
 /**
  * Returns the version range to use for a given NPM package by extracting it
@@ -248,29 +325,34 @@ function rewriteMappings(mappings: Record<string, string>): Plugin {
   return {
     name: "rewriteMappings",
     async resolveId(importee, importer, resolveOptions) {
-      // We first call the regular resolver. This allows us to map based on the
-      // resolved path.
-      const resolved = await this.resolve(
-        importee,
-        importer,
-        Object.assign({ skipSelf: true }, resolveOptions),
-      );
+      if (importee.startsWith(".")) {
+        // For relative imports, we first call the regular resolver. This allows
+        // us to map based on the resolved path.
+        const resolved = await this.resolve(
+          importee,
+          importer,
+          Object.assign({ skipSelf: true }, resolveOptions),
+        );
+        if (!resolved) {
+          return null;
+        }
 
-      const mapped = entries.find(
-        resolved
-          ? (entry) => {
-              const path = resolved.id.startsWith(cwd)
-                ? `./${resolved.id.slice(cwd.length + 1)}`
-                : resolved.id;
-              return entry.from === path;
-            }
-          : (entry) => entry.from === importee,
-      );
+        const path = resolved.id.startsWith(cwd)
+          ? `./${resolved.id.slice(cwd.length + 1)}`
+          : resolved.id;
 
-      if (mapped) {
-        return mapped.to.startsWith("./")
-          ? { id: `${cwd}/${mapped.to.slice(2)}` }
-          : { id: mapped.to };
+        const mapped = entries.find((entry) => entry.from === path);
+        if (mapped) {
+          return mapped.to.startsWith("./")
+            ? { id: `${cwd}/${mapped.to.slice(2)}` }
+            : { id: mapped.to };
+        }
+      } else {
+        // Other imports are simply mapped to an NPM package.
+        const mapped = entries.find((entry) => entry.from === importee);
+        if (mapped) {
+          return { id: mapped.to };
+        }
       }
     },
   };
