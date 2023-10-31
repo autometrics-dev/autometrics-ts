@@ -136,7 +136,7 @@ const swcPlugin = swc(
 );
 
 for (const [entrypoint, packageInfo] of Object.entries(packages)) {
-  const { name, description, mappings, readme } = packageInfo;
+  const { name, mappings, readme } = packageInfo;
   console.log(bold(`Building ${cyan(`@autometrics/${name}`)} package...`));
 
   const outDir = `${OUT_DIR}/${name}`;
@@ -146,11 +146,10 @@ for (const [entrypoint, packageInfo] of Object.entries(packages)) {
   await generateWebBundle(entrypoint, outDir, mappings);
   await generateDtsBundle(entrypoint, outDir, mappings);
   await generatePackageJson(outDir, packageInfo);
+  await installPackage(outDir);
 
   await Deno.copyFile("LICENSE", `${outDir}/LICENSE`);
   await Deno.copyFile(readme, `${outDir}/README.md`);
-
-  await installPackage(outDir);
 }
 
 console.log(bold(green("Done.")));
@@ -190,7 +189,10 @@ async function generateWebBundle(
     external: Object.values(mappings),
     plugins: [
       rewriteMappings({
-        ...mappings,
+        ...omit(
+          mappings,
+          "./packages/autometrics/src/exporter-prometheus-push-gateway/fetch.ts",
+        ),
         "./packages/autometrics/src/platform.deno.ts":
           "./packages/autometrics/src/platform.web.ts",
       }),
@@ -299,6 +301,19 @@ function getVersion() {
 }
 
 /**
+ * Creates an object from another, with one or more properties removed.
+ */
+export function omit<
+  T extends Record<string, unknown>,
+  K extends Array<keyof T>,
+>(object: T, ...propNames: K): Omit<T, K[number]> {
+  return pickBy(object, (_value, key) => !propNames.includes(key)) as Omit<
+    T,
+    K[number]
+  >;
+}
+
+/**
  * Creates an object from the specified input object's properties.
  */
 export function pick<
@@ -308,6 +323,21 @@ export function pick<
   return Object.fromEntries(
     Object.entries(object).filter(([key]) => propNames.includes(key)),
   ) as Pick<T, K[number]>;
+}
+
+/**
+ * Creates an object from all the input object's properties the given predicate
+ * returns `true` for.
+ */
+export function pickBy<T extends Record<string, unknown>, K = keyof T>(
+  object: T,
+  predicate: (value: T[keyof T], key: keyof T) => boolean,
+): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(object).filter(([key, value]) =>
+      predicate(value as T[keyof T], key as keyof T),
+    ),
+  ) as T;
 }
 
 function readJson<T>(path: string): T {
