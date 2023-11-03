@@ -1,3 +1,11 @@
+import type { Attributes } from "npm:@opentelemetry/api@^1.6.0";
+
+import {
+  OBJECTIVE_LATENCY_THRESHOLD_LABEL,
+  OBJECTIVE_NAME_LABEL,
+  OBJECTIVE_PERCENTILE_LABEL,
+} from "./constants.ts";
+
 /**
  * This represents a Service-Level Objective (SLO) for a function or group of functions.
  * The objective should be given a descriptive name and can represent
@@ -127,4 +135,46 @@ export enum ObjectiveLatency {
    * 10 seconds
    */
   Ms10000 = "10",
+}
+
+export function getObjectiveAttributes(objective: Objective | undefined): {
+  counterObjectiveAttributes: Attributes;
+  histogramObjectiveAttributes: Attributes;
+} {
+  // NOTE - Gravel Gateway will reject two metrics of the same name if one of
+  //        them has a subset of the attributes of the other. This means to be
+  //        able to support functions that have objectives, as well as functions
+  //        that do not have objectives, we need to default to setting the
+  //        labels to empty strings.
+  const counterObjectiveAttributes: Attributes = {
+    [OBJECTIVE_NAME_LABEL]: "",
+    [OBJECTIVE_PERCENTILE_LABEL]: "",
+  };
+
+  const histogramObjectiveAttributes: Attributes = {
+    [OBJECTIVE_NAME_LABEL]: "",
+    [OBJECTIVE_LATENCY_THRESHOLD_LABEL]: "",
+    [OBJECTIVE_PERCENTILE_LABEL]: "",
+  };
+
+  if (objective) {
+    const { latency, name, successRate } = objective;
+
+    counterObjectiveAttributes[OBJECTIVE_NAME_LABEL] = name;
+    histogramObjectiveAttributes[OBJECTIVE_NAME_LABEL] = name;
+
+    if (latency) {
+      const [threshold, latencyPercentile] = latency;
+      histogramObjectiveAttributes[OBJECTIVE_LATENCY_THRESHOLD_LABEL] =
+        threshold;
+      histogramObjectiveAttributes[OBJECTIVE_PERCENTILE_LABEL] =
+        latencyPercentile;
+    }
+
+    if (successRate) {
+      counterObjectiveAttributes[OBJECTIVE_PERCENTILE_LABEL] = successRate;
+    }
+  }
+
+  return { counterObjectiveAttributes, histogramObjectiveAttributes };
 }

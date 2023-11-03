@@ -1,18 +1,23 @@
-import { Attributes, ValueType } from "$otel/api";
+import { ValueType } from "npm:@opentelemetry/api@^1.6.0";
 
 import {
+  CALLER_FUNCTION_LABEL,
+  CALLER_MODULE_LABEL,
   COUNTER_DESCRIPTION,
   COUNTER_NAME,
+  FUNCTION_LABEL,
   GAUGE_DESCRIPTION,
   GAUGE_NAME,
   HISTOGRAM_DESCRIPTION,
   HISTOGRAM_NAME,
+  MODULE_LABEL,
+  RESULT_LABEL,
 } from "./constants.ts";
-import { getMeter, metricsRecorded } from "./instrumentation.ts";
-import { trace, warn } from "./logger.ts";
-import type { Objective } from "./objectives.ts";
 import { getALSInstance } from "./platform.deno.ts";
+import { getMeter, metricsRecorded } from "./instrumentation.ts";
 import { getModulePath, isFunction, isObject, isPromise } from "./utils.ts";
+import { getObjectiveAttributes, Objective } from "./objectives.ts";
+import { trace, warn } from "./logger.ts";
 
 const asyncLocalStorage = getALSInstance();
 
@@ -230,38 +235,8 @@ export function autometrics<F extends FunctionSig>(
     return fn as F;
   }
 
-  // NOTE - Gravel Gateway will reject two metrics of the same name if one of
-  //        them has a subset of the attributes of the other. This means to be
-  //        able to support functions that have objectives, as well as functions
-  //        that do not have objectives, we need to default to setting the objective_*
-  //        labels to the empty string.
-  const counterObjectiveAttributes: Attributes = {
-    objective_name: "",
-    objective_percentile: "",
-  };
-
-  const histogramObjectiveAttributes: Attributes = {
-    objective_name: "",
-    objective_latency_threshold: "",
-    objective_percentile: "",
-  };
-
-  if (objective) {
-    const { latency, name, successRate } = objective;
-
-    counterObjectiveAttributes.objective_name = name;
-    histogramObjectiveAttributes.objective_name = name;
-
-    if (latency) {
-      const [threshold, latencyPercentile] = latency;
-      histogramObjectiveAttributes.objective_latency_threshold = threshold;
-      histogramObjectiveAttributes.objective_percentile = latencyPercentile;
-    }
-
-    if (successRate) {
-      counterObjectiveAttributes.objective_percentile = successRate;
-    }
-  }
+  const { counterObjectiveAttributes, histogramObjectiveAttributes } =
+    getObjectiveAttributes(objective);
 
   const meter = getMeter();
   const counter = meter.createCounter(COUNTER_NAME, {
@@ -280,19 +255,19 @@ export function autometrics<F extends FunctionSig>(
     : null;
 
   counter.add(0, {
-    function: functionName,
-    module: moduleName,
-    result: "ok",
-    caller_function: "",
-    caller_module: "",
+    [FUNCTION_LABEL]: functionName,
+    [MODULE_LABEL]: moduleName,
+    [RESULT_LABEL]: "ok",
+    [CALLER_FUNCTION_LABEL]: "",
+    [CALLER_MODULE_LABEL]: "",
     ...counterObjectiveAttributes,
   });
 
   return (...params) => {
     const autometricsStart = performance.now();
     concurrencyGauge?.add(1, {
-      function: functionName,
-      module: moduleName,
+      [FUNCTION_LABEL]: functionName,
+      [MODULE_LABEL]: moduleName,
     });
 
     const callerData = asyncLocalStorage?.getStore();
@@ -303,11 +278,11 @@ export function autometrics<F extends FunctionSig>(
       const autometricsDuration = (performance.now() - autometricsStart) / 1000;
 
       counter.add(1, {
-        function: functionName,
-        module: moduleName,
-        result: "ok",
-        caller_function: callerFunction,
-        caller_module: callerModule,
+        [FUNCTION_LABEL]: functionName,
+        [MODULE_LABEL]: moduleName,
+        [RESULT_LABEL]: "ok",
+        [CALLER_FUNCTION_LABEL]: callerFunction,
+        [CALLER_MODULE_LABEL]: callerModule,
         ...counterObjectiveAttributes,
       });
 
