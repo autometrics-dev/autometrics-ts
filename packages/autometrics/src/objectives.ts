@@ -1,4 +1,4 @@
-import type { Attributes } from "npm:@opentelemetry/api@^1.6.0";
+import type { Attributes } from "$otel/api";
 
 import {
   OBJECTIVE_LATENCY_THRESHOLD_LABEL,

@@ -1,4 +1,4 @@
-import { ValueType } from "npm:@opentelemetry/api@^1.6.0";
+import { ValueType } from "$otel/api";
 
 import {
   CALLER_FUNCTION_LABEL,
