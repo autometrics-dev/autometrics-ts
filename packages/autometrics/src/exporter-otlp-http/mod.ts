@@ -4,12 +4,7 @@ import {
 } from "$otel/exporter-metrics-otlp-http";
 import { PeriodicExportingMetricReader } from "$otel/sdk-metrics";
 
-import {
-  BuildInfo,
-  amLogger,
-  createDefaultBuildInfo,
-  recordBuildInfo,
-} from "../../mod.ts";
+import { BuildInfo, amLogger, recordBuildInfo } from "../../mod.ts";
 import { registerExporterInternal } from "./registerExporterInternal.ts";
 
 export { AggregationTemporalityPreference };
@@ -75,7 +70,7 @@ export function init({
   concurrencyLimit,
   timeout = 1000,
   temporalityPreference = AggregationTemporalityPreference.CUMULATIVE,
-  buildInfo,
+  buildInfo = {},
 }: InitOptions) {
   const defaultPath = "/v1/metrics" as const;
   const defaultPort = "4317" as const;
@@ -136,5 +131,5 @@ export function init({
     throw new Error(`Invalid pushInterval: ${pushInterval}`);
   }
 
-  recordBuildInfo(buildInfo ?? createDefaultBuildInfo());
+  recordBuildInfo(buildInfo);
 }

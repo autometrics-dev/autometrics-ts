@@ -92,11 +92,11 @@ export type BuildInfo = {
  */
 const buildInfo: BuildInfo = {
   [AUTOMETRICS_VERSION_LABEL]: "1.0.0",
-  [BRANCH_LABEL]: "",
-  [COMMIT_LABEL]: "",
-  [REPOSITORY_PROVIDER_LABEL]: "",
-  [REPOSITORY_URL_LABEL]: "",
-  [VERSION_LABEL]: "",
+  [BRANCH_LABEL]: getBranch() ?? "",
+  [COMMIT_LABEL]: getCommit() ?? "",
+  [REPOSITORY_PROVIDER_LABEL]: getRepositoryProvider() ?? "",
+  [REPOSITORY_URL_LABEL]: getRepositoryUrl() ?? "",
+  [VERSION_LABEL]: getVersion() ?? "",
   clearmode: "",
 };
 
@@ -135,17 +135,4 @@ export function recordBuildInfo(info: BuildInfo) {
   }
 
   buildInfoGauge.add(1, buildInfo);
-}
-
-/**
- * Creates the default `BuildInfo` based on environment variables.
- */
-export function createDefaultBuildInfo(): BuildInfo {
-  return {
-    [VERSION_LABEL]: getVersion(),
-    [COMMIT_LABEL]: getCommit(),
-    [BRANCH_LABEL]: getBranch(),
-    [REPOSITORY_URL_LABEL]: getRepositoryUrl(),
-    [REPOSITORY_PROVIDER_LABEL]: getRepositoryProvider(),
-  };
 }
