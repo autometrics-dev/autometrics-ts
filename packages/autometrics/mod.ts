@@ -1,7 +1,15 @@
 export * from "./src/buildInfo.ts";
 export {
-  type ExporterOptions,
+  AUTOMETRICS_VERSION_LABEL,
+  BRANCH_LABEL,
+  COMMIT_LABEL,
+  REPOSITORY_PROVIDER_LABEL,
+  REPOSITORY_URL_LABEL,
+  VERSION_LABEL,
+} from "./src/constants.ts";
+export {
   registerExporter,
+  type ExporterOptions,
 } from "./src/instrumentation.ts";
 export * as amLogger from "./src/logger.ts";
 export * from "./src/objectives.ts";
