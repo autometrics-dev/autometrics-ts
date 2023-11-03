@@ -13,11 +13,11 @@ import {
   MODULE_LABEL,
   RESULT_LABEL,
 } from "./constants.ts";
-import { getALSInstance } from "./platform.deno.ts";
 import { getMeter, metricsRecorded } from "./instrumentation.ts";
-import { getModulePath, isFunction, isObject, isPromise } from "./utils.ts";
-import { getObjectiveAttributes, Objective } from "./objectives.ts";
 import { trace, warn } from "./logger.ts";
+import { Objective, getObjectiveAttributes } from "./objectives.ts";
+import { getALSInstance } from "./platform.deno.ts";
+import { getModulePath, isFunction, isObject, isPromise } from "./utils.ts";
 
 const asyncLocalStorage = getALSInstance();
 
