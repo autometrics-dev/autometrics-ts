@@ -17,26 +17,35 @@ import { getMeter, metricsRecorded } from "./instrumentation.ts";
 import { trace, warn } from "./logger.ts";
 import { Objective, getObjectiveAttributes } from "./objectives.ts";
 import { getALSInstance } from "./platform.deno.ts";
-import { getModulePath, isFunction, isObject, isPromise } from "./utils.ts";
+import { FunctionSig, getModulePath, isPromise } from "./utils.ts";
 
 const asyncLocalStorage = getALSInstance();
 
 /**
- * Function Wrapper
- * This seems to be the preferred way for defining functions in TypeScript
+ * Obtains the `this` argument of a function type.
  */
-// biome-ignore lint/suspicious/noExplicitAny:
-type FunctionSig = (...args: any[]) => any;
+type This<T extends FunctionSig> = T extends (
+  this: infer T,
+  ...args: Array<unknown>
+) => unknown
+  ? T
+  : // biome-ignore lint/suspicious/noConfusingVoidType: Biome doesn't recognize this correctly.
+    void;
 
+/**
+ * Generic type that can be used to match any function, while inferring and
+ * preserving its type information.
+ */
 type AnyFunction<T extends FunctionSig> = (
-  ...params: Parameters<T>
+  this: This<T>,
+  ...args: Parameters<T>
 ) => ReturnType<T>;
 
 /**
  * This type signals to the language service plugin that it should show extra
  * documentation along with the queries.
  */
-type AutometricsWrapper<T extends AnyFunction<T>> = AnyFunction<T>;
+type AutometricsWrapper<T extends AnyFunction<FunctionSig>> = AnyFunction<T>;
 
 /**
  * @group Wrapper and Decorator API
@@ -61,6 +70,18 @@ export type AutometricsOptions<F extends FunctionSig> = {
    * @group Wrapper and Decorator API
    */
   className?: string;
+
+  /**
+   * Whether or not the wrapped function is a static class method.
+   *
+   * Per convention, normal methods are submitted to Autometrics as
+   * `"ClassName.prototype.methodName"`, while static methods are submitted as
+   * `"ClassName.methodName"`.
+   *
+   * This is only used when a `className` is provided. If you use the
+   * decorators, this property will be set for you.
+   */
+  static?: boolean;
 
   /**
    * Name of the module (usually filename)
@@ -197,9 +218,9 @@ export function autometrics<F extends FunctionSig>(
 export function autometrics<F extends FunctionSig>(
   ...args: [F] | [AutometricsOptions<F>, F]
 ): AutometricsWrapper<F> {
-  let functionName: string | undefined;
+  let functionName: string;
   let moduleName: string | undefined;
-  let fn: F | undefined;
+  let fn: F;
   let objective: Objective | undefined;
   let trackConcurrency = false;
   let recordErrorIf: ReportErrorCondition<F> | undefined;
@@ -216,8 +237,10 @@ export function autometrics<F extends FunctionSig>(
     fn = maybeFn;
 
     functionName = options.functionName ?? fn.name;
-    if (options.className) {
-      functionName = `${options.className}#${functionName}`;
+    if (functionName && options.className) {
+      functionName = `${options.className}${
+        options.static ? "." : ".prototype."
+      }${functionName}`;
     }
 
     moduleName = options.moduleName ?? getModulePath();
@@ -226,13 +249,16 @@ export function autometrics<F extends FunctionSig>(
     trackConcurrency = options.trackConcurrency ?? false;
     recordErrorIf = options.recordErrorIf;
     recordSuccessIf = options.recordSuccessIf;
+  } else {
+    warn("autometrics() did not receive a function. Returning argument as is.");
+    return fnOrOptions as F;
   }
 
   if (!functionName) {
     warn(
       "Decorated functions must have a name to successfully create a metric. Function will not be instrumented.",
     );
-    return fn as F;
+    return fn;
   }
 
   const { counterObjectiveAttributes, histogramObjectiveAttributes } =
@@ -263,7 +289,7 @@ export function autometrics<F extends FunctionSig>(
     ...counterObjectiveAttributes,
   });
 
-  return (...params) => {
+  return function (...params) {
     const autometricsStart = performance.now();
     concurrencyGauge?.add(1, {
       [FUNCTION_LABEL]: functionName,
@@ -358,9 +384,8 @@ export function autometrics<F extends FunctionSig>(
       }
     };
 
-    function instrumentedFn() {
+    function instrumentedFn(this: This<F>): ReturnType<F> {
       try {
-        // @ts-ignore TypeScript doesn't the type of `this`.
         const returnValue: ReturnType<F> = fn.apply(this, params);
         if (isPromise(returnValue)) {
           return returnValue
@@ -386,216 +411,8 @@ export function autometrics<F extends FunctionSig>(
     return asyncLocalStorage
       ? asyncLocalStorage.run(
           { callerFunction: functionName, callerModule: moduleName },
-          instrumentedFn,
+          () => instrumentedFn.call(this),
         )
-      : instrumentedFn();
-  };
-}
-
-type AutometricsClassDecoratorOptions = Omit<
-  AutometricsOptions<FunctionSig>,
-  "functionName"
->;
-
-type AutometricsDecoratorOptions<F> = F extends FunctionSig
-  ? AutometricsClassDecoratorOptions
-  : AutometricsOptions<FunctionSig>;
-
-/**
- * Autometrics decorator that can be applied to either a class or class method
- * that automatically instruments methods with OpenTelemetry-compatible metrics.
- * Hover over the method to get the links for generated queries (if you have the
- * language service plugin installed).
- *
- * Optionally, you can pass in an {@link AutometricsOptions} object to configure
- * the decorator.
- * @param autometricsOptions
- *
- * @example
- *
- * <caption>Basic class decorator implementation</caption>
- *
- * ```
- *  \@Autometrics()
- *  class Foo {
- *   // Don't add a backslash in front of the decorator, this is only here to
- *   // prevent the example from rendering incorrectly
- *   bar() {
- *     console.log("bar");
- *   }
- * }
- * ```
- * @example
- *
- * <caption>Method decorator that passes in an autometrics options object
- * including SLO</caption>
- *
- * ```typescript
- * import {
- *   Autometrics,
- *   AutometricsOptions,
- *   Objective,
- *   ObjectivePercentile,
- *   ObjectiveLatency,
- * } from "autometrics";
- *
- * const objective: Objective = {
- *   successRate: ObjectivePercentile.P99_9,
- *   latency: [ObjectiveLatency.Ms250, ObjectivePercentile.P99],
- *   name: "foo",
- * };
- *
- * const autometricsOptions: AutometricsOptions = {
- *   functionName: "FooBar",
- *   objective,
- *   trackConcurrency: true,
- * };
- *
- * class Foo {
- *   // Don't add a backslash in front of the decorator, this is only here to
- *   // prevent the example from rendering incorrectly
- *   \@Autometrics(autometricsOptions)
- *   bar() {
- *     console.log("bar");
- *   }
- * }
- * ```
- *
- * @group Wrapper and Decorator API
- */
-export function Autometrics<T extends FunctionSig>(
-  autometricsOptions: AutometricsOptions<T> = {},
-) {
-  return (target: T, context: DecoratorContext): T | undefined => {
-    switch (context.kind) {
-      case "class": {
-        const className =
-          typeof context.name === "string" ? context.name : target.name;
-        context.addInitializer(function () {
-          const classDecorator = getAutometricsClassDecorator({
-            className,
-            ...autometricsOptions,
-          });
-          classDecorator(this);
-        });
-        return;
-      }
-
-      case "method": {
-        const functionName =
-          typeof context.name === "string" ? context.name : target.name;
-        return autometrics(
-          { functionName, ...autometricsOptions },
-          target,
-        ) as unknown as T;
-      }
-
-      default:
-        warn("Autometrics decorator can only be used on classes and methods");
-    }
-  };
-}
-
-/**
- * Autometrics decorator that can be used with TypeScript's
- * `experimentalDecorators` option.
- *
- * The options and usage are the same as the modern {@link Autometrics}
- * decorator.
- *
- * @group Wrapper and Decorator API
- */
-export function AutometricsLegacy<T extends Function | Object>(
-  autometricsOptions?: AutometricsDecoratorOptions<T>,
-) {
-  function decorator<T extends Function>(target: T): void;
-  function decorator<T extends Object>(
-    target: T,
-    propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ): void;
-  function decorator(
-    target: T,
-    propertyKey?: string,
-    descriptor?: PropertyDescriptor,
-  ) {
-    if (isFunction(target)) {
-      const classDecorator = getAutometricsClassDecorator(autometricsOptions);
-      classDecorator(target);
-
-      return;
-    }
-
-    if (isObject(target) && propertyKey && descriptor) {
-      const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
-      methodDecorator(target, propertyKey, descriptor);
-    }
-  }
-
-  return decorator;
-}
-
-/**
- * Decorator factory that returns a method decorator. Optionally accepts
- * an autometrics options object.
- *
- * @internal
- */
-export function getAutometricsMethodDecorator(
-  autometricsOptions?: AutometricsOptions<FunctionSig>,
-) {
-  return (
-    _target: Object,
-    _propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) => {
-    const originalFunction = descriptor.value;
-    const functionOrOptions = autometricsOptions ?? originalFunction;
-    const functionInput = autometricsOptions ? originalFunction : undefined;
-
-    descriptor.value = autometrics(functionOrOptions, functionInput);
-
-    return descriptor;
-  };
-}
-
-/**
- * Decorator factory that returns a class decorator that instruments all methods
- * of a class with autometrics. Optionally accepts an autometrics options
- * object.
- *
- * @internal
- */
-export function getAutometricsClassDecorator(
-  autometricsOptions?: AutometricsClassDecoratorOptions,
-): ClassDecorator {
-  return (classConstructor: Function) => {
-    const prototype = classConstructor.prototype;
-    const propertyNames = Object.getOwnPropertyNames(prototype);
-    const methodDecorator = getAutometricsMethodDecorator(autometricsOptions);
-
-    for (const propertyName of propertyNames) {
-      const property = prototype[propertyName];
-      const descriptor = Object.getOwnPropertyDescriptor(
-        prototype,
-        propertyName,
-      );
-
-      if (
-        typeof property !== "function" ||
-        propertyName === "constructor" ||
-        !descriptor
-      ) {
-        continue;
-      }
-
-      const instrumentedDescriptor = methodDecorator(
-        {},
-        propertyName,
-        descriptor,
-      );
-
-      Object.defineProperty(prototype, propertyName, instrumentedDescriptor);
-    }
+      : instrumentedFn.call(this);
   };
 }

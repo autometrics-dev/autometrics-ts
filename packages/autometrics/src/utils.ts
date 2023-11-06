@@ -1,6 +1,13 @@
 import { getCwd } from "./platform.deno.ts";
 
 /**
+ * Function Wrapper
+ * This seems to be the preferred way for defining functions in TypeScript
+ */
+// biome-ignore lint/suspicious/noExplicitAny:
+export type FunctionSig = (...args: any[]) => any;
+
+/**
  * Attempts to auto-detect the repository provider if none is specified, but we
  * do know the repository URL.
  */

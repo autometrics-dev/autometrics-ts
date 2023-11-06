@@ -1,6 +1,6 @@
 import { assertMatch } from "$std/assert/mod.ts";
 
-import { autometrics } from "../src/wrappers.ts";
+import { autometrics } from "../src/wrapper.ts";
 
 import { collectAndSerialize, stepWithMetricReader } from "./testUtils.ts";
 

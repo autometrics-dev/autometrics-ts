@@ -19,6 +19,7 @@
     "@opentelemetry/resources": "^1.17.0",
     "@opentelemetry/sdk-metrics": "^1.17.0",
     "@parcel/types": "^2.10.0",
+    "@types/node": "^18.6.5",
     "typescript": "^5.2.2"
   },
   "resolutions": {
