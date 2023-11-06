@@ -5,19 +5,19 @@ import { AutometricsLegacy } from "@autometrics/autometrics";
 
 import { collectAndSerialize, stepWithMetricReader } from "./test-utils.js";
 
-test("Legacy decorator test", async (t) => {
-  await stepWithMetricReader(t, "class methods", async (metricReader) => {
-    // @Autometrics decorator is likely to be used along-side other decorators
-    // this tests for any conflicts
-    function other(
-      _target: Object,
-      _propertyKey: string,
-      descriptor: PropertyDescriptor,
-    ) {
-      const originalMethod = descriptor.value;
-      descriptor.value = originalMethod;
-    }
+test("Legacy decorator tests", async (t) => {
+  // @Autometrics decorator is likely to be used along-side other decorators
+  // this tests for any conflicts
+  function other(
+    _target: Object,
+    _propertyKey: string,
+    descriptor: PropertyDescriptor,
+  ) {
+    const originalMethod = descriptor.value;
+    descriptor.value = originalMethod;
+  }
 
+  await stepWithMetricReader(t, "class methods", async (metricReader) => {
     @AutometricsLegacy() class Foo {
       counter = 0;
 
@@ -45,7 +45,7 @@ test("Legacy decorator test", async (t) => {
 
     assert.match(
       serialized,
-      /function_calls_total\{\S*function="Foo.prototype.increase"\S*module="\/[^"]*\/tests\/decorators.test.js"\S*\} 2/gm,
+      /function_calls_total\{\S*function="Foo.prototype.increase"\S*module="\/[^"]*\/tests\/legacyDecorators.test.js"\S*\} 2/gm,
     );
 
     assert.doesNotMatch(serialized, /untracked/m);
@@ -53,17 +53,6 @@ test("Legacy decorator test", async (t) => {
   });
 
   await stepWithMetricReader(t, "individual method", async (metricReader) => {
-    // @Autometrics decorator is likely to be used along-side other decorators
-    // this tests for any conflicts
-    function other(
-      _target: Object,
-      _propertyKey: string,
-      descriptor: PropertyDescriptor,
-    ) {
-      const originalMethod = descriptor.value;
-      descriptor.value = originalMethod;
-    }
-
     class Bar {
       counter = 0;
 
@@ -93,7 +82,7 @@ test("Legacy decorator test", async (t) => {
 
     assert.match(
       serialized,
-      /function_calls_total\{\S*function="Bar.prototype.increase"\S*module="\/[^"]*\/tests\/decorators.test.js"\S*\} 2/gm,
+      /function_calls_total\{\S*function="Bar.prototype.increase"\S*module="\/[^"]*\/tests\/legacyDecorators.test.js"\S*\} 2/gm,
     );
 
     assert.doesNotMatch(serialized, /untracked/m);
@@ -122,7 +111,7 @@ test("Legacy decorator test", async (t) => {
 
     assert.match(
       serialized,
-      /function_calls_total\{\S*function="Baz.theAnswer"\S*module="\/[^"]*\/tests\/decorators.test.js"\S*\} 2/gm,
+      /function_calls_total\{\S*function="Baz.theAnswer"\S*module="\/[^"]*\/tests\/legacyDecorators.test.js"\S*\} 2/gm,
     );
 
     assert.doesNotMatch(serialized, /untracked/m);
