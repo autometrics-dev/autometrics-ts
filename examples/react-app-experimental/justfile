@@ -5,7 +5,7 @@ start:
     yarn preview
 
 test:
-    true # no tests; no issues
+    yarn test
 
 type-check:
     yarn tsc -p tsconfig.json --noEmit

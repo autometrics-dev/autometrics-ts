@@ -1,5 +1,5 @@
 import { warn } from "./logger.ts";
-import { FunctionSig, isFunction, isObject } from "./utils.ts";
+import { FunctionSig, isFunction } from "./utils.ts";
 import { AutometricsOptions, autometrics } from "./wrapper.ts";
 
 const EMPTY_OBJECT = {} as const;
@@ -17,7 +17,7 @@ type AutometricsDecoratorOptions<T extends DecoratorContext> = T extends {
   ? AutometricsClassDecoratorOptions
   : AutometricsMethodDecoratorOptions;
 
-type AutometricsLegacyDecoratorOptions<F> = F extends FunctionSig
+type AutometricsLegacyDecoratorOptions<F> = F extends Function
   ? AutometricsClassDecoratorOptions
   : AutometricsMethodDecoratorOptions;
 
@@ -95,10 +95,10 @@ type AutometricsSkippedMethodDecoratorOptions = {
  *
  * @group Wrapper and Decorator API
  */
-export function Autometrics<T extends DecoratorContext>(
-  autometricsOptions: AutometricsDecoratorOptions<T> = {},
+export function Autometrics<C extends DecoratorContext>(
+  autometricsOptions: AutometricsDecoratorOptions<C> = {},
 ) {
-  return (target: FunctionSig, context: T): FunctionSig | undefined => {
+  return <T extends Function>(target: T, context: C): T | undefined => {
     switch (context.kind) {
       case "class": {
         const className =
@@ -119,7 +119,10 @@ export function Autometrics<T extends DecoratorContext>(
         } else {
           const functionName =
             typeof context.name === "string" ? context.name : target.name;
-          return autometrics({ functionName, ...autometricsOptions }, target);
+          return autometrics(
+            { functionName, ...autometricsOptions },
+            target as unknown as FunctionSig,
+          ) as unknown as T;
         }
         break;
 
