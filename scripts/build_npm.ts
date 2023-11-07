@@ -119,6 +119,9 @@ const packageJsonFields = {
   devDependencies: {
     "@types/node": "^18.6.5",
   },
+  engines: {
+    node: ">=16.0.0",
+  },
 };
 
 const dtsPlugin = dts();
