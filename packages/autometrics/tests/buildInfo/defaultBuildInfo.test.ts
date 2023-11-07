@@ -1,14 +1,7 @@
 import { assertStringIncludes } from "$std/assert/mod.ts";
 
-import { recordBuildInfo } from "../mod.ts";
-import {
-  BRANCH_LABEL,
-  COMMIT_LABEL,
-  REPOSITORY_URL_LABEL,
-  SERVICE_NAME_LABEL,
-  VERSION_LABEL,
-} from "../src/constants.ts";
-import { collectAndSerialize, stepWithMetricReader } from "./testUtils.ts";
+import { recordBuildInfo } from "../../mod.ts";
+import { collectAndSerialize, stepWithMetricReader } from "../testUtils.ts";
 
 Deno.test("Build info tests", async (t) => {
   await stepWithMetricReader(

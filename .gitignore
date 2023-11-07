@@ -33,8 +33,10 @@ lerna-debug.log*
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+deno.lock
 node_modules
 package-lock.json
+yarn.lock
 
 # OS
 .DS_Store

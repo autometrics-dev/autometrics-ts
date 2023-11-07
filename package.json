@@ -22,6 +22,6 @@
     "typescript": "^5.2.2"
   },
   "resolutions": {
-    "@opentelemetry/sdk-metrics": "1.17.1"
+    "@opentelemetry/sdk-metrics": "1.18.0"
   }
 }
