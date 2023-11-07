@@ -1,29 +1,23 @@
 /**
- * On web, environment variables don't exist, so we return an empty string.
+ * On web, environment variables don't exist, so we don't return anything.
  *
  * @internal
  */
-export function getVersion(): string | undefined {
-  return "";
-}
+export function getVersion() {}
 
 /**
- * On web, environment variables don't exist, so we return an empty string.
+ * On web, environment variables don't exist, so we don't return anything.
  *
  * @internal
  */
-export function getCommit(): string | undefined {
-  return "";
-}
+export function getCommit() {}
 
 /**
- * On web, environment variables don't exist, so we return an empty string.
+ * On web, environment variables don't exist, so we don't return anything.
  *
  * @internal
  */
-export function getBranch(): string | undefined {
-  return "";
-}
+export function getBranch() {}
 
 /**
  * On web, there's no concept of a working directory, so we return an empty
@@ -34,6 +28,20 @@ export function getBranch(): string | undefined {
 export function getCwd(): string {
   return "";
 }
+
+/**
+ * On web, environment variables don't exist, so we don't return anything.
+ *
+ * @internal
+ */
+export function getRepositoryUrl() {}
+
+/**
+ * On web, environment variables don't exist, so we don't return anything.
+ *
+ * @internal
+ */
+export function getRepositoryProvider() {}
 
 /**
  * `AsyncLocalStorage` is not supported on web, so we don't return anything.

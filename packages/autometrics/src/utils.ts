@@ -1,5 +1,29 @@
 import { getCwd } from "./platform.deno.ts";
 
+/**
+ * Attempts to auto-detect the repository provider if none is specified, but we
+ * do know the repository URL.
+ */
+export function detectRepositoryProvider(
+  repositoryUrl: string | undefined,
+): string | undefined {
+  if (!repositoryUrl) {
+    return;
+  }
+
+  if (repositoryUrl.includes("github.com")) {
+    return "github";
+  }
+
+  if (repositoryUrl.includes("gitlab.com")) {
+    return "gitlab";
+  }
+
+  if (repositoryUrl.includes("bitbucket.org")) {
+    return "bitbucket";
+  }
+}
+
 // HACK: this entire function is a hacky way to acquire the module name for a
 // given function e.g.: dist/index.js
 export function getModulePath(): string | undefined {

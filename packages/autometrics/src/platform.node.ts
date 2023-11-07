@@ -3,6 +3,9 @@
 // @ts-ignore statements in this file...
 
 import { AsyncLocalStorage } from "node:async_hooks";
+import { readFileSync } from "node:fs";
+
+import { getGitRepositoryUrl } from "./platformUtils.ts";
 
 /**
  * Returns the version of the application, based on environment variables.
@@ -53,6 +56,26 @@ export function getCwd(): string {
 }
 
 /**
+ * Returns the URL to the repository where the project's source code is located.
+ *
+ * @internal
+ */
+export function getRepositoryUrl(): string | undefined {
+  // @ts-ignore
+  return process.env.AUTOMETRICS_REPOSITORY_URL ?? detectRepositoryUrl();
+}
+
+/**
+ * Returns a hint as to which provider is being used to host the repository.
+ *
+ * @internal
+ */
+export function getRepositoryProvider(): string | undefined {
+  // @ts-ignore
+  return process.env.AUTOMETRICS_REPOSITORY_PROVIDER;
+}
+
+/**
  * Returns a new `AsyncLocalStorage` instance for storing caller information.
  *
  * @internal
@@ -62,4 +85,11 @@ export function getALSInstance() {
     callerFunction?: string;
     callerModule?: string;
   }>();
+}
+
+function detectRepositoryUrl(): string | undefined {
+  try {
+    const gitConfig = readFileSync(".git/config");
+    return getGitRepositoryUrl(gitConfig);
+  } catch {}
 }

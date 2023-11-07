@@ -3,7 +3,6 @@ import { PeriodicExportingMetricReader } from "$otel/sdk-metrics";
 import {
   BuildInfo,
   amLogger,
-  createDefaultBuildInfo,
   recordBuildInfo,
   registerExporter,
 } from "../../mod.ts";
@@ -61,7 +60,7 @@ export function init({
   pushInterval = 5000,
   concurrencyLimit,
   timeout = 1000,
-  buildInfo,
+  buildInfo = {},
 }: InitOptions) {
   if (typeof fetch === "undefined") {
     amLogger.warn(
@@ -99,5 +98,5 @@ export function init({
     throw new Error(`Invalid pushInterval: ${pushInterval}`);
   }
 
-  recordBuildInfo(buildInfo ?? createDefaultBuildInfo());
+  recordBuildInfo(buildInfo);
 }

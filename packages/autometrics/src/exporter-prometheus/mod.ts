@@ -3,7 +3,6 @@ import { MetricReader } from "$otel/sdk-metrics";
 import {
   BuildInfo,
   amLogger,
-  createDefaultBuildInfo,
   recordBuildInfo,
   registerExporter,
 } from "../../mod.ts";
@@ -37,7 +36,7 @@ export type InitOptions = {
  * Prometheus.
  */
 export function init({
-  buildInfo,
+  buildInfo = {},
   hostname = "0.0.0.0",
   port = 9464,
 }: InitOptions = {}) {
@@ -53,7 +52,7 @@ export function init({
   metricReader = new PrometheusExporter({ host: hostname, port });
   registerExporter({ metricReader });
 
-  recordBuildInfo(buildInfo ?? createDefaultBuildInfo());
+  recordBuildInfo(buildInfo);
 }
 
 /**

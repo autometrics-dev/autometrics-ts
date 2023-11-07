@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
+import { getGitRepositoryUrl } from "./platformUtils.ts";
 
 /**
  * Returns the version of the application, based on environment variables.
@@ -39,6 +40,24 @@ export function getCwd(): string {
 }
 
 /**
+ * Returns the URL to the repository where the project's source code is located.
+ *
+ * @internal
+ */
+export function getRepositoryUrl(): string | undefined {
+  return Deno.env.get("AUTOMETRICS_REPOSITORY_URL") ?? detectRepositoryUrl();
+}
+
+/**
+ * Returns a hint as to which provider is being used to host the repository.
+ *
+ * @internal
+ */
+export function getRepositoryProvider(): string | undefined {
+  return Deno.env.get("AUTOMETRICS_REPOSITORY_PROVIDER");
+}
+
+/**
  * Caller information we track across async function calls.
  *
  * @internal
@@ -56,4 +75,11 @@ export type AsyncContext = { callerFunction?: string; callerModule?: string };
  */
 export function getALSInstance(): AsyncLocalStorage<AsyncContext> | undefined {
   return new AsyncLocalStorage<AsyncContext>();
+}
+
+function detectRepositoryUrl(): string | undefined {
+  try {
+    const gitConfig = Deno.readFileSync(".git/config");
+    return getGitRepositoryUrl(gitConfig);
+  } catch {}
 }
