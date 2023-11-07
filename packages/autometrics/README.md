@@ -7,7 +7,7 @@ This is the official TypeScript implementation for https://autometrics.dev/.
 Full documentation for the `@autometrics/autometrics` library can be found here:
 https://github.com/autometrics-dev/autometrics-ts
 
-## Installation
+## Setup
 
 Add the following mappings to your [import map](https://docs.deno.com/runtime/manual/basics/import_maps):
 
@@ -15,6 +15,7 @@ Add the following mappings to your [import map](https://docs.deno.com/runtime/ma
 {
   "$autometrics/": "https://deno.land/x/autometrics/",
   "$otel/": "npm:/@opentelemetry/",
+  "$std/": "https://deno.land/std/",
 }
 ```
 

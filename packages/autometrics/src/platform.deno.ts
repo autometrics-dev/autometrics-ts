@@ -1,13 +1,24 @@
+import { dirname, join } from "$std/path/mod.ts";
+
 import { AsyncLocalStorage } from "node:async_hooks";
-import { getGitRepositoryUrl } from "./platformUtils.ts";
+
+import { AUTOMETRICS_DEFAULT_SERVICE_NAME } from "./constants.ts";
+import { getGitRepositoryUrl, getPackageStringField } from "./platformUtils.ts";
 
 /**
  * Returns the version of the application, based on environment variables.
  *
+ * If no relevant environment variables are set, it attempts to use the version
+ * from the closest `package.json` file.
+ *
  * @internal
  */
 export function getVersion(): string | undefined {
-  return Deno.env.get("AUTOMETRICS_VERSION") || Deno.env.get("PACKAGE_VERSION");
+  return (
+    Deno.env.get("AUTOMETRICS_VERSION") ??
+    Deno.env.get("PACKAGE_VERSION") ??
+    detectPackageVersion()
+  );
 }
 
 /**
@@ -58,6 +69,23 @@ export function getRepositoryProvider(): string | undefined {
 }
 
 /**
+ * Returns the service name based on environment variables.
+ *
+ * If no relevant environment variables are set, it attempts to use the version
+ * from the closest `package.json` file.
+ *
+ * @internal
+ */
+export function getServiceName(): string {
+  return (
+    Deno.env.get("AUTOMETRICS_SERVICE_NAME") ??
+    Deno.env.get("OTEL_SERVICE_NAME") ??
+    detectPackageName() ??
+    AUTOMETRICS_DEFAULT_SERVICE_NAME
+  );
+}
+
+/**
  * Caller information we track across async function calls.
  *
  * @internal
@@ -77,9 +105,36 @@ export function getALSInstance(): AsyncLocalStorage<AsyncContext> | undefined {
   return new AsyncLocalStorage<AsyncContext>();
 }
 
+function detectPackageName(): string | undefined {
+  try {
+    const gitConfig = readClosest("package.json");
+    return getPackageStringField(gitConfig, "name");
+  } catch {}
+}
+
+function detectPackageVersion(): string | undefined {
+  try {
+    const gitConfig = readClosest("package.json");
+    return getPackageStringField(gitConfig, "version");
+  } catch {}
+}
+
 function detectRepositoryUrl(): string | undefined {
   try {
-    const gitConfig = Deno.readFileSync(".git/config");
+    const gitConfig = readClosest(".git/config");
     return getGitRepositoryUrl(gitConfig);
   } catch {}
+}
+
+function readClosest(path: string): Uint8Array {
+  let basePath = getCwd();
+  while (basePath.length > 0) {
+    try {
+      return Deno.readFileSync(join(basePath, path));
+    } catch {
+      basePath = dirname(basePath);
+    }
+  }
+
+  throw new Error(`Could not read ${path}`);
 }

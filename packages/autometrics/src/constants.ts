@@ -1,6 +1,9 @@
 // Spec version
 export const AUTOMETRICS_VERSION = "1.0.0";
 
+export const AUTOMETRICS_DEFAULT_SERVICE_NAME =
+  "AUTOMETRICS_TYPESCRIPT_SERVICE";
+
 // Metrics
 export const COUNTER_NAME = "function.calls" as const;
 export const HISTOGRAM_NAME = "function.calls.duration" as const;

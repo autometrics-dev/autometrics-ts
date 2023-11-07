@@ -9,5 +9,6 @@ snapshot[`OTLP/HTTP exporter 1`] = `
   objective_name: "",
   objective_percentile: "",
   result: "ok",
+  service_name: "autometrics-monorepo",
 }
 `;

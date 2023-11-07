@@ -1,10 +1,12 @@
+const decoder = new TextDecoder("utf8");
+
 /**
  * Parses the `.git/config` file to extract the repository URL.
  *
  * For documentation of the file format, see: https://git-scm.com/docs/git-config#_configuration_file
  */
 export function getGitRepositoryUrl(gitConfig: Uint8Array): string | undefined {
-  const lines = new TextDecoder("utf8").decode(gitConfig).split("\n");
+  const lines = decoder.decode(gitConfig).split("\n");
 
   let section = "";
   let subsection = "";
@@ -61,4 +63,15 @@ function unquote(maybeQuotedValue: string): string {
   }
 
   return maybeQuotedValue;
+}
+
+/**
+ * Parses the `package.json` file to extract a string field.
+ */
+export function getPackageStringField(
+  packageJson: Uint8Array,
+  fieldName: string,
+): string | undefined {
+  const json = JSON.parse(decoder.decode(packageJson));
+  return typeof json[fieldName] === "string" ? json[fieldName] : undefined;
 }

@@ -8,6 +8,7 @@ import {
   COMMIT_LABEL,
   REPOSITORY_PROVIDER_LABEL,
   REPOSITORY_URL_LABEL,
+  SERVICE_NAME_LABEL,
   VERSION_LABEL,
 } from "./constants.ts";
 import { getMeter } from "./instrumentation.ts";
@@ -17,6 +18,7 @@ import {
   getCommit,
   getRepositoryProvider,
   getRepositoryUrl,
+  getServiceName,
   getVersion,
 } from "./platform.deno.ts";
 import { detectRepositoryProvider } from "./utils.ts";
@@ -64,6 +66,26 @@ export type BuildInfo = {
   [REPOSITORY_PROVIDER_LABEL]?: string;
 
   /**
+   * The service name to be used for this project.
+   *
+   * Should be set through the `AUTOMETRICS_SERVICE_NAME` or `OTEL_SERVICE_NAME`
+   * environment variable, or by explicitly specifying the `buildInfo` when
+   * calling `init()`.
+   *
+   * @warning Caveat: Because the service name is also submitted together with
+   * function metrics, you need to be careful to call `init()` *before* invoking
+   * any Autometrics wrappers if you do not use environment variables for
+   * setting the service name.
+   *
+   * If no service name can be determined, the string
+   * "AUTOMETRICS_TYPESCRIPT_SERVICE" is used. Web users who cannot use
+   * environment variables can also use a bundler with a string replacer plugin
+   * to replace this string with their desired value, as a workaround if calling
+   * `init()` first is not feasible.
+   */
+  [SERVICE_NAME_LABEL]?: string;
+
+  /**
    * The current version of the application.
    *
    * Should be set through the `AUTOMETRICS_VERSION` environment variable, or by
@@ -90,12 +112,13 @@ export type BuildInfo = {
  *
  * @internal
  */
-const buildInfo: BuildInfo = {
+export const buildInfo: BuildInfo = {
   [AUTOMETRICS_VERSION_LABEL]: "1.0.0",
   [BRANCH_LABEL]: getBranch() ?? "",
   [COMMIT_LABEL]: getCommit() ?? "",
   [REPOSITORY_PROVIDER_LABEL]: getRepositoryProvider() ?? "",
   [REPOSITORY_URL_LABEL]: getRepositoryUrl() ?? "",
+  [SERVICE_NAME_LABEL]: getServiceName(),
   [VERSION_LABEL]: getVersion() ?? "",
   clearmode: "",
 };
@@ -120,11 +143,11 @@ export function recordBuildInfo(info: BuildInfo) {
   }
 
   if (
-    info[REPOSITORY_URL_LABEL] &&
+    buildInfo[REPOSITORY_URL_LABEL] &&
     info[REPOSITORY_PROVIDER_LABEL] === undefined
   ) {
     buildInfo[REPOSITORY_PROVIDER_LABEL] = detectRepositoryProvider(
-      info[REPOSITORY_URL_LABEL],
+      buildInfo[REPOSITORY_URL_LABEL],
     );
   }
 
