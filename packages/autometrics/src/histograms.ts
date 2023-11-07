@@ -1,7 +1,4 @@
-import {
-  ExplicitBucketHistogramAggregation,
-  View,
-} from "npm:@opentelemetry/sdk-metrics@^1.17.0";
+import { ExplicitBucketHistogramAggregation, View } from "$otel/sdk-metrics";
 
 import { HISTOGRAM_NAME } from "./constants.ts";
 

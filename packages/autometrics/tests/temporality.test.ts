@@ -1,6 +1,6 @@
 import { assertEquals } from "$std/assert/mod.ts";
 
-import { MetricData } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
+import { MetricData } from "$otel/sdk-metrics";
 import { autometrics } from "../mod.ts";
 import { COUNTER_NAME } from "../src/constants.ts";
 import {

@@ -4,6 +4,13 @@
     "strict": true
   },
   "imports": {
-    "$std/": "https://deno.land/std@0.203.0/"
+    "$std/": "https://deno.land/std@0.203.0/",
+    "$otel/api": "npm:@opentelemetry/api@^1.6.0",
+    "$otel/core": "npm:@opentelemetry/core@^1.17.0",
+    "$otel/exporter-metrics-otlp-http": "npm:@opentelemetry/exporter-metrics-otlp-http@^0.43.0",
+    "$otel/exporter-prometheus": "npm:@opentelemetry/exporter-prometheus@^0.43.0",
+    "$otel/resources": "npm:@opentelemetry/resources@^1.17.0",
+    "$otel/sdk-metrics": "npm:@opentelemetry/sdk-metrics@^1.17.0",
+    "node-fetch-native": "npm:node-fetch-native@^1.4.1"
   }
 }

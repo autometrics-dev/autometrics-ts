@@ -2,16 +2,16 @@ alias b := build
 alias l := lint
 alias t := test
 
-examples := "deno-fresh express faas-experimental fastify hono-bun"
+examples := "deno-fresh express faas-experimental fastify hono-bun react-app-experimental"
 
 lib_packages := "autometrics exporter-otlp-http exporter-prometheus exporter-prometheus-push-gateway"
 
 test_permissions := "--allow-env --allow-net --allow-read --allow-sys"
 
-build: (build-npm "beta")
+build: (build-npm "")
 
 build-npm version:
-    deno run --allow-env --allow-net=deno.land --allow-read --allow-run=yarn --allow-write=dist scripts/build_npm.ts {{version}}
+    deno run --allow-env --allow-ffi --allow-net=deno.land --allow-read --allow-run --allow-sys --allow-write=dist scripts/build_npm.ts {{version}}
 
 build-examples:
     #!/usr/bin/env bash
@@ -74,7 +74,7 @@ type-check-typescript-plugin:
 type-check-all: type-check type-check-examples type-check-parcel-transformer type-check-typescript-plugin
 
 clean:
-    rm -Rf dist
+    rm -Rf dist node_modules
 
 clean-examples:
     for example in {{examples}}; do pushd "examples/$example"; just clean; popd; done

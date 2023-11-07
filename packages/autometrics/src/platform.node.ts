@@ -1,12 +1,22 @@
+// NOTE: Node type definitions are not installed on purpose to prevent
+// accidental usage outside this file. As a result, there's quite a few
+// @ts-ignore statements in this file...
+
+import { AsyncLocalStorage } from "node:async_hooks";
+
 /**
  * Returns the version of the application, based on environment variables.
  *
  * @internal
  */
 export function getVersion(): string | undefined {
-  const env = getEnv();
   return (
-    env.npm_package_version || env.PACKAGE_VERSION || env.AUTOMETRICS_VERSION
+    // @ts-ignore
+    process.env.AUTOMETRICS_VERSION ||
+    // @ts-ignore
+    process.env.npm_package_version ||
+    // @ts-ignore
+    process.env.PACKAGE_VERSION
   );
 }
 
@@ -17,8 +27,8 @@ export function getVersion(): string | undefined {
  * @internal
  */
 export function getCommit(): string | undefined {
-  const env = getEnv();
-  return env.COMMIT_SHA || env.AUTOMETRICS_COMMIT;
+  // @ts-ignore
+  return process.env.AUTOMETRICS_COMMIT || process.env.COMMIT_SHA;
 }
 
 /**
@@ -28,8 +38,8 @@ export function getCommit(): string | undefined {
  * @internal
  */
 export function getBranch(): string | undefined {
-  const env = getEnv();
-  return env.BRANCH_NAME || env.AUTOMETRICS_BRANCH;
+  // @ts-ignore
+  return process.env.AUTOMETRICS_BRANCH || process.env.BRANCH_NAME;
 }
 
 /**
@@ -38,13 +48,18 @@ export function getBranch(): string | undefined {
  * @internal
  */
 export function getCwd(): string {
-  // @ts-ignore Node type definitions are not installed on purpose to prevent
-  // accidental usage outside this file.
-  return ("process" in globalThis && process.cwd?.()) || "";
+  // @ts-ignore
+  return process.cwd();
 }
 
-function getEnv(): Record<string, string> {
-  // @ts-ignore Node type definitions are not installed on purpose to prevent
-  // accidental usage outside this file.
-  return ("process" in globalThis && process.env) || {};
+/**
+ * Returns a new `AsyncLocalStorage` instance for storing caller information.
+ *
+ * @internal
+ */
+export function getALSInstance() {
+  return new AsyncLocalStorage<{
+    callerFunction?: string;
+    callerModule?: string;
+  }>();
 }

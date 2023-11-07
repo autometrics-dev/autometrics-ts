@@ -1,8 +1,8 @@
 import {
   AggregationTemporalityPreference,
   OTLPMetricExporter,
-} from "npm:@opentelemetry/exporter-metrics-otlp-http@^0.43.0";
-import { PeriodicExportingMetricReader } from "npm:@opentelemetry/sdk-metrics@^1.17.0";
+} from "$otel/exporter-metrics-otlp-http";
+import { PeriodicExportingMetricReader } from "$otel/sdk-metrics";
 
 import {
   BuildInfo,
@@ -19,7 +19,7 @@ const MAX_SAFE_INTERVAL = 2 ** 31 - 1;
 export type InitOptions = {
   /**
    * URL of the OpenTelemetry Collector to push metrics to. Should be a
-   * complete url with port and `/v1/metrics` endpoint:
+   * complete URL with port and `/v1/metrics` endpoint:
    * `http://localhost:4317/v1/metrics`.
    */
   url: string;

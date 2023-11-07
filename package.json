@@ -2,6 +2,7 @@
   "private": true,
   "name": "autometrics-monorepo",
   "packageManager": "yarn@3.6.3",
+  "version": "0.8.0-dev",
   "workspaces": [
     "dist/autometrics",
     "dist/exporter-otlp-http",
@@ -11,7 +12,14 @@
     "packages/typescript-plugin"
   ],
   "devDependencies": {
-    "@parcel/types": "^2.10.0"
+    "@opentelemetry/api": "^1.6.0",
+    "@opentelemetry/core": "^1.17.0",
+    "@opentelemetry/exporter-metrics-otlp-http": "^0.43.0",
+    "@opentelemetry/exporter-prometheus": "^0.43.0",
+    "@opentelemetry/resources": "^1.17.0",
+    "@opentelemetry/sdk-metrics": "^1.17.0",
+    "@parcel/types": "^2.10.0",
+    "typescript": "^5.2.2"
   },
   "resolutions": {
     "@opentelemetry/sdk-metrics": "1.17.1"

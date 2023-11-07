@@ -1,17 +1,14 @@
-import {
-  BindOnceFuture,
-  ExportResult,
-  ExportResultCode,
-} from "npm:@opentelemetry/core@^1.17.0";
+import { BindOnceFuture, ExportResult, ExportResultCode } from "$otel/core";
 import {
   AggregationTemporality,
   InstrumentType,
   PushMetricExporter,
   ResourceMetrics,
-} from "npm:@opentelemetry/sdk-metrics@^1.17.0";
+} from "$otel/sdk-metrics";
 
 import { amLogger } from "../../mod.ts";
 import { PrometheusSerializer } from "../exporter-prometheus/PrometheusSerializer.ts";
+import { fetch } from "./fetch.ts";
 import type { InitOptions } from "./mod.ts";
 
 const serializer = new PrometheusSerializer();

@@ -3,7 +3,7 @@ import {
   InMemoryMetricExporter,
   MetricReader,
   PeriodicExportingMetricReader,
-} from "npm:@opentelemetry/sdk-metrics@^1.17.0";
+} from "$otel/sdk-metrics";
 
 import { registerExporter } from "../mod.ts";
 import { PrometheusSerializer } from "../src/exporter-prometheus/PrometheusSerializer.ts";

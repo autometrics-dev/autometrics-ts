@@ -13,7 +13,7 @@ import {
   ObservableUpDownCounter,
   UpDownCounter,
   createNoopMeter,
-} from "npm:@opentelemetry/api@^1.6.0";
+} from "$otel/api";
 
 import { warn } from "./logger.ts";
 

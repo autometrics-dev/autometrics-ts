@@ -1,6 +1,5 @@
-import { Attributes, ValueType } from "npm:@opentelemetry/api@^1.6.0";
+import { Attributes, ValueType } from "$otel/api";
 
-import { amLogger } from "../mod.ts";
 import {
   COUNTER_DESCRIPTION,
   COUNTER_NAME,
@@ -12,22 +11,10 @@ import {
 import { getMeter, metricsRecorded } from "./instrumentation.ts";
 import { trace, warn } from "./logger.ts";
 import type { Objective } from "./objectives.ts";
-import {
-  ALSInstance,
-  getALSCaller,
-  getALSInstance,
-  getModulePath,
-  isFunction,
-  isObject,
-  isPromise,
-} from "./utils.ts";
+import { getALSInstance } from "./platform.deno.ts";
+import { getModulePath, isFunction, isObject, isPromise } from "./utils.ts";
 
-let asyncLocalStorage: ALSInstance | undefined;
-if (typeof window === "undefined") {
-  (async () => {
-    asyncLocalStorage = await getALSInstance();
-  })();
-}
+const asyncLocalStorage = getALSInstance();
 
 /**
  * Function Wrapper
@@ -291,13 +278,13 @@ export function autometrics<F extends FunctionSig>(
         valueType: ValueType.INT,
       })
     : null;
-  const caller = getALSCaller(asyncLocalStorage);
 
   counter.add(0, {
     function: functionName,
     module: moduleName,
     result: "ok",
-    caller,
+    caller_function: "",
+    caller_module: "",
     ...counterObjectiveAttributes,
   });
 
@@ -308,6 +295,10 @@ export function autometrics<F extends FunctionSig>(
       module: moduleName,
     });
 
+    const callerData = asyncLocalStorage?.getStore();
+    const callerFunction = callerData?.callerFunction ?? "";
+    const callerModule = callerData?.callerModule ?? "";
+
     const onSuccess = () => {
       const autometricsDuration = (performance.now() - autometricsStart) / 1000;
 
@@ -315,14 +306,16 @@ export function autometrics<F extends FunctionSig>(
         function: functionName,
         module: moduleName,
         result: "ok",
-        caller,
+        caller_function: callerFunction,
+        caller_module: callerModule,
         ...counterObjectiveAttributes,
       });
 
       histogram.record(autometricsDuration, {
         function: functionName,
         module: moduleName,
-        caller,
+        caller_function: callerFunction,
+        caller_module: callerModule,
         ...histogramObjectiveAttributes,
       });
 
@@ -341,21 +334,24 @@ export function autometrics<F extends FunctionSig>(
         function: functionName,
         module: moduleName,
         result: "error",
-        caller,
+        caller_function: callerFunction,
+        caller_module: callerModule,
         ...counterObjectiveAttributes,
       });
 
       histogram.record(autometricsDuration, {
         function: functionName,
         module: moduleName,
-        caller,
+        caller_function: callerFunction,
+        caller_module: callerModule,
         ...histogramObjectiveAttributes,
       });
 
       concurrencyGauge?.add(-1, {
         function: functionName,
         module: moduleName,
-        caller,
+        caller_function: callerFunction,
+        caller_module: callerModule,
       });
 
       metricsRecorded();
@@ -412,11 +408,12 @@ export function autometrics<F extends FunctionSig>(
       }
     }
 
-    if (asyncLocalStorage) {
-      return asyncLocalStorage.run({ caller: functionName }, instrumentedFn);
-    }
-
-    return instrumentedFn();
+    return asyncLocalStorage
+      ? asyncLocalStorage.run(
+          { callerFunction: functionName, callerModule: moduleName },
+          instrumentedFn,
+        )
+      : instrumentedFn();
   };
 }
 
@@ -519,9 +516,7 @@ export function Autometrics<T extends FunctionSig>(
       }
 
       default:
-        amLogger.warn(
-          "Autometrics decorator can only be used on classes and methods",
-        );
+        warn("Autometrics decorator can only be used on classes and methods");
     }
   };
 }

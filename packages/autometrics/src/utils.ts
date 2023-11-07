@@ -4,47 +4,32 @@ import { getCwd } from "./platform.deno.ts";
 // given function e.g.: dist/index.js
 export function getModulePath(): string | undefined {
   let wrappedFunctionPath = getWrappedFunctionPath();
+  if (!wrappedFunctionPath) {
+    return;
+  }
 
   // check if the string is wrapped in parenthesis, if so, remove them
-  if (wrappedFunctionPath?.startsWith("(")) {
+  if (wrappedFunctionPath.startsWith("(")) {
     wrappedFunctionPath = wrappedFunctionPath.slice(1, -1);
   }
 
-  // If the path contains file:// protocol we need to remove it
-  if (wrappedFunctionPath?.includes("file://")) {
-    wrappedFunctionPath = wrappedFunctionPath.replace("file://", "");
+  // If the path starts with file:// protocol we need to remove it
+  if (wrappedFunctionPath.startsWith("file://")) {
+    wrappedFunctionPath = wrappedFunctionPath.slice(7);
   }
 
-  // if the path contains the column/line number we need to remove it
-
-  if (wrappedFunctionPath?.includes(":")) {
-    wrappedFunctionPath = wrappedFunctionPath.slice(
-      0,
-      wrappedFunctionPath.indexOf(":"),
-    );
+  // If the path contains the column/line number we need to remove it
+  const colonIndex = wrappedFunctionPath.indexOf(":");
+  if (colonIndex > -1) {
+    wrappedFunctionPath = wrappedFunctionPath.slice(0, colonIndex);
   }
 
-  wrappedFunctionPath = wrappedFunctionPath?.replace(getCwd(), "");
+  const cwd = getCwd();
+  if (wrappedFunctionPath.startsWith(cwd)) {
+    wrappedFunctionPath = wrappedFunctionPath.slice(cwd.length);
+  }
 
   return wrappedFunctionPath;
-}
-
-type ALSContext = {
-  caller?: string;
-};
-
-export type ALSInstance = Awaited<ReturnType<typeof getALSInstance>>;
-
-export async function getALSInstance() {
-  const { AsyncLocalStorage } = await import("node:async_hooks");
-  return new AsyncLocalStorage<ALSContext>();
-}
-
-export function getALSCaller(context?: ALSInstance) {
-  if (context) {
-    const contextValue = context.getStore();
-    return contextValue?.caller;
-  }
 }
 
 function getWrappedFunctionPath(): string | undefined {
@@ -62,14 +47,8 @@ function getWrappedFunctionPath(): string | undefined {
       file: callSite.getFileName(),
     }));
 
-    if (!stack) {
-      return;
-    }
-
-    // First checks if it is a TypeScript legacy decorator, and returns the
-    // file path in which the decorator is defined if it is. Otherwise it
-    // returns the first file path from the 4th call in the stack trace which
-    // does not point to our `wrappers.ts`.
+    // Returns the first file path from the 4th call in the stack trace which
+    // does not point to Autometrics itself.
     //
     // 0: getWrappedFunctionPath
     // 1: getModulePath
@@ -77,22 +56,21 @@ function getWrappedFunctionPath(): string | undefined {
     // 3: ... -> 4th call is the original wrapped function, but may be wrapped
     //           by a decorator still.
 
-    const call =
-      stack.find((call) => call.name?.includes("__decorate")) ??
-      stack
-        .slice(3)
-        .find(
-          (call) =>
-            call.file &&
-            !call.file.includes("wrappers.ts") &&
-            !call.file.includes("wrappers.js"),
-        );
+    const call = stack.find((call, index) => {
+      const { file } = call;
+      return (
+        index > 2 &&
+        file &&
+        !file.includes("autometrics/index.cjs") &&
+        !file.includes("autometrics/index.mjs") &&
+        !file.includes("wrappers.ts") &&
+        !file.includes("wrappers.js")
+      );
+    });
     return call?.file;
   } else {
-    // First checks if it is a TypeScript legacy decorator, and returns the
-    // file path in which the decorator is defined if it is. Otherwise it
-    // returns the first file path from the 5th line in the stack trace which
-    // does not point to our `wrappers.ts`.
+    // Returns the first file path from the 5th line in the stack trace which
+    // does not point to Autometrics itself.
     //
     // 0: Error
     // 1: at getWrappedFunctionPath ...
@@ -107,14 +85,14 @@ function getWrappedFunctionPath(): string | undefined {
     }
 
     const lines = stack.split("\n");
-    const line =
-      lines.find((line) => line.startsWith("at __decorate ")) ??
-      lines
-        .slice(4)
-        .find(
-          (line) =>
-            !line.includes("wrappers.ts") && !line.includes("wrappers.js"),
-        );
+    const line = lines.find(
+      (line, index) =>
+        index > 3 &&
+        !line.includes("autometrics/index.cjs") &&
+        !line.includes("autometrics/index.mjs") &&
+        !line.includes("wrappers.ts") &&
+        !line.includes("wrappers.js"),
+    );
 
     // Last space-separated item on the line is the path.
     const path = line?.trim().split(" ").pop();

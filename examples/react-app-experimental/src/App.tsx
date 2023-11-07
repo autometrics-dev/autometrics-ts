@@ -15,7 +15,7 @@ import "./App.css";
 init({
   // A proxy configured in `vite.config.ts` forwards the `/metrics` endpoint
   // to the Otel Collector.
-  url: "/metrics",
+  url: `${location.origin}/metrics`,
   // Uncomment the next line to push "eagerly" instead of in batches. Eager
   // pushing may generate more traffic, but reduces chances of missing metrics
   // when the user closes their tab.

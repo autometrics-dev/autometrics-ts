@@ -2,7 +2,8 @@ export const snapshot = {};
 
 snapshot[`OTLP/HTTP exporter 1`] = `
 {
-  caller: undefined,
+  caller_function: "",
+  caller_module: "",
   function: "foo",
   module: "/packages/autometrics/tests/otlpHttpExporter.test.ts",
   objective_name: "",
