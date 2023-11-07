@@ -5,6 +5,9 @@ import {
   OBJECTIVE_NAME_LABEL,
   OBJECTIVE_PERCENTILE_LABEL,
 } from "./constants.ts";
+import { warn } from "./logger.ts";
+
+const objectiveNameRegex = /^[a-zA-Z0-9][a-zA-Z0-9_ -]*$/;
 
 /**
  * This represents a Service-Level Objective (SLO) for a function or group of functions.
@@ -159,6 +162,11 @@ export function getObjectiveAttributes(objective: Objective | undefined): {
 
   if (objective) {
     const { latency, name, successRate } = objective;
+    if (!objectiveNameRegex.test(name)) {
+      warn(
+        `Objective names may only contain alphanumeric characters, dashes, underscores, and spaces, and must start with an alphanumeric character. Received: "${name}"`,
+      );
+    }
 
     counterObjectiveAttributes[OBJECTIVE_NAME_LABEL] = name;
     histogramObjectiveAttributes[OBJECTIVE_NAME_LABEL] = name;
