@@ -1,6 +1,7 @@
 import type { UpDownCounter } from "$otel/api";
 
 import {
+  AUTOMETRICS_VERSION,
   AUTOMETRICS_VERSION_LABEL,
   BRANCH_LABEL,
   BUILD_INFO_DESCRIPTION,
@@ -11,8 +12,8 @@ import {
   SERVICE_NAME_LABEL,
   VERSION_LABEL,
 } from "./constants.ts";
-import { getMeter } from "./instrumentation.ts";
 import { debug } from "./logger.ts";
+import { getMeter } from "./instrumentation.ts";
 import {
   getBranch,
   getCommit,
@@ -105,6 +106,17 @@ export type BuildInfo = {
   clearmode?: "replace" | "aggregate" | "family" | "";
 };
 
+const BUILD_INFO_KEYS = [
+  AUTOMETRICS_VERSION_LABEL,
+  BRANCH_LABEL,
+  COMMIT_LABEL,
+  REPOSITORY_URL_LABEL,
+  REPOSITORY_PROVIDER_LABEL,
+  SERVICE_NAME_LABEL,
+  VERSION_LABEL,
+  "clearmode",
+] as const;
+
 /**
  * The build info of the application.
  *
@@ -112,16 +124,7 @@ export type BuildInfo = {
  *
  * @internal
  */
-export const buildInfo: BuildInfo = {
-  [AUTOMETRICS_VERSION_LABEL]: "1.0.0",
-  [BRANCH_LABEL]: getBranch() ?? "",
-  [COMMIT_LABEL]: getCommit() ?? "",
-  [REPOSITORY_PROVIDER_LABEL]: getRepositoryProvider() ?? "",
-  [REPOSITORY_URL_LABEL]: getRepositoryUrl() ?? "",
-  [SERVICE_NAME_LABEL]: getServiceName(),
-  [VERSION_LABEL]: getVersion() ?? "",
-  clearmode: "",
-};
+export const buildInfo: BuildInfo = {};
 
 let buildInfoGauge: UpDownCounter;
 
@@ -134,11 +137,12 @@ let buildInfoGauge: UpDownCounter;
 export function recordBuildInfo(info: BuildInfo) {
   debug("Recording build info");
 
-  for (const key of Object.keys(buildInfo)) {
-    const labelName = key as keyof BuildInfo;
-    const labelValue = info[labelName];
+  for (const key of BUILD_INFO_KEYS) {
+    const labelValue = info[key];
     if (typeof labelValue === "string") {
-      (buildInfo[labelName] as string) = labelValue;
+      (buildInfo[key] as string) = labelValue;
+    } else {
+      (buildInfo[key] as string | undefined) ??= getDefaultValue(key);
     }
   }
 
@@ -158,4 +162,25 @@ export function recordBuildInfo(info: BuildInfo) {
   }
 
   buildInfoGauge.add(1, buildInfo);
+}
+
+function getDefaultValue(key: keyof BuildInfo): string {
+  switch (key) {
+    case AUTOMETRICS_VERSION_LABEL:
+      return AUTOMETRICS_VERSION;
+    case BRANCH_LABEL:
+      return getBranch() ?? "";
+    case COMMIT_LABEL:
+      return getCommit() ?? "";
+    case REPOSITORY_URL_LABEL:
+      return getRepositoryUrl() ?? "";
+    case REPOSITORY_PROVIDER_LABEL:
+      return getRepositoryProvider() ?? "";
+    case SERVICE_NAME_LABEL:
+      return getServiceName();
+    case VERSION_LABEL:
+      return getVersion() ?? "";
+    case "clearmode":
+      return "";
+  }
 }

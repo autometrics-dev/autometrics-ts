@@ -4,6 +4,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 
 import { AUTOMETRICS_DEFAULT_SERVICE_NAME } from "./constants.ts";
 import { getGitRepositoryUrl, getPackageStringField } from "./platformUtils.ts";
+import { debug } from "./logger.ts";
 
 /**
  * Returns the version of the application, based on environment variables.
@@ -107,15 +108,15 @@ export function getALSInstance(): AsyncLocalStorage<AsyncContext> | undefined {
 
 function detectPackageName(): string | undefined {
   try {
-    const gitConfig = readClosest("package.json");
-    return getPackageStringField(gitConfig, "name");
+    const packageJson = readClosest("package.json");
+    return getPackageStringField(packageJson, "name");
   } catch {}
 }
 
 function detectPackageVersion(): string | undefined {
   try {
-    const gitConfig = readClosest("package.json");
-    return getPackageStringField(gitConfig, "version");
+    const packageJson = readClosest("package.json");
+    return getPackageStringField(packageJson, "version");
   } catch {}
 }
 
@@ -129,10 +130,17 @@ function detectRepositoryUrl(): string | undefined {
 function readClosest(path: string): Uint8Array {
   let basePath = getCwd();
   while (basePath.length > 0) {
+    const filePath = join(basePath, path);
+    debug(`Attempting to read ${filePath}`);
     try {
-      return Deno.readFileSync(join(basePath, path));
+      return Deno.readFileSync(filePath);
     } catch {
-      basePath = dirname(basePath);
+      const basePathParent = dirname(basePath);
+      if (basePathParent === basePath) {
+        break;
+      }
+
+      basePath = basePathParent;
     }
   }
 

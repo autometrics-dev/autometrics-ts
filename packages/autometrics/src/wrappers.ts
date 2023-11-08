@@ -18,7 +18,7 @@ import {
 import { getMeter, metricsRecorded } from "./instrumentation.ts";
 import { trace, warn } from "./logger.ts";
 import { Objective, getObjectiveAttributes } from "./objectives.ts";
-import { getALSInstance } from "./platform.deno.ts";
+import { getALSInstance, getServiceName } from "./platform.deno.ts";
 import { getModulePath, isFunction, isObject, isPromise } from "./utils.ts";
 
 const asyncLocalStorage = getALSInstance();
@@ -372,6 +372,9 @@ export function autometrics<F extends FunctionSig>(
  * For the duration and concurrency metrics, attributes don't change at all
  * between invocations, so those can be passed into the trackers as they are.
  *
+ * This function lazily initializes `buildInfo[SERVICE_NAME_LABEL]`, if
+ * necessary.
+ *
  * @internal
  */
 function getCommonAttributes(
@@ -382,24 +385,30 @@ function getCommonAttributes(
   const { counterObjectiveAttributes, histogramObjectiveAttributes } =
     getObjectiveAttributes(objective);
 
+  let serviceName = buildInfo[SERVICE_NAME_LABEL];
+  if (serviceName === undefined) {
+    serviceName = getServiceName();
+    buildInfo[SERVICE_NAME_LABEL] = serviceName;
+  }
+
   const commonCounterAttributes = {
     [FUNCTION_LABEL]: functionName,
     [MODULE_LABEL]: moduleName,
-    [SERVICE_NAME_LABEL]: buildInfo[SERVICE_NAME_LABEL],
+    [SERVICE_NAME_LABEL]: serviceName,
     ...counterObjectiveAttributes,
   };
 
   const histogramAttributes = {
     [FUNCTION_LABEL]: functionName,
     [MODULE_LABEL]: moduleName,
-    [SERVICE_NAME_LABEL]: buildInfo[SERVICE_NAME_LABEL],
+    [SERVICE_NAME_LABEL]: serviceName,
     ...histogramObjectiveAttributes,
   };
 
   const concurrencyAttributes = {
     [FUNCTION_LABEL]: functionName,
     [MODULE_LABEL]: moduleName,
-    [SERVICE_NAME_LABEL]: buildInfo[SERVICE_NAME_LABEL],
+    [SERVICE_NAME_LABEL]: serviceName,
   };
 
   return {
