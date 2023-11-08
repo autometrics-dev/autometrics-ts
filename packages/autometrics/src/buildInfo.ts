@@ -12,8 +12,8 @@ import {
   SERVICE_NAME_LABEL,
   VERSION_LABEL,
 } from "./constants.ts";
-import { debug } from "./logger.ts";
 import { getMeter } from "./instrumentation.ts";
+import { debug } from "./logger.ts";
 import {
   getBranch,
   getCommit,

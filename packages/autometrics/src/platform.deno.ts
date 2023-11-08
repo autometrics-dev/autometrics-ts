@@ -3,8 +3,8 @@ import { dirname, join } from "$std/path/mod.ts";
 import { AsyncLocalStorage } from "node:async_hooks";
 
 import { AUTOMETRICS_DEFAULT_SERVICE_NAME } from "./constants.ts";
-import { getGitRepositoryUrl, getPackageStringField } from "./platformUtils.ts";
 import { debug } from "./logger.ts";
+import { getGitRepositoryUrl, getPackageStringField } from "./platformUtils.ts";
 
 /**
  * Returns the version of the application, based on environment variables.
