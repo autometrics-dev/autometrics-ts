@@ -1,5 +1,6 @@
 import { ValueType } from "$otel/api";
 
+import { buildInfo } from "./buildInfo.ts";
 import {
   CALLER_FUNCTION_LABEL,
   CALLER_MODULE_LABEL,
@@ -12,11 +13,12 @@ import {
   HISTOGRAM_NAME,
   MODULE_LABEL,
   RESULT_LABEL,
+  SERVICE_NAME_LABEL,
 } from "./constants.ts";
 import { getMeter, metricsRecorded } from "./instrumentation.ts";
 import { trace, warn } from "./logger.ts";
 import { Objective, getObjectiveAttributes } from "./objectives.ts";
-import { getALSInstance } from "./platform.deno.ts";
+import { getALSInstance, getServiceName } from "./platform.deno.ts";
 import { getModulePath, isFunction, isObject, isPromise } from "./utils.ts";
 
 const asyncLocalStorage = getALSInstance();
@@ -235,8 +237,11 @@ export function autometrics<F extends FunctionSig>(
     return fn as F;
   }
 
-  const { counterObjectiveAttributes, histogramObjectiveAttributes } =
-    getObjectiveAttributes(objective);
+  const {
+    commonCounterAttributes,
+    histogramAttributes,
+    concurrencyAttributes,
+  } = getCommonAttributes(functionName, moduleName, objective);
 
   const meter = getMeter();
   const counter = meter.createCounter(COUNTER_NAME, {
@@ -255,20 +260,15 @@ export function autometrics<F extends FunctionSig>(
     : null;
 
   counter.add(0, {
-    [FUNCTION_LABEL]: functionName,
-    [MODULE_LABEL]: moduleName,
+    ...commonCounterAttributes,
     [RESULT_LABEL]: "ok",
     [CALLER_FUNCTION_LABEL]: "",
     [CALLER_MODULE_LABEL]: "",
-    ...counterObjectiveAttributes,
   });
 
   return (...params) => {
     const autometricsStart = performance.now();
-    concurrencyGauge?.add(1, {
-      [FUNCTION_LABEL]: functionName,
-      [MODULE_LABEL]: moduleName,
-    });
+    concurrencyGauge?.add(1, concurrencyAttributes);
 
     const callerData = asyncLocalStorage?.getStore();
     const callerFunction = callerData?.callerFunction ?? "";
@@ -278,26 +278,14 @@ export function autometrics<F extends FunctionSig>(
       const autometricsDuration = (performance.now() - autometricsStart) / 1000;
 
       counter.add(1, {
-        [FUNCTION_LABEL]: functionName,
-        [MODULE_LABEL]: moduleName,
+        ...commonCounterAttributes,
         [RESULT_LABEL]: "ok",
         [CALLER_FUNCTION_LABEL]: callerFunction,
         [CALLER_MODULE_LABEL]: callerModule,
-        ...counterObjectiveAttributes,
       });
 
-      histogram.record(autometricsDuration, {
-        function: functionName,
-        module: moduleName,
-        caller_function: callerFunction,
-        caller_module: callerModule,
-        ...histogramObjectiveAttributes,
-      });
-
-      concurrencyGauge?.add(-1, {
-        function: functionName,
-        module: moduleName,
-      });
+      histogram.record(autometricsDuration, histogramAttributes);
+      concurrencyGauge?.add(-1, concurrencyAttributes);
 
       metricsRecorded();
     };
@@ -306,28 +294,14 @@ export function autometrics<F extends FunctionSig>(
       const autometricsDuration = (performance.now() - autometricsStart) / 1000;
 
       counter.add(1, {
-        function: functionName,
-        module: moduleName,
-        result: "error",
-        caller_function: callerFunction,
-        caller_module: callerModule,
-        ...counterObjectiveAttributes,
+        ...commonCounterAttributes,
+        [RESULT_LABEL]: "error",
+        [CALLER_FUNCTION_LABEL]: callerFunction,
+        [CALLER_MODULE_LABEL]: callerModule,
       });
 
-      histogram.record(autometricsDuration, {
-        function: functionName,
-        module: moduleName,
-        caller_function: callerFunction,
-        caller_module: callerModule,
-        ...histogramObjectiveAttributes,
-      });
-
-      concurrencyGauge?.add(-1, {
-        function: functionName,
-        module: moduleName,
-        caller_function: callerFunction,
-        caller_module: callerModule,
-      });
+      histogram.record(autometricsDuration, histogramAttributes);
+      concurrencyGauge?.add(-1, concurrencyAttributes);
 
       metricsRecorded();
     };
@@ -389,6 +363,58 @@ export function autometrics<F extends FunctionSig>(
           instrumentedFn,
         )
       : instrumentedFn();
+  };
+}
+
+/**
+ * Returns attributes that are common across function invocations.
+ *
+ * For the duration and concurrency metrics, attributes don't change at all
+ * between invocations, so those can be passed into the trackers as they are.
+ *
+ * This function lazily initializes `buildInfo[SERVICE_NAME_LABEL]`, if
+ * necessary.
+ *
+ * @internal
+ */
+function getCommonAttributes(
+  functionName: string,
+  moduleName?: string,
+  objective?: Objective,
+) {
+  const { counterObjectiveAttributes, histogramObjectiveAttributes } =
+    getObjectiveAttributes(objective);
+
+  let serviceName = buildInfo[SERVICE_NAME_LABEL];
+  if (serviceName === undefined) {
+    serviceName = getServiceName();
+    buildInfo[SERVICE_NAME_LABEL] = serviceName;
+  }
+
+  const commonCounterAttributes = {
+    [FUNCTION_LABEL]: functionName,
+    [MODULE_LABEL]: moduleName,
+    [SERVICE_NAME_LABEL]: serviceName,
+    ...counterObjectiveAttributes,
+  };
+
+  const histogramAttributes = {
+    [FUNCTION_LABEL]: functionName,
+    [MODULE_LABEL]: moduleName,
+    [SERVICE_NAME_LABEL]: serviceName,
+    ...histogramObjectiveAttributes,
+  };
+
+  const concurrencyAttributes = {
+    [FUNCTION_LABEL]: functionName,
+    [MODULE_LABEL]: moduleName,
+    [SERVICE_NAME_LABEL]: serviceName,
+  };
+
+  return {
+    commonCounterAttributes,
+    histogramAttributes,
+    concurrencyAttributes,
   };
 }
 

@@ -163,7 +163,12 @@ async function generateNodeBundles(
 
   const nodeBuild = await rollup({
     input: `./packages/autometrics/${entrypoint}`,
-    external: ["node:async_hooks", "node:fs", ...Object.values(mappings)],
+    external: [
+      "node:async_hooks",
+      "node:fs",
+      "node:path",
+      ...Object.values(mappings),
+    ],
     plugins: [rewriteMappings(mappings), swcPlugin],
   });
   await nodeBuild.write({ file: `${outDir}/index.mjs`, format: "esm" });

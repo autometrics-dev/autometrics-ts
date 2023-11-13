@@ -6,7 +6,7 @@ examples := "deno-fresh express faas-experimental fastify hono-bun react-app-exp
 
 lib_packages := "autometrics exporter-otlp-http exporter-prometheus exporter-prometheus-push-gateway"
 
-test_permissions := "--allow-env --allow-net --allow-read --allow-sys"
+test_permissions := "--allow-env --allow-net --allow-read --allow-sys --allow-write"
 
 build: (build-npm "")
 

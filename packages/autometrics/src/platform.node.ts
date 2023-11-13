@@ -4,22 +4,28 @@
 
 import { AsyncLocalStorage } from "node:async_hooks";
 import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 
-import { getGitRepositoryUrl } from "./platformUtils.ts";
+import { AUTOMETRICS_DEFAULT_SERVICE_NAME } from "./constants.ts";
+import { getGitRepositoryUrl, getPackageStringField } from "./platformUtils.ts";
 
 /**
  * Returns the version of the application, based on environment variables.
+ *
+ * If no relevant environment variables are set, it attempts to use the version
+ * from the closest `package.json` file.
  *
  * @internal
  */
 export function getVersion(): string | undefined {
   return (
     // @ts-ignore
-    process.env.AUTOMETRICS_VERSION ||
+    process.env.AUTOMETRICS_VERSION ??
     // @ts-ignore
-    process.env.npm_package_version ||
+    process.env.npm_package_version ??
     // @ts-ignore
-    process.env.PACKAGE_VERSION
+    process.env.PACKAGE_VERSION ??
+    detectPackageVersion()
   );
 }
 
@@ -76,6 +82,25 @@ export function getRepositoryProvider(): string | undefined {
 }
 
 /**
+ * Returns the service name based on environment variables.
+ *
+ * If no relevant environment variables are set, it attempts to use the version
+ * from the closest `package.json` file.
+ *
+ * @internal
+ */
+export function getServiceName(): string {
+  return (
+    // @ts-ignore
+    process.env.AUTOMETRICS_SERVICE_NAME ??
+    // @ts-ignore
+    process.env.OTEL_SERVICE_NAME ??
+    detectPackageName() ??
+    AUTOMETRICS_DEFAULT_SERVICE_NAME
+  );
+}
+
+/**
  * Returns a new `AsyncLocalStorage` instance for storing caller information.
  *
  * @internal
@@ -87,9 +112,36 @@ export function getALSInstance() {
   }>();
 }
 
+function detectPackageName(): string | undefined {
+  try {
+    const gitConfig = readClosest("package.json");
+    return getPackageStringField(gitConfig, "name");
+  } catch {}
+}
+
+function detectPackageVersion(): string | undefined {
+  try {
+    const gitConfig = readClosest("package.json");
+    return getPackageStringField(gitConfig, "version");
+  } catch {}
+}
+
 function detectRepositoryUrl(): string | undefined {
   try {
-    const gitConfig = readFileSync(".git/config");
+    const gitConfig = readClosest(".git/config");
     return getGitRepositoryUrl(gitConfig);
   } catch {}
+}
+
+function readClosest(path: string): Uint8Array {
+  let basePath = getCwd();
+  while (basePath.length > 0) {
+    try {
+      return readFileSync(join(basePath, path));
+    } catch {
+      basePath = dirname(basePath);
+    }
+  }
+
+  throw new Error(`Could not read ${path}`);
 }

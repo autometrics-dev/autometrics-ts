@@ -1,6 +1,7 @@
 import type { UpDownCounter } from "$otel/api";
 
 import {
+  AUTOMETRICS_VERSION,
   AUTOMETRICS_VERSION_LABEL,
   BRANCH_LABEL,
   BUILD_INFO_DESCRIPTION,
@@ -8,6 +9,7 @@ import {
   COMMIT_LABEL,
   REPOSITORY_PROVIDER_LABEL,
   REPOSITORY_URL_LABEL,
+  SERVICE_NAME_LABEL,
   VERSION_LABEL,
 } from "./constants.ts";
 import { getMeter } from "./instrumentation.ts";
@@ -17,6 +19,7 @@ import {
   getCommit,
   getRepositoryProvider,
   getRepositoryUrl,
+  getServiceName,
   getVersion,
 } from "./platform.deno.ts";
 import { detectRepositoryProvider } from "./utils.ts";
@@ -64,6 +67,26 @@ export type BuildInfo = {
   [REPOSITORY_PROVIDER_LABEL]?: string;
 
   /**
+   * The service name to be used for this project.
+   *
+   * Should be set through the `AUTOMETRICS_SERVICE_NAME` or `OTEL_SERVICE_NAME`
+   * environment variable, or by explicitly specifying the `buildInfo` when
+   * calling `init()`.
+   *
+   * @warning Caveat: Because the service name is also submitted together with
+   * function metrics, you need to be careful to call `init()` *before* invoking
+   * any Autometrics wrappers if you do not use environment variables for
+   * setting the service name.
+   *
+   * If no service name can be determined, the string
+   * "AUTOMETRICS_TYPESCRIPT_SERVICE" is used. Web users who cannot use
+   * environment variables can also use a bundler with a string replacer plugin
+   * to replace this string with their desired value, as a workaround if calling
+   * `init()` first is not feasible.
+   */
+  [SERVICE_NAME_LABEL]?: string;
+
+  /**
    * The current version of the application.
    *
    * Should be set through the `AUTOMETRICS_VERSION` environment variable, or by
@@ -83,6 +106,17 @@ export type BuildInfo = {
   clearmode?: "replace" | "aggregate" | "family" | "";
 };
 
+const BUILD_INFO_KEYS = [
+  AUTOMETRICS_VERSION_LABEL,
+  BRANCH_LABEL,
+  COMMIT_LABEL,
+  REPOSITORY_URL_LABEL,
+  REPOSITORY_PROVIDER_LABEL,
+  SERVICE_NAME_LABEL,
+  VERSION_LABEL,
+  "clearmode",
+] as const;
+
 /**
  * The build info of the application.
  *
@@ -90,15 +124,7 @@ export type BuildInfo = {
  *
  * @internal
  */
-const buildInfo: BuildInfo = {
-  [AUTOMETRICS_VERSION_LABEL]: "1.0.0",
-  [BRANCH_LABEL]: getBranch() ?? "",
-  [COMMIT_LABEL]: getCommit() ?? "",
-  [REPOSITORY_PROVIDER_LABEL]: getRepositoryProvider() ?? "",
-  [REPOSITORY_URL_LABEL]: getRepositoryUrl() ?? "",
-  [VERSION_LABEL]: getVersion() ?? "",
-  clearmode: "",
-};
+export const buildInfo: BuildInfo = {};
 
 let buildInfoGauge: UpDownCounter;
 
@@ -111,20 +137,21 @@ let buildInfoGauge: UpDownCounter;
 export function recordBuildInfo(info: BuildInfo) {
   debug("Recording build info");
 
-  for (const key of Object.keys(buildInfo)) {
-    const labelName = key as keyof BuildInfo;
-    const labelValue = info[labelName];
+  for (const key of BUILD_INFO_KEYS) {
+    const labelValue = info[key];
     if (typeof labelValue === "string") {
-      (buildInfo[labelName] as string) = labelValue;
+      (buildInfo[key] as string) = labelValue;
+    } else {
+      (buildInfo[key] as string | undefined) ??= getDefaultValue(key);
     }
   }
 
   if (
-    info[REPOSITORY_URL_LABEL] &&
+    buildInfo[REPOSITORY_URL_LABEL] &&
     info[REPOSITORY_PROVIDER_LABEL] === undefined
   ) {
     buildInfo[REPOSITORY_PROVIDER_LABEL] = detectRepositoryProvider(
-      info[REPOSITORY_URL_LABEL],
+      buildInfo[REPOSITORY_URL_LABEL],
     );
   }
 
@@ -135,4 +162,25 @@ export function recordBuildInfo(info: BuildInfo) {
   }
 
   buildInfoGauge.add(1, buildInfo);
+}
+
+function getDefaultValue(key: keyof BuildInfo): string {
+  switch (key) {
+    case AUTOMETRICS_VERSION_LABEL:
+      return AUTOMETRICS_VERSION;
+    case BRANCH_LABEL:
+      return getBranch() ?? "";
+    case COMMIT_LABEL:
+      return getCommit() ?? "";
+    case REPOSITORY_URL_LABEL:
+      return getRepositoryUrl() ?? "";
+    case REPOSITORY_PROVIDER_LABEL:
+      return getRepositoryProvider() ?? "";
+    case SERVICE_NAME_LABEL:
+      return getServiceName();
+    case VERSION_LABEL:
+      return getVersion() ?? "";
+    case "clearmode":
+      return "";
+  }
 }

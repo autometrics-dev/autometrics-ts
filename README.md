@@ -18,12 +18,16 @@ Autometrics provides a wrapper function and decorator to instrument functions, c
 ## Benefits
 
 - ✨ `autometrics()` wrapper / `@Autometrics()` decorator instruments any function or class method to track its most useful metrics
-- 🌳 Works in NodeJS and has experimental support for Deno and browser environments
+- 🌳 Works in Deno, NodeJS and browser environments [(*)](#known-issues)
 - 💡 Writes Prometheus queries so you can understand the data generated without knowing PromQL
 - 🔗 Injects links to live Prometheus charts directly into each function's doc
 - 🔍 Helps you to [identify commits](https://docs.autometrics.dev/typescript/adding-version-information) that introduced errors or increased latency
 - 📊 [Grafana dashboards](https://github.com/autometrics-dev/autometrics-shared#dashboards) work out of the box and visualize the performance of instrumented functions & SLOs
 - ⚡ Minimal runtime overhead
+
+### Known issues
+
+- Pushing metrics from client-side and FaaS environments is currently experimental.
 
 ## Advanced Features
 - 🚨 Allows you to [define alerts](https://docs.autometrics.dev/typescript/adding-alerts-and-slos) using SLO best practices directly in your source code comments
