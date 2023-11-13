@@ -9,8 +9,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@autometrics/autometrics@workspace:../../dist/autometrics"
   dependencies:
-    "@opentelemetry/api": ^1.7.0
-    "@opentelemetry/sdk-metrics": ^1.18.0
+    "@opentelemetry/api": 1.7.0
+    "@opentelemetry/sdk-metrics": 1.18.0
     "@types/node": ^18.6.5
   languageName: unknown
   linkType: soft
@@ -19,8 +19,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@autometrics/autometrics@portal:../../dist/autometrics::locator=fastify-example%40workspace%3A."
   dependencies:
-    "@opentelemetry/api": ^1.7.0
-    "@opentelemetry/sdk-metrics": ^1.18.0
+    "@opentelemetry/api": 1.7.0
+    "@opentelemetry/sdk-metrics": 1.18.0
   languageName: node
   linkType: soft
 
@@ -29,9 +29,9 @@ __metadata:
   resolution: "@autometrics/exporter-prometheus@portal:../../dist/exporter-prometheus::locator=fastify-example%40workspace%3A."
   dependencies:
     "@autometrics/autometrics": 0.8.0-dev
-    "@opentelemetry/api": ^1.7.0
-    "@opentelemetry/exporter-prometheus": ^0.45.0
-    "@opentelemetry/sdk-metrics": ^1.18.0
+    "@opentelemetry/api": 1.7.0
+    "@opentelemetry/exporter-prometheus": 0.45.0
+    "@opentelemetry/sdk-metrics": 1.18.0
   languageName: node
   linkType: soft
 
@@ -40,9 +40,9 @@ __metadata:
   resolution: "@autometrics/exporter-prometheus@workspace:../../dist/exporter-prometheus"
   dependencies:
     "@autometrics/autometrics": 0.8.0-dev
-    "@opentelemetry/api": ^1.7.0
-    "@opentelemetry/exporter-prometheus": ^0.45.0
-    "@opentelemetry/sdk-metrics": ^1.18.0
+    "@opentelemetry/api": 1.7.0
+    "@opentelemetry/exporter-prometheus": 0.45.0
+    "@opentelemetry/sdk-metrics": 1.18.0
     "@types/node": ^18.6.5
   languageName: unknown
   linkType: soft
@@ -88,7 +88,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api@npm:^1.7.0":
+"@opentelemetry/api@npm:1.7.0":
   version: 1.7.0
   resolution: "@opentelemetry/api@npm:1.7.0"
   checksum: 2398cbe65f199c3a7050125b3ad9c835f789bb0a616665e9c7f4475a29ac8334b6a3c15f38db48d345b522180c41c00b04cc174cd0eeffba98eb4874a565fa7e
@@ -106,7 +106,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/exporter-prometheus@npm:^0.45.0":
+"@opentelemetry/exporter-prometheus@npm:0.45.0":
   version: 0.45.0
   resolution: "@opentelemetry/exporter-prometheus@npm:0.45.0"
   dependencies:
@@ -131,7 +131,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/sdk-metrics@npm:1.18.0, @opentelemetry/sdk-metrics@npm:^1.18.0":
+"@opentelemetry/sdk-metrics@npm:1.18.0":
   version: 1.18.0
   resolution: "@opentelemetry/sdk-metrics@npm:1.18.0"
   dependencies:
