@@ -131,7 +131,6 @@ function readClosest(path: string): Uint8Array {
   let basePath = getCwd();
   while (basePath.length > 0) {
     const filePath = join(basePath, path);
-    debug(`Attempting to read ${filePath}`);
     try {
       return Deno.readFileSync(filePath);
     } catch {

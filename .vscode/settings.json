@@ -15,6 +15,7 @@
     "packages/typescript-plugin"
   ],
   "editor.defaultFormatter": "biomejs.biome",
+  "editor.tabSize": 2,
   "files.insertFinalNewline": true,
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome"

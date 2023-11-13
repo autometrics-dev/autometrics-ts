@@ -7,10 +7,11 @@ export {
   REPOSITORY_URL_LABEL,
   VERSION_LABEL,
 } from "./src/constants.ts";
+export * from "./src/decorators.ts";
 export {
   registerExporter,
   type ExporterOptions,
 } from "./src/instrumentation.ts";
 export * as amLogger from "./src/logger.ts";
 export * from "./src/objectives.ts";
-export * from "./src/wrappers.ts";
+export * from "./src/wrapper.ts";

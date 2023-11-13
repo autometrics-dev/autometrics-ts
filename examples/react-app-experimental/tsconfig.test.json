@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "outDir": "dist/tests",
+    "plugins": [
+      {
+        "name": "@autometrics/typescript-plugin",
+        "prometheusUrl": ""
+      }
+    ]
+  },
+  "include": ["tests"],
+  "exclude": ["dist", "node_modules"]
+}

@@ -34,7 +34,7 @@ test:
     deno test {{test_permissions}} packages/autometrics
 
 update-snapshot test_file:
-    deno test {{test_permissions}} --allow-write=packages/autometrics/tests/__snapshots__ {{test_file}} -- --update
+    deno test {{test_permissions}} {{test_file}} -- --update
 
 test-examples:
     #!/usr/bin/env bash
