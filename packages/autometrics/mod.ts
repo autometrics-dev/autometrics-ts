@@ -1,4 +1,4 @@
-export * from "./src/buildInfo.ts";
+export { recordBuildInfo, type BuildInfo } from "./src/buildInfo.ts";
 export {
   AUTOMETRICS_VERSION_LABEL,
   BRANCH_LABEL,

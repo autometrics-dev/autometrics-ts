@@ -72,7 +72,9 @@ const transformerFactory: TransformerFactory<Node> = (
               [autometricsOptions, functionOrOptions],
             ),
           );
-        } else if (
+        }
+
+        if (
           isObjectLiteralExpression(functionOrOptions) &&
           isFunctionExpression(maybeFunction)
         ) {
@@ -148,7 +150,9 @@ const transformerFactory: TransformerFactory<Node> = (
               ]),
             ),
           );
-        } else if (
+        }
+
+        if (
           isObjectLiteralExpression(functionOrOptions) &&
           isFunctionExpression(maybeFunction)
         ) {

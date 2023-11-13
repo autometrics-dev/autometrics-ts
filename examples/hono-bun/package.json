@@ -9,8 +9,8 @@
   },
   "devDependencies": {
     "bun-types": "^1.0",
-    "@opentelemetry/exporter-prometheus": "^0.43.0",
-    "@opentelemetry/sdk-metrics": "^1.17.0",
+    "@opentelemetry/exporter-prometheus": "^0.45.0",
+    "@opentelemetry/sdk-metrics": "^1.18.0",
     "typescript": "^5.2.2"
   }
 }

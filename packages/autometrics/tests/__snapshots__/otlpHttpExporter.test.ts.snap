@@ -2,12 +2,13 @@ export const snapshot = {};
 
 snapshot[`OTLP/HTTP exporter 1`] = `
 {
-  caller_function: "",
-  caller_module: "",
+  "caller.function": "",
+  "caller.module": "",
+  "objective.name": "",
+  "objective.percentile": "",
+  "service.name": "autometrics-monorepo",
   function: "foo",
   module: "/packages/autometrics/tests/otlpHttpExporter.test.ts",
-  objective_name: "",
-  objective_percentile: "",
   result: "ok",
 }
 `;

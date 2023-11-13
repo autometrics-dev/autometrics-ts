@@ -103,15 +103,13 @@ function enforcePrometheusNamingConvention(
 function valueString(value: number) {
   if (Number.isNaN(value)) {
     return "NaN";
-  } else if (!Number.isFinite(value)) {
-    if (value < 0) {
-      return "-Inf";
-    } else {
-      return "+Inf";
-    }
-  } else {
-    return `${value}`;
   }
+
+  if (!Number.isFinite(value)) {
+    return value < 0 ? "-Inf" : "+Inf";
+  }
+
+  return `${value}`;
 }
 
 function toPrometheusType(metricData: MetricData): PrometheusDataTypeLiteral {

@@ -1,3 +1,5 @@
+import { AUTOMETRICS_DEFAULT_SERVICE_NAME } from "./constants.ts";
+
 /**
  * On web, environment variables don't exist, so we don't return anything.
  *
@@ -42,6 +44,18 @@ export function getRepositoryUrl() {}
  * @internal
  */
 export function getRepositoryProvider() {}
+
+/**
+ * On web, environment variables don't exist, so we can only return the default.
+ *
+ * Users can replace the default if they use a bundler with a string replacer
+ * plugin.
+ *
+ * @internal
+ */
+export function getServiceName(): string {
+  return AUTOMETRICS_DEFAULT_SERVICE_NAME;
+}
 
 /**
  * `AsyncLocalStorage` is not supported on web, so we don't return anything.

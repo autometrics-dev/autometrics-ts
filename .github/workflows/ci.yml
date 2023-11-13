@@ -26,6 +26,9 @@ jobs:
       - name: Run linter and format checker
         run: just lint
 
+      - name: Install dependencies
+        run: YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn
+
       - name: Create builds
         run: YARN_ENABLE_IMMUTABLE_INSTALLS=false just build-all
 

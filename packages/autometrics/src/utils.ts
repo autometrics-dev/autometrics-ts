@@ -99,40 +99,40 @@ function getWrappedFunctionPath(): string | undefined {
       );
     });
     return call?.file;
-  } else {
-    // Returns the first file path from the 5th line in the stack trace which
-    // does not point to Autometrics itself.
-    //
-    // 0: Error
-    // 1: at getWrappedFunctionPath ...
-    // 2: at getModulePath ...
-    // 3: at autometrics ...
-    // 4: at ... -> 5th line is the original wrapped function, but may be
-    //              wrapped by a decorator still.
-
-    const { stack } = new Error();
-    if (!stack) {
-      return;
-    }
-
-    const lines = stack.split("\n");
-    const line = lines.find(
-      (line, index) =>
-        index > 3 &&
-        !line.includes("autometrics/index.cjs") &&
-        !line.includes("autometrics/index.mjs") &&
-        !line.includes("wrappers.ts") &&
-        !line.includes("wrappers.js"),
-    );
-
-    // Last space-separated item on the line is the path.
-    const path = line?.trim().split(" ").pop();
-
-    // Optionally strip surrounding braces before returning the path.
-    return path?.startsWith("(") && path.endsWith(")")
-      ? path.slice(1, path.length - 1)
-      : path;
   }
+
+  // Returns the first file path from the 5th line in the stack trace which
+  // does not point to Autometrics itself.
+  //
+  // 0: Error
+  // 1: at getWrappedFunctionPath ...
+  // 2: at getModulePath ...
+  // 3: at autometrics ...
+  // 4: at ... -> 5th line is the original wrapped function, but may be
+  //              wrapped by a decorator still.
+
+  const { stack } = new Error();
+  if (!stack) {
+    return;
+  }
+
+  const lines = stack.split("\n");
+  const line = lines.find(
+    (line, index) =>
+      index > 3 &&
+      !line.includes("autometrics/index.cjs") &&
+      !line.includes("autometrics/index.mjs") &&
+      !line.includes("wrappers.ts") &&
+      !line.includes("wrappers.js"),
+  );
+
+  // Last space-separated item on the line is the path.
+  const path = line?.trim().split(" ").pop();
+
+  // Optionally strip surrounding braces before returning the path.
+  return path?.startsWith("(") && path.endsWith(")")
+    ? path.slice(1, path.length - 1)
+    : path;
 }
 
 export function isPromise(value: unknown): value is Promise<unknown> {

@@ -1,6 +1,9 @@
 import { assertEquals } from "$std/assert/mod.ts";
 
-import { getGitRepositoryUrl } from "../src/platformUtils.ts";
+import {
+  getGitRepositoryUrl,
+  getPackageStringField,
+} from "../src/platformUtils.ts";
 
 Deno.test("Platform utils tests", async (t) => {
   await t.step("extracts Git URL", () => {
@@ -76,6 +79,16 @@ Deno.test("Platform utils tests", async (t) => {
         ),
       ),
       "git@github.com:arendjr/autometrics-ts.git",
+    );
+  });
+
+  await t.step("extracts the package name", () => {
+    assertEquals(
+      getPackageStringField(
+        new TextEncoder().encode(`{ "name": "autometrics-monorepo" }`),
+        "name",
+      ),
+      "autometrics-monorepo",
     );
   });
 });
