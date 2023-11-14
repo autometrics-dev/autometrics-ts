@@ -43,8 +43,8 @@ jobs:
       - name: Perform type-checking
         run: just type-check-all
 
-      - name: Run all tests
-        run: just test-all
+      - name: Run tests
+        run: just test && just test-examples
 
       - name: Publish
         run: just release-lib
