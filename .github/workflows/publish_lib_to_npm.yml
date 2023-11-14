@@ -38,7 +38,7 @@ jobs:
         run: YARN_ENABLE_IMMUTABLE_INSTALLS=false just build-npm ${GITHUB_REF}
 
       - name: Build examples
-        run: just build-examples
+        run: YARN_ENABLE_IMMUTABLE_INSTALLS=false just build-examples
 
       - name: Perform type-checking
         run: just type-check-all
