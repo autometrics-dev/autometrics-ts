@@ -31,6 +31,9 @@ jobs:
         with:
           tool: biome,just
 
+      - name: Install dependencies
+        run: YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn
+
       - name: Create packages
         run: YARN_ENABLE_IMMUTABLE_INSTALLS=false just build-npm ${GITHUB_REF}
 
