@@ -1,11 +1,70 @@
 # Changelog
 
-## [unreleased]
+## [v1.0.0]
 
-- **Breaking change:** Split the exporters into separate packages. Users will
-  need to explicitly choose an exporter and call its `init()` function.
-- (_experimental_) Push metrics to gateway "eagerly" when pushInterval is set to 0
-- Log error when fetch is not defined in push context
+This release features full compliance with the
+[Autometrics v1.0.0 specification](https://github.com/autometrics-dev/autometrics-shared/blob/main/specs/autometrics_v1.0.0.md)
+as well as first-class [Deno](https://deno.com/) support. Also, our decorators
+have been updated to match the
+[Stage 3 ECMAScript decorators proposal](https://github.com/tc39/proposal-decorators).
+
+### Changed
+
+- **BREAKING:** Labels are submitted with dots instead of underscores when
+  exported through OTLP. This should not affect exports to Prometheus.
+- **BREAKING:** The `@Autometrics` decorator is now compliant with the
+  [Stage 3 ECMAScript decorators proposal](https://github.com/tc39/proposal-decorators).
+  For the legacy TypeScript decorators, please use `@AutometricsLegacy` instead.
+- **BREAKING:** *Autometrics 1.0:* `caller.function` and `caller.module` have
+  been changed to match the specification.
+- Deno has become a first-class supported platform.
+
+### Added
+
+- *Autometrics 1.0:* Added support for the `service.name` label.
+- *Autometrics 1.0:* Added support for the `repository.url` and
+  `repository.provider` labels.
+- *Autometrics 1.0:* Added support for excluding individual methods from the
+  class decorator, using `@Autometrics({ skip: true })`. This also works with
+  the legacy decorator.
+- *Autometrics 1.0:* Users should see a warning in their console if they've
+  configured an invalid objective name.
+
+### Fixed
+
+- Fixed `this` handling in the wrappers and decorators.
+- Fixed using the `autometrics` package with web bundlers such as Parcel and
+  WebPack.
+- Fixed an issue where caller information sometimes wasn't submitted.
+
+## [v0.7.0]
+
+### Changed
+
+**BREAKING:** v0.7 is a big change to how the Autometrics library works in
+JavaScript. The core library interface of wrappers and decorators remains the
+same and will collect the metrics as previously, however it will not export
+them. For that purpose exporters are now separate to the library itself allowing
+the user more control as to how they want to set up the metrics collection: as a
+pull endpoint for Prometheus, push gateway, OpenTelemetry collector or something
+else.
+
+- Users need to explicitly choose an exporter and call its `init()` function.
+- *Experimental:* Eagerly push metrics when `pushInterval` is set to 0.
+
+### Added
+
+- Support Bun runtime in the core library.
+- Warn on a potentially incorrect HTTP OTLP endpoint.
+- *Experimental:* Initial Gravel Gateway Support.
+
+### Fixed
+
+- Clear timer on handover.
+- Log error when fetch is not defined in push context.
+- Fix default Prometheus exporter port.
+- Various smaller bugfixes.
+- Updated all our examples.
 
 ## [v0.6.0] - @autometrics/autometrics - 2023-07-20
 
