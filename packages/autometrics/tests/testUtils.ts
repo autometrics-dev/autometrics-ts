@@ -59,7 +59,7 @@ export function testWithTemporality({
     // retrying, which may mess with other tests.
     const serverController = new AbortController();
     const { signal } = serverController;
-    Deno.serve({ port, signal }, () => new Response("ok"));
+    const server = Deno.serve({ port, signal }, () => new Response("ok"));
 
     const timeout = 10;
 
@@ -96,5 +96,7 @@ export function testWithTemporality({
     await metricReader.shutdown();
 
     serverController.abort();
+
+    await server.finished;
   };
 }

@@ -14,7 +14,7 @@ Deno.test("OTLP/HTTP exporter", async (t) => {
   // retrying, which may mess with other tests.
   const serverController = new AbortController();
   const { signal } = serverController;
-  Deno.serve({ port, signal }, () => new Response("ok"));
+  const server = Deno.serve({ port, signal }, () => new Response("ok"));
 
   // make sure that metrics that are collected before `init()` is called are
   // correctly tracked.
@@ -53,4 +53,6 @@ Deno.test("OTLP/HTTP exporter", async (t) => {
   );
 
   serverController.abort();
+
+  await server.finished;
 });

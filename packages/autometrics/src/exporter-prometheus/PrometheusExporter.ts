@@ -42,6 +42,7 @@ export interface ExporterConfig {
 
 export class PrometheusExporter extends MetricReader {
   private readonly _abortController: AbortController;
+  private readonly _server: Deno.HttpServer;
 
   // This will be required when histogram is implemented. Leaving here so it is not forgotten
   // Histogram cannot have a attribute named 'le'
@@ -68,7 +69,7 @@ export class PrometheusExporter extends MetricReader {
     this._abortController = new AbortController();
     const { signal } = this._abortController;
 
-    Deno.serve({ hostname, port, signal, onError }, async (request) => {
+    this._server = Deno.serve({ hostname, port, signal, onError }, async (request) => {
       if (new URL(request.url).pathname !== "/metrics") {
         return new Response("not found", { status: 404 });
       }
@@ -113,6 +114,6 @@ export class PrometheusExporter extends MetricReader {
    */
   stopServer(): Promise<void> {
     this._abortController.abort();
-    return Promise.resolve();
+    return this._server.finished;
   }
 }
