@@ -125,7 +125,7 @@ you want to publish you will need to create a separate release.
 
 ### Creating a release
 
-1. Ensure that the version number in respective `package.json` is up to date
+1. Ensure that the version number in the root `package.json` is up to date
 2. Make sure that all tests have successfully passed in the latest commit on
    `main` (the CI will run one more time before publishing it to NPM)
 3. Create a release on GitHub along with a respective tag for each package:
