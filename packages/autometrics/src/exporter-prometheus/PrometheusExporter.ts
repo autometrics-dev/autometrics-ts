@@ -69,29 +69,32 @@ export class PrometheusExporter extends MetricReader {
     this._abortController = new AbortController();
     const { signal } = this._abortController;
 
-    this._server = Deno.serve({ hostname, port, signal, onError }, async (request) => {
-      if (new URL(request.url).pathname !== "/metrics") {
-        return new Response("not found", { status: 404 });
-      }
-
-      try {
-        const { resourceMetrics, errors } = await this.collect();
-        if (errors.length) {
-          amLogger.trace(
-            "PrometheusExporter: metrics collection errors",
-            ...errors,
-          );
+    this._server = Deno.serve(
+      { hostname, port, signal, onError },
+      async (request) => {
+        if (new URL(request.url).pathname !== "/metrics") {
+          return new Response("not found", { status: 404 });
         }
 
-        return new Response(serializer.serialize(resourceMetrics), {
-          headers: HEADERS,
-        });
-      } catch (error) {
-        return new Response(`# failed to export metrics: ${error}`, {
-          headers: HEADERS,
-        });
-      }
-    });
+        try {
+          const { resourceMetrics, errors } = await this.collect();
+          if (errors.length) {
+            amLogger.trace(
+              "PrometheusExporter: metrics collection errors",
+              ...errors,
+            );
+          }
+
+          return new Response(serializer.serialize(resourceMetrics), {
+            headers: HEADERS,
+          });
+        } catch (error) {
+          return new Response(`# failed to export metrics: ${error}`, {
+            headers: HEADERS,
+          });
+        }
+      },
+    );
 
     amLogger.debug(
       `Prometheus exporter server started: ${hostname}:${port}/metrics`,
