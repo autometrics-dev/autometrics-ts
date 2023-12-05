@@ -101,6 +101,6 @@ release-lib:
     set -euxo pipefail
     for package in {{lib_packages}}; do
         pushd "dist/$package"
-        yarn npm publish
+        npm publish
         popd
     done
