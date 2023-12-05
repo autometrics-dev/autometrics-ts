@@ -128,10 +128,11 @@ you want to publish you will need to create a separate release.
 1. Ensure that the version number in the root `package.json` is up to date
 2. Run `just build-all` to make sure lock files in the examples are updated
    correctly.
-3. Make sure that all tests have successfully passed in the latest commit on
+3. Update the `CHANGELOG.md`.
+4. Make sure that all tests have successfully passed in the latest commit on
    `main` (the CI will run one more time before publishing it to NPM)
-4. Create a release on GitHub along with a respective tag for each package:
+5. Create a release on GitHub along with a respective tag for each package:
    - `lib/` (main autometrics library) → tag: `lib-*` (e.g.: `lib-v0.7`)
    - `typescript-plugin/` → tag: `typescript-plugin-*`
    - `parcel-transformer-autometrics/` → tag: `parcel-transformer-*`
-5. When the release is published, the relevant GitHub workflow will kick off.
+6. When the release is published, the relevant GitHub workflow will kick off.
