@@ -42,6 +42,7 @@ export interface ExporterConfig {
 
 export class PrometheusExporter extends MetricReader {
   private readonly _abortController: AbortController;
+  private readonly _server: Deno.HttpServer;
 
   // This will be required when histogram is implemented. Leaving here so it is not forgotten
   // Histogram cannot have a attribute named 'le'
@@ -68,29 +69,32 @@ export class PrometheusExporter extends MetricReader {
     this._abortController = new AbortController();
     const { signal } = this._abortController;
 
-    Deno.serve({ hostname, port, signal, onError }, async (request) => {
-      if (new URL(request.url).pathname !== "/metrics") {
-        return new Response("not found", { status: 404 });
-      }
-
-      try {
-        const { resourceMetrics, errors } = await this.collect();
-        if (errors.length) {
-          amLogger.trace(
-            "PrometheusExporter: metrics collection errors",
-            ...errors,
-          );
+    this._server = Deno.serve(
+      { hostname, port, signal, onError },
+      async (request) => {
+        if (new URL(request.url).pathname !== "/metrics") {
+          return new Response("not found", { status: 404 });
         }
 
-        return new Response(serializer.serialize(resourceMetrics), {
-          headers: HEADERS,
-        });
-      } catch (error) {
-        return new Response(`# failed to export metrics: ${error}`, {
-          headers: HEADERS,
-        });
-      }
-    });
+        try {
+          const { resourceMetrics, errors } = await this.collect();
+          if (errors.length) {
+            amLogger.trace(
+              "PrometheusExporter: metrics collection errors",
+              ...errors,
+            );
+          }
+
+          return new Response(serializer.serialize(resourceMetrics), {
+            headers: HEADERS,
+          });
+        } catch (error) {
+          return new Response(`# failed to export metrics: ${error}`, {
+            headers: HEADERS,
+          });
+        }
+      },
+    );
 
     amLogger.debug(
       `Prometheus exporter server started: ${hostname}:${port}/metrics`,
@@ -113,6 +117,6 @@ export class PrometheusExporter extends MetricReader {
    */
   stopServer(): Promise<void> {
     this._abortController.abort();
-    return Promise.resolve();
+    return this._server.finished;
   }
 }

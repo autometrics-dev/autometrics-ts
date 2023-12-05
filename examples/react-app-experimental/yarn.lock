@@ -15,7 +15,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@autometrics/autometrics@0.8.0-dev, @autometrics/autometrics@workspace:../../dist/autometrics":
+"@autometrics/autometrics@1.0.0, @autometrics/autometrics@workspace:../../dist/autometrics":
   version: 0.0.0-use.local
   resolution: "@autometrics/autometrics@workspace:../../dist/autometrics"
   dependencies:
@@ -38,7 +38,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@autometrics/exporter-otlp-http@portal:../../dist/exporter-otlp-http::locator=react-app-example%40workspace%3A."
   dependencies:
-    "@autometrics/autometrics": 0.8.0-dev
+    "@autometrics/autometrics": 1.0.0
     "@opentelemetry/api": 1.7.0
     "@opentelemetry/exporter-metrics-otlp-http": 0.45.0
     "@opentelemetry/sdk-metrics": 1.18.0
@@ -49,7 +49,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@autometrics/exporter-prometheus@workspace:../../dist/exporter-prometheus"
   dependencies:
-    "@autometrics/autometrics": 0.8.0-dev
+    "@autometrics/autometrics": 1.0.0
     "@opentelemetry/api": 1.7.0
     "@opentelemetry/exporter-prometheus": 0.45.0
     "@opentelemetry/sdk-metrics": 1.18.0
