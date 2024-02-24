@@ -140,6 +140,7 @@ function readClosest(path: string): Uint8Array {
       return readFileSync(join(basePath, path));
     } catch {
       basePath = dirname(basePath);
+      break;
     }
   }
 
