@@ -112,6 +112,15 @@ export function getALSInstance() {
   }>();
 }
 
+/**
+ * Returns a boolean indicating whether a given path is the file-system root or not.
+ *
+ * @internal
+ */
+export function isRootPath(pathToCheck: str): string {
+  return pathToCheck == path.parse(getCwd()).root;
+}
+
 function detectPackageName(): string | undefined {
   try {
     const gitConfig = readClosest("package.json");
@@ -139,8 +148,11 @@ function readClosest(path: string): Uint8Array {
     try {
       return readFileSync(join(basePath, path));
     } catch {
+      // Break once we've tried the file-system root
+      if (isRootPath(basePath)) {
+        break;
+      }
       basePath = dirname(basePath);
-      break;
     }
   }
 
