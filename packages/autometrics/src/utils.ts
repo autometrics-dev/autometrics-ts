@@ -95,7 +95,8 @@ function getWrappedFunctionPath(): string | undefined {
         !file.includes("autometrics/index.cjs") &&
         !file.includes("autometrics/index.mjs") &&
         !file.includes("wrappers.ts") &&
-        !file.includes("wrappers.js")
+        !file.includes("wrappers.js") &&
+        !file.includes("reflect-metadata")
       );
     });
     return call?.file;
