@@ -92,10 +92,14 @@ function getWrappedFunctionPath(): string | undefined {
       return (
         index > 2 &&
         file &&
+        // Ignore autometrics internals
         !file.includes("autometrics/index.cjs") &&
         !file.includes("autometrics/index.mjs") &&
         !file.includes("wrappers.ts") &&
         !file.includes("wrappers.js") &&
+        // Ignore reflect-metadata - often used by IOC libraries for runtime dependency injection
+        // Without this, instrumented functions will be attributed to this module rather than
+        // the module the function truly belongs to
         !file.includes("reflect-metadata")
       );
     });
