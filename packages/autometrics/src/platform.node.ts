@@ -4,7 +4,7 @@
 
 import { AsyncLocalStorage } from "node:async_hooks";
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, parse } from "node:path";
 
 import { AUTOMETRICS_DEFAULT_SERVICE_NAME } from "./constants.ts";
 import { getGitRepositoryUrl, getPackageStringField } from "./platformUtils.ts";
@@ -117,8 +117,8 @@ export function getALSInstance() {
  *
  * @internal
  */
-export function isRootPath(pathToCheck: str): string {
-  return pathToCheck == path.parse(getCwd()).root;
+export function isRootPath(pathToCheck: string): boolean {
+  return pathToCheck == parse(getCwd()).root;
 }
 
 function detectPackageName(): string | undefined {
