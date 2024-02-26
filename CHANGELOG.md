@@ -1,5 +1,15 @@
 # Changelog
 
+## [v1.0.1]
+
+This release fixes two issues. Thanks to @benjibuiltit for his contributions!
+
+### Fixed
+
+- #149 - Fixed an issue where autometrics in a Node.js environment would fail if it was not running inside a git repository
+- #150 - Fixed rendering of a function name and module when using the `relfect-metadata` package
+
+
 ## [v1.0.0]
 
 This release features full compliance with the
