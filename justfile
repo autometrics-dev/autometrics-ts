@@ -8,6 +8,8 @@ lib_packages := "autometrics exporter-otlp-http exporter-prometheus exporter-pro
 
 test_permissions := "--allow-env --allow-net --allow-read --allow-sys --allow-write"
 
+biome_permissions := "--allow-env --allow-read --allow-run --allow-write"
+
 build: (build-npm "")
 
 build-npm version:
@@ -88,13 +90,13 @@ clean-typescript-plugin:
 clean-all: clean clean-examples clean-parcel-transformer clean-typescript-plugin
 
 fix:
-    biome check --apply-unsafe packages
+    deno run {{biome_permissions}} npm:@biomejs/biome check --apply-unsafe packages
 
 format:
-    biome format --write packages
+    deno run {{biome_permissions}} npm:@biomejs/biome format --write packages
 
 lint:
-    biome ci packages
+    deno run {{biome_permissions}} npm:@biomejs/biome ci packages
 
 release-lib:
     #!/usr/bin/env bash
