@@ -33,6 +33,14 @@ The `justfile` has several commands that are useful during development:
 
 Run `just -l` for a list of all available commands.
 
+#### Troubleshooting
+
+If you run into dependency-related issues with the `justfile` commands, you may need to do one or any of the following:
+
+- Remove `node_modules`
+- Upgrade `deno`
+- Reload all cached deno dependencies (e.g., `find . -type f \( -name "*.ts" \) -exec deno cache --reload {} +`)
+
 ### Overview
 
 #### `packages/autometrics`
