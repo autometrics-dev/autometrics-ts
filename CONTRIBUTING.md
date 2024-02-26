@@ -33,6 +33,15 @@ The `justfile` has several commands that are useful during development:
 
 Run `just -l` for a list of all available commands.
 
+#### Troubleshooting
+
+If you run into dependency-related issues with the `justfile` build commands, you may need to do one or any of the following:
+
+- Remove `node_modules` (`just clean-all`)
+- Reload all cached deno dependencies (`just reload-all`)
+
+Note that you'll need several tools installed to run the examples. This includes `bun` and `deno`.
+
 ### Overview
 
 #### `packages/autometrics`

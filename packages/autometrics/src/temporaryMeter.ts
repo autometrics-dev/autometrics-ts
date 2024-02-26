@@ -293,7 +293,10 @@ class TemporaryCounter<AttributesTypes extends Attributes = Attributes>
   > = [];
   private _counter: Counter<AttributesTypes> | undefined;
 
-  constructor(public name: string, public options?: MetricOptions) {}
+  constructor(
+    public name: string,
+    public options?: MetricOptions,
+  ) {}
 
   add(value: number, attributes?: AttributesTypes, context?: Context): void {
     if (this._counter) {
@@ -321,7 +324,10 @@ class TemporaryHistogram<AttributesTypes extends Attributes = Attributes>
     [number, AttributesTypes | undefined, Context | undefined]
   > = [];
 
-  constructor(public name: string, public options?: MetricOptions) {}
+  constructor(
+    public name: string,
+    public options?: MetricOptions,
+  ) {}
 
   record(value: number, attributes?: AttributesTypes, context?: Context): void {
     if (this._histogram) {
@@ -350,7 +356,10 @@ class TemporaryObservable<AttributesTypes extends Attributes = Attributes>
   private _listeners: Array<ObservableCallback<AttributesTypes>> = [];
   private _observable: Observable<AttributesTypes> | undefined;
 
-  constructor(public name: string, public options?: MetricOptions) {}
+  constructor(
+    public name: string,
+    public options?: MetricOptions,
+  ) {}
 
   addCallback(callback: ObservableCallback<AttributesTypes>): void {
     if (this._observable) {

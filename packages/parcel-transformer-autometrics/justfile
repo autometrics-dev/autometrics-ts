@@ -11,4 +11,4 @@ type-check:
     yarn tsc -p tsconfig.json --noEmit
 
 clean:
-    rm -Rf dist
+    rm -Rf dist node_modules
