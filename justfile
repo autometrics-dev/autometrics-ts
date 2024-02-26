@@ -25,14 +25,16 @@ build-examples:
         popd
     done
 
+# NOTE - You may need to run `just clean` in the project root before running this command
 build-parcel-transformer:
     cd packages/parcel-transformer-autometrics; just build
 
+# NOTE - You may need to run `just clean` in the project root before running this command
 build-typescript-plugin:
     cd packages/typescript-plugin; just build
 
 # NOTE - Build the non-deno things first, then the deno things (this order is important)
-build-all: build-parcel-transformer build-typescript-plugin build build-examples
+build-all: clean-all build-parcel-transformer build-typescript-plugin build build-examples
 
 test:
     deno test {{test_permissions}} packages/autometrics
