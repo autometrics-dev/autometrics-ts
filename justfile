@@ -1,6 +1,7 @@
 alias b := build
 alias l := lint
 alias t := test
+alias reload-all := reload-all-deno-cache
 
 examples := "deno-fresh express faas-experimental fastify hono-bun react-app-experimental"
 
@@ -30,7 +31,8 @@ build-parcel-transformer:
 build-typescript-plugin:
     cd packages/typescript-plugin; just build
 
-build-all: build build-examples build-parcel-transformer build-typescript-plugin
+# NOTE - Build the non-deno things first, then the deno things (this order is important)
+build-all: build-parcel-transformer build-typescript-plugin build build-examples
 
 test:
     deno test {{test_permissions}} packages/autometrics
@@ -88,6 +90,17 @@ clean-typescript-plugin:
     cd packages/typescript-plugin; just clean
 
 clean-all: clean clean-examples clean-parcel-transformer clean-typescript-plugin
+
+reload-all-deno-cache:
+    #!/usr/bin/env bash
+    set -euxo pipefail
+    for package in {{lib_packages}}; do
+        pushd "packages/$package"
+        # Ignore directories named `tests` or `dist` or `node_modules`
+        # Then reload the Deno cache for any imports in files that end in .ts or .js
+        find . \( -type d \( -name "tests" -o -name "dist" -o -name "node_modules" \) -prune \) -o \( -type f \( -name "*.ts" \) -exec deno cache --reload {} + \)
+        popd
+    done
 
 fix:
     deno run {{biome_permissions}} npm:@biomejs/biome check --apply-unsafe packages
