@@ -34,7 +34,8 @@ build-typescript-plugin:
     cd packages/typescript-plugin; just build
 
 # NOTE - Build the non-deno things first, then the deno things (this order is important)
-build-all: clean-all build-parcel-transformer build-typescript-plugin build build-examples
+# NOTE - If this fails, try running `clean-all` then run this command again
+build-all: build-parcel-transformer build-typescript-plugin build build-examples
 
 test:
     deno test {{test_permissions}} packages/autometrics
